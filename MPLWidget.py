@@ -4,9 +4,151 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import numpy as np
 
+
 class RectangleHandler(object):
-    def __init__(self, fig, ax):
+    def __init__(self, canvas, fig, ax):
         self.fig = fig
+        self.ax = ax
+        self.canvas = canvas
+        self.background = None
+        self.lims = [[0, 0], [0, 0]]
+        self.rect_color = 'r'
+        self.rect = self.ax.plot([0], [0], color=self.rect_color, lw=.5)[0]
+        self.hand_ratio = 1/500
+        self.hand_size = 0
+        self.hands = [mpl.patches.Rectangle([0, 0],
+                                            self.hand_size, self.hand_size,
+                                            color=self.rect_color,
+                                            alpha=0.25)
+                      for i in range(4)]
+        ind_xs = [0, 1, 1, 0]
+        ind_ys = [0, 0, 1, 1]
+        for hand, ind_xlim, ind_ylim in zip(self.hands, ind_xs, ind_ys):
+            hand.ind_xlim = ind_xlim
+            hand.ind_ylim = ind_ylim
+        for hand in self.hands:
+            self.ax.add_patch(hand)
+        self.dragged_hand = None
+        self.dragged_offset = [0, 0]
+        self.dragged_ind = None
+
+    def update_lims(self, xlim1, xlim2, ylim1, ylim2):
+        # update
+        self.lims = [[xlim1, xlim2], [ylim1, ylim2]]
+        self.ensure_lims_in_image()
+        self.update_hand_size()
+        self.update_rect()
+        self.update_hands()
+
+    def ensure_lims_in_image(self):
+        sizex = abs(self.ax.viewLim.width)
+        sizey = abs(self.ax.viewLim.height)
+        (xlim1, xlim2), (ylim1, ylim2) = self.lims
+        # checks
+        #    x
+        if xlim1 < 0:
+            xlim1 = 0
+        if xlim2 > sizex:
+            xlim2 = sizex
+        if xlim2 < xlim1:
+            xlim1 = xlim2
+        #    y
+        if ylim1 < 0:
+            ylim1 = 0
+        if ylim2 > sizey:
+            ylim2 = sizey
+        if ylim2 < ylim1:
+            ylim1 = ylim2
+        # Update
+        self.lims = [[xlim1, xlim2], [ylim1, ylim2]]
+
+    def update_rect(self):
+        (xlim1, xlim2), (ylim1, ylim2) = self.lims
+        xs = [xlim1, xlim2, xlim2, xlim1, xlim1]
+        ys = [ylim1, ylim1, ylim2, ylim2, ylim1]
+        self.rect.set_data([xs, ys])
+
+    def update_hand_size(self):
+        sizex = abs(self.ax.viewLim.width)
+        sizey = abs(self.ax.viewLim.height)
+        self.hand_size = (self.hand_ratio*sizex*sizey)**.5
+        if self.hand_size > np.min([sizex, sizey])/2:
+            self.hand_size = int(np.min([sizex, sizey])/2) - 1
+        for hand in self.hands:
+            hand.set_width(self.hand_size)
+            hand.set_height(self.hand_size)
+
+    def update_hands(self):
+        size = self.hand_size
+        (xlim1, xlim2), (ylim1, ylim2) = self.lims
+        xs = [xlim1, xlim2 - size, xlim2 - size, xlim1]
+        ys = [ylim1, ylim1, ylim2 - size, ylim2 - size]
+        for hand, xlim, ylim in zip(self.hands, xs, ys):
+            hand.set_xy([xlim, ylim])
+
+    def select_hand_at_point(self, event):
+        ind_corner = np.argwhere([hand.contains(event)[0]
+                                  for hand in self.hands])
+        ind_corner = ind_corner.flatten()
+        if len(ind_corner) == 0:
+            return None
+        ind_corner = ind_corner[0]
+        self.dragged_ind = ind_corner
+        self.dragged_hand = self.hands[ind_corner]
+        self.dragged_offset = [event.xdata - self.dragged_hand.xy[0],
+                               event.ydata - self.dragged_hand.xy[1]]
+
+    def prepare_for_drag(self):
+        for hand in self.hands:
+            hand.set_animated(True)
+        self.rect.set_animated(True)
+        self.canvas.draw()
+        self.background = self.canvas.copy_from_bbox(self.ax.bbox)
+        for hand in self.hands:
+            self.ax.draw_artist(hand)
+        self.ax.draw_artist(self.rect)
+        self.canvas.blit(self.ax.bbox)
+
+    def drag_to(self, event):
+        if self.dragged_hand is None:
+            return None
+        # Update lims
+        new_xlim = event.xdata - self.dragged_offset[0]
+        new_xlim += self.dragged_hand.ind_xlim*self.hand_size
+        new_ylim = event.ydata - self.dragged_offset[1]
+        new_ylim += self.dragged_hand.ind_ylim*self.hand_size
+        self.lims[0][self.dragged_hand.ind_xlim] = new_xlim
+        self.lims[1][self.dragged_hand.ind_ylim] = new_ylim
+        self.ensure_lims_in_image()
+        # Update rectangle
+        self.update_rect()
+        # Update handlers
+        self.update_hands()
+        # Redraw
+        self.canvas.restore_region(self.background)
+        for hand in self.hands:
+            self.ax.draw_artist(hand)
+        self.ax.draw_artist(self.rect)
+        # blit just the redrawn area
+        self.canvas.blit(self.ax.bbox)
+
+    def unselect_hand(self):
+        self.dragged_hand = None
+        self.dragged_ind = None
+        self.dragged_offset = None
+
+    def finish_drag(self):
+        for hand in self.hands:
+            hand.set_animated(False)
+        self.rect.set_animated(False)
+        self.background = None
+
+    def is_dragging(self):
+        if self.dragged_hand is not None:
+            return True
+        else:
+            return False
+
 
 class MplPlotWidget(Canvas):
     def __init__(self, parent=None):
@@ -42,34 +184,19 @@ class MplPlotWidget(Canvas):
 
 class MplWidgetImport(Canvas):
     def __init__(self, parent=None):
-        #
+        # Plot
         super(MplWidgetImport, self).__init__(Figure())
         self.setParent(parent)
         self.figure = Figure(dpi=100, figsize=(200, 200))
         self.canvas = Canvas(self.figure)
         self.ax = self.figure.add_axes([0, 0, 1, 1])
-        #
+        # Image
         self.data = np.random.rand(200, 300)
         self.im = self.ax.imshow(self.data,
                                  cmap=plt.cm.binary_r)
         # Cropped area
-        self.background = None
-        self.lims = [[0, 0], [0, 0]]
-        self.crop_area_color = 'r'
-        self.crop_area = self.ax.plot([0], [0],
-                                      color=self.crop_area_color)[0]
-        self.crop_handler_ratio = 1/100
-        self.crop_handler_size = 0
-        self.handlers = [mpl.patches.Rectangle([0, 0],
-                                               self.crop_handler_size,
-                                               self.crop_handler_size,
-                                               color=self.crop_area_color,
-                                               alpha=0.25)
-                         for i in range(4)]
-        for hand in self.handlers:
-            self.ax.add_patch(hand)
-        self.dragged_handler = None
-        # clean stuff !
+        self.rect_hand = RectangleHandler(self, self.figure, self.ax)
+        # Clean stuff !
         self.ax.set_xticks([])
         self.ax.set_xticklabels([])
         self.ax.set_yticks([])
@@ -97,103 +224,26 @@ class MplWidgetImport(Canvas):
         self.draw()
 
     def update_crop_area(self, xlim1, xlim2, ylim1, ylim2):
-        self.lims = [[xlim1, xlim2], [ylim1, ylim2]]
-        # Update rectangle
-        xs = [xlim1, xlim2, xlim2, xlim1, xlim1]
-        ys = [ylim1, ylim1, ylim2, ylim2, ylim1]
-        self.crop_area.set_data([xs, ys])
-        # Update handlers
-        #    size
-        self.crop_handler_size = (self.crop_handler_ratio
-                                  * self.data.shape[0]
-                                  * self.data.shape[1])**.5
-        if self.crop_handler_size > np.min(self.data.shape)/2:
-            self.crop_handler_size = int(np.min(self.data.shape)/2) - 1
-        for hand in self.handlers:
-            hand.set_width(self.crop_handler_size)
-            hand.set_height(self.crop_handler_size)
-        #    position
-        size = self.crop_handler_size
-        xs = [xlim1, xlim2 - size, xlim2 - size, xlim1]
-        ys = [ylim1, ylim1, ylim2 - size, ylim2 - size]
-        ind_xs = [0, 1, 1, 0]
-        ind_ys = [0, 0, 1, 1]
-        for hand, xlim, ylim, ind_xlim, ind_ylim in zip(self.handlers, xs, ys,
-                                                        ind_xs, ind_ys):
-            hand.set_xy([xlim, ylim])
-            hand.ind_xlim = ind_xlim
-            hand.ind_ylim = ind_ylim
+        self.rect_hand.update_lims(xlim1, xlim2,
+                                   ylim1, ylim2)
         self.draw()
 
     def on_press(self, event):
         # see: https://stackoverflow.com/questions/28001655/draggable-line-with-draggable-points
+        # Check
         if event.inaxes != self.ax:
             return None
-        # check selected corner here
-        ind_corner = np.argwhere([hand.contains(event)[0]
-                                  for hand in self.handlers])
-        ind_corner = ind_corner.flatten()
-        if len(ind_corner) == 0:
-            return None
-        ind_corner = ind_corner[0]
-        self.dragged_handler = self.handlers[ind_corner]
-        self.dragged_offset = [event.xdata - self.dragged_handler.xy[0],
-                               event.ydata - self.dragged_handler.xy[1]]
-        #
-        self.dragged_handler.set_animated(True)
-        self.crop_area.set_animated(True)
-        self.draw()
-        self.background = self.copy_from_bbox(self.dragged_handler.axes.bbox)
-        self.dragged_handler.axes.draw_artist(self.dragged_handler)
-        self.blit(self.dragged_handler.axes.bbox)
+        self.rect_hand.select_hand_at_point(event)
+        self.rect_hand.prepare_for_drag()
 
     def on_motion(self, event):
         # Check
-        if self.dragged_handler is None:
-            return None
         if event.inaxes != self.ax:
             return None
-        # Update handler
-        new_xlim = event.xdata - self.dragged_offset[0]
-        new_ylim = event.ydata - self.dragged_offset[1]
-        self.dragged_handler.set_xy([new_xlim,
-                                     new_ylim])
-        # Update lims
-        self.lims[0][self.dragged_handler.ind_xlim] = new_xlim
-        self.lims[1][self.dragged_handler.ind_ylim] = new_ylim
-        # Update rectangle
-        (xlim1, xlim2), (ylim1, ylim2) = self.lims
-        xs = [xlim1, xlim2, xlim2, xlim1, xlim1]
-        ys = [ylim1, ylim1, ylim2, ylim2, ylim1]
-        self.crop_area.set_data([xs, ys])
-        # redraw
-        self.restore_region(self.background)
-        self.ax.draw_artist(self.dragged_handler)
-        self.ax.draw_artist(self.crop_area)
-        # blit just the redrawn area
-        self.blit(self.dragged_handler.axes.bbox)
+        # Drag
+        self.rect_hand.drag_to(event)
 
     def on_release(self, event):
-        self.dragged_handler.set_animated(False)
-        self.dragged_handler = None
-        self.dragged_offset = None
-        self.background = None
-        self.figure.canvas.draw()
-
-
-
-
-
-
-        # # draw everything but the selected rectangle and store the pixel buffer
-        # canvas = self.point.figure.canvas
-        # axes = self.point.axes
-        # self.point.set_animated(True)
-        # canvas.draw()
-        # self.background = canvas.copy_from_bbox(self.point.axes.bbox)
-
-        # # now redraw just the rectangle
-        # axes.draw_artist(self.point)
-
-        # # and blit just the redrawn area
-        # canvas.blit(axes.bbox)
+        if self.rect_hand.is_dragging():
+            self.rect_hand.finish_drag()
+            self.rect_hand.unselect_hand()

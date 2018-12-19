@@ -142,90 +142,14 @@
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_12">
               <item>
-               <layout class="QVBoxLayout" name="verticalLayout_11">
-                <item>
-                 <widget class="QLabel" name="label_8">
-                  <property name="text">
-                   <string>Axe x</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QSlider" name="xlim1">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="sliderPosition">
-                   <number>0</number>
-                  </property>
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="invertedAppearance">
-                   <bool>false</bool>
-                  </property>
-                  <property name="invertedControls">
-                   <bool>false</bool>
-                  </property>
-                  <property name="tickPosition">
-                   <enum>QSlider::NoTicks</enum>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QSlider" name="xlim2">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="value">
-                   <number>0</number>
-                  </property>
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="invertedAppearance">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-              <item>
-               <layout class="QVBoxLayout" name="verticalLayout_5">
-                <item>
-                 <widget class="QLabel" name="label_2">
-                  <property name="text">
-                   <string>Axe y</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QSlider" name="ylim1">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QSlider" name="ylim2">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="value">
-                   <number>0</number>
-                  </property>
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="invertedAppearance">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
+               <widget class="QPushButton" name="reset_crop">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>Reset</string>
+                </property>
+               </widget>
               </item>
              </layout>
             </widget>
@@ -503,70 +427,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>xlim1</sender>
-   <signal>sliderMoved(int)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>set_crop_xlim1(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>80</x>
-     <y>364</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>6</x>
-     <y>372</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>xlim2</sender>
-   <signal>sliderMoved(int)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>set_crop_xlim2(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>67</x>
-     <y>382</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>3</x>
-     <y>407</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ylim1</sender>
-   <signal>sliderMoved(int)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>set_crop_ylim1(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>86</x>
-     <y>425</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>2</x>
-     <y>459</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ylim2</sender>
-   <signal>sliderMoved(int)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>set_crop_ylim2(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>96</x>
-     <y>444</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>6</x>
-     <y>444</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>FrameSpinBox</sender>
    <signal>valueChanged(int)</signal>
    <receiver>MainWindow</receiver>
@@ -582,14 +442,27 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>reset_crop</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>reset_crop()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>84</x>
+     <y>344</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>8</x>
+     <y>342</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>import_image()</slot>
   <slot>import_video()</slot>
   <slot>set_current_frame(int)</slot>
-  <slot>set_crop_xlim1(int)</slot>
-  <slot>set_crop_xlim2(int)</slot>
-  <slot>set_crop_ylim1(int)</slot>
-  <slot>set_crop_ylim2(int)</slot>
+  <slot>reset_crop()</slot>
  </slots>
 </ui>
