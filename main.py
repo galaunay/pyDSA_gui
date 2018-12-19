@@ -1,9 +1,30 @@
 import sys
 import pyDSA as dsa
-from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow
+from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QFileDialog,\
+    QDialog
 from PyQt5 import QtWidgets, QtCore, QtGui
 from design import Ui_MainWindow
 import numpy as np
+from datetime import timedelta
+import time
+
+
+class Log(object):
+    def __init__(self, display_area):
+        self.logs = []
+        self.display_area = display_area
+        self.t0 = time.time()
+        self.levels = ['Info', 'Warning', 'Error']
+        self.level_colors = [QtGui.QColor(col)
+                             for col in ['grey', 'orange', 'red']]
+
+    def log(self, message, level):
+        t = str(timedelta(seconds=int(time.time()-self.t0)))
+        text = f"{t}  {self.levels[level-1]}: {message}"
+        self.logs.append(text)
+        for i in range(100):
+            self.display_area.setTextColor(self.level_colors[level - 1])
+            self.display_area.append(self.logs[-1])
 
 
 class DSA(object):
@@ -76,6 +97,7 @@ class AppWindow(QMainWindow):
         # self.ui.statusbar.addPermanentWidget(self.ui.progressbar)
         self.show()
         self.dsa = DSA(self.ui)
+        self.log = Log(self.ui.logarea)
         self._disable_frame_updater = False
         self.tab2_initialized = False
 
@@ -94,17 +116,32 @@ class AppWindow(QMainWindow):
                      0, self.dsa.current_raw_im.shape[1]]
         self.ui.mplwidgetimport.update_crop_area(*crop_lims)
 
+    def select_file(self, message="Open file", filetypes=None):
+        dialog = QDialog()
+        filepath = QFileDialog.getOpenFileName(dialog, message,
+                                               filter=filetypes)
+        return filepath
+        # dialog.show()
+
     def import_image(self):
-        filepath = 'test.png'
-        self.dsa.import_image(filepath)
+        filepath = self.select_file('Open image')[0]
+        try:
+            self.dsa.import_image(filepath)
+        except:
+            self.log.log(f"Couldn't import image: {filepath}", level=3)
+            return None
         self.ui.mplwidgetimport.update_image(self.dsa.current_raw_im.values,
                                              replot=True)
         # Enable cropping sliders
         self.tab1_enable_cropping()
 
     def import_video(self):
-        filepath = 'test.avi'
-        self.dsa.import_video(filepath)
+        filepath = self.select_file('Open video')[0]
+        try:
+            self.dsa.import_video(filepath)
+        except:
+            self.log.log(f"Couldn't import video: {filepath}", level=3)
+            return None
         self.ui.mplwidgetimport.update_image(self.dsa.current_raw_im.values,
                                              replot=True)
         # Enable frame sliders
