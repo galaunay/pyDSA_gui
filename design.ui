@@ -21,7 +21,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -274,14 +274,14 @@
              </widget>
             </item>
             <item>
-             <widget class="QSpinBox" name="FrameSpinBox">
+             <widget class="QSpinBox" name="tab1_spinbox">
               <property name="enabled">
                <bool>false</bool>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QSlider" name="FrameSlider">
+             <widget class="QSlider" name="tab1_frameslider">
               <property name="enabled">
                <bool>false</bool>
               </property>
@@ -296,10 +296,179 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_2">
+      <widget class="QWidget" name="tabdetect">
        <attribute name="title">
         <string>Edge detection</string>
        </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QFrame" name="frame_2">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>2</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>150</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="baseSize">
+           <size>
+            <width>150</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <item>
+            <widget class="QGroupBox" name="groupBox_5">
+             <property name="title">
+              <string>Detection type</string>
+             </property>
+             <property name="flat">
+              <bool>false</bool>
+             </property>
+             <property name="checkable">
+              <bool>false</bool>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_5">
+              <item>
+               <widget class="QPushButton" name="pushButton_8">
+                <property name="text">
+                 <string>Canny edges</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_9">
+                <property name="text">
+                 <string>Contour</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_4">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_6">
+          <item>
+           <layout class="QGridLayout" name="gridLayout_2">
+            <item row="1" column="1">
+             <widget class="MplWidgetDetect" name="mplwidgetdetect" native="true">
+              <property name="cursor">
+               <cursorShape>ArrowCursor</cursorShape>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <spacer name="verticalSpacer_5">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="1" column="2">
+             <spacer name="horizontalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="1">
+             <spacer name="verticalSpacer_6">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="1" column="0">
+             <spacer name="horizontalSpacer_4">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <widget class="QLabel" name="label_2">
+              <property name="text">
+               <string>Frames</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="tab2_spinbox">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSlider" name="tab2_frameslider">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -343,13 +512,19 @@
     <slot>set_xmax(int)</slot>
    </slots>
   </customwidget>
+  <customwidget>
+   <class>MplWidgetDetect</class>
+   <extends>QWidget</extends>
+   <header>MPLWidget</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <resources/>
  <connections>
   <connection>
-   <sender>FrameSlider</sender>
+   <sender>tab1_frameslider</sender>
    <signal>sliderMoved(int)</signal>
-   <receiver>FrameSpinBox</receiver>
+   <receiver>tab1_spinbox</receiver>
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -363,9 +538,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>FrameSpinBox</sender>
+   <sender>tab1_spinbox</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>FrameSlider</receiver>
+   <receiver>tab1_frameslider</receiver>
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -411,10 +586,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>FrameSlider</sender>
+   <sender>tab1_frameslider</sender>
    <signal>sliderMoved(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>set_current_frame(int)</slot>
+   <slot>tab1_set_current_frame(int)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>486</x>
@@ -427,10 +602,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>FrameSpinBox</sender>
+   <sender>tab1_spinbox</sender>
    <signal>valueChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>set_current_frame(int)</slot>
+   <slot>tab1_set_current_frame(int)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>250</x>
@@ -458,11 +633,93 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>tabWidget</sender>
+   <signal>currentChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab_changed(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>110</x>
+     <y>44</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>0</x>
+     <y>65</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab2_frameslider</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab2_set_current_frame(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>545</x>
+     <y>666</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>541</x>
+     <y>698</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab2_spinbox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab2_set_current_frame(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>670</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>255</x>
+     <y>696</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab2_frameslider</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>tab2_spinbox</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>303</x>
+     <y>661</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>263</x>
+     <y>662</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab2_spinbox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>tab2_frameslider</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>233</x>
+     <y>675</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>417</x>
+     <y>670</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>import_image()</slot>
   <slot>import_video()</slot>
-  <slot>set_current_frame(int)</slot>
+  <slot>tab1_set_current_frame(int)</slot>
   <slot>reset_crop()</slot>
+  <slot>tab_changed(int)</slot>
+  <slot>tab2_set_current_frame(int)</slot>
  </slots>
 </ui>

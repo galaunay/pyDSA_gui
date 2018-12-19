@@ -247,3 +247,39 @@ class MplWidgetImport(Canvas):
         if self.rect_hand.is_dragging():
             self.rect_hand.finish_drag()
             self.rect_hand.unselect_hand()
+
+
+class MplWidgetDetect(Canvas):
+    def __init__(self, parent=None):
+        # Plot
+        super(MplWidgetDetect, self).__init__(Figure())
+        self.setParent(parent)
+        self.figure = Figure(dpi=100, figsize=(200, 200))
+        self.canvas = Canvas(self.figure)
+        self.ax = self.figure.add_axes([0, 0, 1, 1])
+        # Image
+        self.data = np.random.rand(200, 300)
+        self.im = self.ax.imshow(self.data,
+                                 cmap=plt.cm.binary_r)
+        # Clean stuff !
+        self.ax.set_xticks([])
+        self.ax.set_xticklabels([])
+        self.ax.set_yticks([])
+        self.ax.set_yticklabels([])
+
+    def update_image(self, im, replot=False, draw=True):
+        self.data = im.transpose()[::-1]
+        if replot:
+            self.im = self.ax.imshow(self.data,
+                                     cmap=plt.cm.binary_r)
+            # clean stuff !
+            self.ax.set_xticks([])
+            self.ax.set_xticklabels([])
+            self.ax.set_yticks([])
+            self.ax.set_yticklabels([])
+        else:
+            self.im.set_data(self.data)
+        print('draw')
+        if draw:
+            self.draw()
+        print('done')
