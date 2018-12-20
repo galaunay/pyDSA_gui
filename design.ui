@@ -21,7 +21,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -340,7 +340,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="tab3_canny_threshold1">
+               <widget class="QSpinBox" name="tab2_canny_threshold1">
                 <property name="maximum">
                  <number>255</number>
                 </property>
@@ -357,7 +357,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="tab3_canny_threshold2">
+               <widget class="QSpinBox" name="tab2_canny_threshold2">
                 <property name="maximum">
                  <number>255</number>
                 </property>
@@ -374,7 +374,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="tab3_canny_smooth_size">
+               <widget class="QSpinBox" name="tab2_canny_smooth_size">
                 <property name="maximum">
                  <number>50</number>
                 </property>
@@ -391,7 +391,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="tab3_canny_dilatation_steps">
+               <widget class="QSpinBox" name="tab2_canny_dilatation_steps">
                 <property name="maximum">
                  <number>50</number>
                 </property>
@@ -426,12 +426,12 @@
                </widget>
               </item>
               <item>
-               <widget class="QSlider" name="tab3_size_ratio_2">
+               <widget class="QSlider" name="tab2_contour_level">
                 <property name="maximum">
-                 <number>100</number>
+                 <number>255</number>
                 </property>
                 <property name="value">
-                 <number>50</number>
+                 <number>128</number>
                 </property>
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
@@ -463,7 +463,7 @@
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_8">
                 <item>
-                 <widget class="QRadioButton" name="tab3_nmb_edges_1">
+                 <widget class="QRadioButton" name="tab2_nmb_edges_1">
                   <property name="text">
                    <string>&amp;1</string>
                   </property>
@@ -473,7 +473,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QRadioButton" name="tab3_nmb_edges_2">
+                 <widget class="QRadioButton" name="tab2_nmb_edges_2">
                   <property name="text">
                    <string>&amp;2</string>
                   </property>
@@ -489,7 +489,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="tab3_ign_pixels">
+               <widget class="QSpinBox" name="tab2_ign_pixels">
                 <property name="maximum">
                  <number>50</number>
                 </property>
@@ -506,7 +506,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QSlider" name="tab3_size_ratio">
+               <widget class="QSlider" name="tab2_size_ratio">
                 <property name="maximum">
                  <number>100</number>
                 </property>
@@ -712,7 +712,7 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>436</x>
+     <x>378</x>
      <y>675</y>
     </hint>
     <hint type="destinationlabel">
@@ -732,7 +732,7 @@
      <y>680</y>
     </hint>
     <hint type="destinationlabel">
-     <x>537</x>
+     <x>378</x>
      <y>675</y>
     </hint>
    </hints>
@@ -744,8 +744,8 @@
    <slot>tab1_import_image()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>76</x>
-     <y>112</y>
+     <x>106</x>
+     <y>126</y>
     </hint>
     <hint type="destinationlabel">
      <x>6</x>
@@ -760,8 +760,8 @@
    <slot>tab1_import_video()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>89</x>
-     <y>180</y>
+     <x>119</x>
+     <y>184</y>
     </hint>
     <hint type="destinationlabel">
      <x>5</x>
@@ -776,8 +776,8 @@
    <slot>tab1_set_current_frame(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>486</x>
-     <y>669</y>
+     <x>378</x>
+     <y>675</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -792,8 +792,8 @@
    <slot>tab1_set_current_frame(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>250</x>
-     <y>662</y>
+     <x>272</x>
+     <y>680</y>
     </hint>
     <hint type="destinationlabel">
      <x>8</x>
@@ -808,7 +808,7 @@
    <slot>tab1_reset_crop()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>114</x>
+     <x>138</x>
      <y>255</y>
     </hint>
     <hint type="destinationlabel">
@@ -904,8 +904,8 @@
    <slot>tab1_set_scaling()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>79</x>
-     <y>319</y>
+     <x>109</x>
+     <y>326</y>
     </hint>
     <hint type="destinationlabel">
      <x>3</x>
@@ -920,12 +920,188 @@
    <slot>tab1_remove_scaling()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>108</x>
-     <y>378</y>
+     <x>138</x>
+     <y>386</y>
     </hint>
     <hint type="destinationlabel">
      <x>4</x>
      <y>387</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab2_canny_threshold1</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab2_update_edge()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>83</x>
+     <y>134</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>6</x>
+     <y>141</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab2_canny_threshold2</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab2_update_edge()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>73</x>
+     <y>187</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-6</x>
+     <y>188</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab2_canny_smooth_size</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab2_update_edge()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>62</x>
+     <y>239</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>4</x>
+     <y>241</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab2_canny_dilatation_steps</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab2_update_edge()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>87</x>
+     <y>295</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>3</x>
+     <y>297</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab2_contour_level</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab2_update_edge()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>98</x>
+     <y>376</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>5</x>
+     <y>383</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab2_ign_pixels</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab2_update_edge()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>82</x>
+     <y>517</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>0</x>
+     <y>523</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab2_size_ratio</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab2_update_edge()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>80</x>
+     <y>560</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-4</x>
+     <y>567</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab2_nmb_edges_2</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab2_update_edge()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>103</x>
+     <y>464</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>4</x>
+     <y>460</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab2_nmb_edges_1</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab2_update_edge()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>57</x>
+     <y>469</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>434</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>groupBox_6</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab2_toggle_contour(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>56</x>
+     <y>328</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-3</x>
+     <y>359</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>groupBox_5</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab2_toggle_canny(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>47</x>
+     <y>82</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>7</x>
+     <y>107</y>
     </hint>
    </hints>
   </connection>
@@ -940,5 +1116,8 @@
   <slot>tab1_set_scaling()</slot>
   <slot>tab1_set_scale(QString)</slot>
   <slot>tab1_remove_scaling()</slot>
+  <slot>tab2_update_edge()</slot>
+  <slot>tab2_toggle_contour(bool)</slot>
+  <slot>tab2_toggle_canny(bool)</slot>
  </slots>
 </ui>

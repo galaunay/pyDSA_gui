@@ -160,6 +160,34 @@ class AppWindow(QMainWindow):
         self.ui.tab2_spinbox.setEnabled(True)
         self._disable_frame_updater = False
 
+    def tab2_get_params(self):
+        contour = {}
+        options = {}
+        canny = {'threshold1': self.ui.tab2_canny_threshold1.value(),
+                 'threshold2': self.ui.tab2_canny_threshold2.value(),
+                 'dilatation_steps': self.ui.tab2_canny_dilatation_steps.value(),
+                 'smooth_size': self.ui.tab2_canny_smooth_size.value()}
+        contour = {'level': self.ui.tab2_contour_level.tickPosition()/255,
+                   'ignored_pixels': self.ui.tab2_ign_pixels.value(),
+                   'size_ratio': self.ui.tab2_size_ratio.tickPosition()/100}
+        if self.ui.tab2_nmb_edges_1.isChecked():
+            edges = 1
+        else:
+            edges = 2
+        options = {'nmb_edges': edges}
+        return canny, contour, options
+
+    def tab2_update_edge(self):
+        params = self.tab2_get_params()
+        TODO
+        pass
+
+    def tab2_toggle_canny(self, toggle):
+        self.dsa.edge_detection_use_canny = toggle
+
+    def tab2_toggle_contour(self, toggle):
+        self.dsa.edge_detection_use_contour = toggle
+
 
 app = QApplication(sys.argv)
 w = AppWindow()

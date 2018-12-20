@@ -13,6 +13,8 @@ class DSA(object):
         self.current_cropped_im = None
         self.baseline_pt1 = None
         self.baseline_pt2 = None
+        self.edge_detection_use_canny = True
+        self.edge_detection_use_contour = False
         self.edges = None
         self.current_edge = None
         self.fits = None
