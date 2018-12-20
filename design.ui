@@ -21,7 +21,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -321,7 +321,7 @@
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <item>
-            <widget class="QGroupBox" name="groupBox_5">
+            <widget class="QGroupBox" name="tab2_canny_box">
              <property name="title">
               <string>Canny edges</string>
              </property>
@@ -404,7 +404,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="groupBox_6">
+            <widget class="QGroupBox" name="tab2_contour_box">
              <property name="title">
               <string>Conto&amp;ur</string>
              </property>
@@ -1074,7 +1074,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>groupBox_6</sender>
+   <sender>tab2_contour_box</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
    <slot>tab2_toggle_contour(bool)</slot>
@@ -1090,7 +1090,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>groupBox_5</sender>
+   <sender>tab2_canny_box</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
    <slot>tab2_toggle_canny(bool)</slot>

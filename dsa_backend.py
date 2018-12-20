@@ -73,6 +73,26 @@ class DSA(object):
                 return False
         self.baseline_pt1 = pt1
         self.baseline_pt2 = pt2
-        self.ims.set_baseline(pt1, pt2)
+        sizey = abs(self.ui.mplwidgetimport.ax.viewLim.height)
+        new_pt1 = [pt1[0], sizey - pt1[1]]
+        new_pt2 = [pt2[0], sizey - pt2[1]]
+        self.ims.set_baseline(new_pt1, new_pt2)
         if self.ims_cropped is not None:
-            self.ims_cropped.set_baseline(pt1, pt2)
+            self.ims_cropped.set_baseline(new_pt1, new_pt2)
+
+    def get_current_edge(self, params):
+        canny_args = params[0]
+        canny_args.update(params[-1])
+        contour_args = params[1]
+        contour_args.update(params[-1])
+        # canny edge
+        if self.edge_detection_use_canny:
+            edge = self.current_cropped_im.edge_detection(**canny_args)
+        elif self.edge_detection_use_contour:
+            edge = self.current_cropped_im.edge_detection_contour(**contour_args)
+        else:
+            raise Exception()
+        edge = edge.xy.transpose()
+        sizey = abs(self.ui.mplwidgetimport.ax.viewLim.height)
+        edge[1] = sizey - edge[1]
+        return edge

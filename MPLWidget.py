@@ -154,6 +154,11 @@ class MplWidgetDetect(Canvas):
                                      color='b',
                                      lw=0.5,
                                      ls="-")[0]
+        # edges
+        self.edge = self.ax.plot([0], [0],
+                                 color='g',
+                                 marker='o',
+                                 ls='none')[0]
         # Clean stuff !
         self.ax.set_xticks([])
         self.ax.set_xticklabels([])
@@ -181,5 +186,10 @@ class MplWidgetDetect(Canvas):
                                                      xmin=0, xmax=sizex)
         self.baseline.set_data([[pt1[0], pt2[0]],
                                 [pt1[1], pt2[1]]])
+        if draw:
+            self.draw()
+
+    def update_edge(self, edge, draw=True):
+        self.edge.set_data(*edge)
         if draw:
             self.draw()

@@ -53,10 +53,13 @@ class AppWindow(QMainWindow):
             self.ui.mplwidgetdetect.update_baseline(self.dsa.baseline_pt1,
                                                     self.dsa.baseline_pt2,
                                                     draw=draw)
+            # Update the curent frame
             self._disable_frame_updater = True
             self.ui.tab2_frameslider.setValue(self.dsa.current_ind + 1)
             self.ui.tab2_spinbox.setValue(self.dsa.current_ind + 1)
             self._disable_frame_updater = False
+            # update the detected edge
+            self.tab2_update_edge(draw=draw)
             #
             self.tab2_initialized = True
 
@@ -147,8 +150,11 @@ class AppWindow(QMainWindow):
         if self._disable_frame_updater:
             return None
         self.dsa.set_current(ind - 1)
+        # update image
         self.ui.mplwidgetdetect.update_image(self.dsa.current_cropped_im.values,
                                              replot=False)
+        # update edge
+        self.tab2_update_edge()
 
     def tab2_enable_frame_sliders(self):
         self._disable_frame_updater = True
@@ -167,9 +173,9 @@ class AppWindow(QMainWindow):
                  'threshold2': self.ui.tab2_canny_threshold2.value(),
                  'dilatation_steps': self.ui.tab2_canny_dilatation_steps.value(),
                  'smooth_size': self.ui.tab2_canny_smooth_size.value()}
-        contour = {'level': self.ui.tab2_contour_level.tickPosition()/255,
+        contour = {'level': self.ui.tab2_contour_level.value()/255,
                    'ignored_pixels': self.ui.tab2_ign_pixels.value(),
-                   'size_ratio': self.ui.tab2_size_ratio.tickPosition()/100}
+                   'size_ratio': self.ui.tab2_size_ratio.value()/100}
         if self.ui.tab2_nmb_edges_1.isChecked():
             edges = 1
         else:
@@ -177,16 +183,27 @@ class AppWindow(QMainWindow):
         options = {'nmb_edges': edges}
         return canny, contour, options
 
-    def tab2_update_edge(self):
+    def tab2_update_edge(self, draw=True):
         params = self.tab2_get_params()
-        TODO
-        pass
+        try:
+            edge = self.dsa.get_current_edge(params)
+        except Exception:
+            self.log.log("Couldn't find a drop on the current frame",
+                         level=2)
+            edge = [[], []]
+        self.ui.mplwidgetdetect.update_edge(edge, draw=draw)
 
     def tab2_toggle_canny(self, toggle):
         self.dsa.edge_detection_use_canny = toggle
+        self.dsa.edge_detection_use_contour = not toggle
+        self.ui.tab2_contour_box.setChecked(not toggle)
+        self.tab2_update_edge()
 
     def tab2_toggle_contour(self, toggle):
         self.dsa.edge_detection_use_contour = toggle
+        self.dsa.edge_detection_use_canny = not toggle
+        self.ui.tab2_canny_box.setChecked(not toggle)
+        self.tab2_update_edge()
 
 
 app = QApplication(sys.argv)
