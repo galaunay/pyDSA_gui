@@ -21,7 +21,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>4</number>
+       <number>0</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -107,35 +107,6 @@
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="groupBox_3">
-             <property name="title">
-              <string>Baseline</string>
-             </property>
-             <layout class="QVBoxLayout" name="verticalLayout_13">
-              <item>
-               <widget class="QPushButton" name="pushButton_4">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="text">
-                 <string>Add point</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="pushButton_5">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="text">
-                 <string>Clear points</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
             <widget class="QGroupBox" name="groupBox">
              <property name="title">
               <string>Crop</string>
@@ -161,22 +132,43 @@
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_14">
               <item>
-               <widget class="QPushButton" name="pushButton_6">
+               <widget class="QPushButton" name="tab1_set_scaling_btn">
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
                 <property name="text">
-                 <string>Add point</string>
+                 <string>Set scaling</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="pushButton_7">
+               <layout class="QHBoxLayout" name="horizontalLayout_7">
+                <item>
+                 <widget class="QLabel" name="label_3">
+                  <property name="text">
+                   <string>dl:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="tab1_set_scaling_text">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="text">
+                   <string>1mm</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QPushButton" name="tab1_remove_scaling_btn">
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
                 <property name="text">
-                 <string>Clear points</string>
+                 <string>Remove</string>
                 </property>
                </widget>
               </item>
@@ -577,7 +569,7 @@
    <sender>pushButton</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>import_image()</slot>
+   <slot>tab1_import_image()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>76</x>
@@ -593,7 +585,7 @@
    <sender>pushButton_3</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>import_video()</slot>
+   <slot>tab1_import_video()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>89</x>
@@ -641,11 +633,11 @@
    <sender>reset_crop</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>reset_crop()</slot>
+   <slot>tab1_reset_crop()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>84</x>
-     <y>344</y>
+     <x>114</x>
+     <y>255</y>
     </hint>
     <hint type="destinationlabel">
      <x>8</x>
@@ -733,13 +725,48 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>tab1_set_scaling_btn</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab1_set_scaling()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>79</x>
+     <y>319</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>3</x>
+     <y>272</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab1_remove_scaling_btn</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab1_remove_scaling()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>108</x>
+     <y>378</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>4</x>
+     <y>387</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
-  <slot>import_image()</slot>
-  <slot>import_video()</slot>
+  <slot>tab1_import_image()</slot>
+  <slot>tab1_import_video()</slot>
   <slot>tab1_set_current_frame(int)</slot>
-  <slot>reset_crop()</slot>
+  <slot>tab1_reset_crop()</slot>
   <slot>tab_changed(int)</slot>
   <slot>tab2_set_current_frame(int)</slot>
+  <slot>tab1_set_scaling()</slot>
+  <slot>tab1_set_scale(QString)</slot>
+  <slot>tab1_remove_scaling()</slot>
  </slots>
 </ui>

@@ -2,8 +2,9 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as Canvas
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import numpy as np
+from pyDSA.baseline import Baseline
 
-from mpl_handlers import BaselineHandler, RectangleHandler
+from mpl_handlers import BaselineHandler, RectangleHandler, ScalingHandler
 
 
 # class MplPlotWidget(Canvas):
@@ -54,6 +55,9 @@ class MplWidgetImport(Canvas):
         self.rect_hand = RectangleHandler(self, self.figure, self.ax)
         # Baseline
         self.baseline_hand = BaselineHandler(self, self.figure, self.ax)
+        # Scaling
+        self.is_scaling = False
+        self.scaling_hand = ScalingHandler(self, self.figure, self.ax)
         # Clean stuff !
         self.ax.set_xticks([])
         self.ax.set_xticklabels([])
@@ -95,28 +99,40 @@ class MplWidgetImport(Canvas):
         # Check
         if event.inaxes != self.ax:
             return None
+        #
+        if self.scaling_hand.select_hand_at_point(event):
+            self.scaling_hand.prepare_for_drag()
+        # Add a new scaling point
+        elif self.is_scaling and len(self.scaling_hand.pts) < 2:
+            self.scaling_hand.add_point(event)
+            self.draw()
         # On a crop handle
-        if self.rect_hand.select_hand_at_point(event):
+        elif self.rect_hand.select_hand_at_point(event):
             self.rect_hand.prepare_for_drag()
         # On a baseline handle
-        if self.baseline_hand.select_hand_at_point(event):
+        elif self.baseline_hand.select_hand_at_point(event):
             self.baseline_hand.prepare_for_drag()
 
     def on_motion(self, event):
         # Check
         if event.inaxes != self.ax:
             return None
-        # Drag
-        if self.rect_hand.dragged_hand is not None:
+        #
+        if self.scaling_hand.dragged_hand is not None:
+            self.scaling_hand.drag_to(event)
+        elif self.rect_hand.dragged_hand is not None:
             self.rect_hand.drag_to(event)
-        if self.baseline_hand.dragged_hand is not None:
+        elif self.baseline_hand.dragged_hand is not None:
             self.baseline_hand.drag_to(event)
 
     def on_release(self, event):
-        if self.rect_hand.is_dragging():
+        if self.scaling_hand.is_dragging():
+            self.scaling_hand.finish_drag()
+            self.scaling_hand.unselect_hand()
+        elif self.rect_hand.is_dragging():
             self.rect_hand.finish_drag()
             self.rect_hand.unselect_hand()
-        if self.baseline_hand.is_dragging():
+        elif self.baseline_hand.is_dragging():
             self.baseline_hand.finish_drag()
             self.baseline_hand.unselect_hand()
 
@@ -136,6 +152,7 @@ class MplWidgetDetect(Canvas):
         # baseline
         self.baseline = self.ax.plot([0, 0], [0, 0],
                                      color='b',
+                                     lw=0.5,
                                      ls="-")[0]
         # Clean stuff !
         self.ax.set_xticks([])
@@ -159,6 +176,9 @@ class MplWidgetDetect(Canvas):
             self.draw()
 
     def update_baseline(self, pt1, pt2, draw=True):
+        sizex = abs(self.ax.viewLim.width)
+        pt1, pt2 = Baseline.get_baseline_from_points([pt1, pt2],
+                                                     xmin=0, xmax=sizex)
         self.baseline.set_data([[pt1[0], pt2[0]],
                                 [pt1[1], pt2[1]]])
         if draw:

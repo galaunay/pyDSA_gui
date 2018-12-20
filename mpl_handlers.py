@@ -1,6 +1,98 @@
 import matplotlib as mpl
 import numpy as np
+from pyDSA.baseline import Baseline
 
+
+class Handler(object):
+    def __init__(self, canvas, fig, ax, color, hand_ratio):
+        self.fig = fig
+        self.ax = ax
+        self.canvas = canvas
+        self.background = None
+        self.color = color
+        self.line = self.ax.plot([0], [0], color=self.color, lw=.5)[0]
+        self.hands = []
+        self.minihands = []
+        self.hand_ratio = hand_ratio
+        self.hand_size = 0
+        self.dragged_hand = None
+        self.dragged_offset = [0, 0]
+        self.dragged_ind = None
+
+    def update_hand_size(self):
+        sizex = abs(self.ax.viewLim.width)
+        sizey = abs(self.ax.viewLim.height)
+        self.hand_size = (self.hand_ratio*sizex*sizey)**.5
+        if self.hand_size > np.min([sizex, sizey])/2:
+            self.hand_size = int(np.min([sizex, sizey])/2) - 1
+        for hand in self.hands + self.minihands:
+            hand.set_width(self.hand_size)
+            hand.set_height(self.hand_size)
+
+    def select_hand_at_point(self, event):
+        ind_sel = np.argwhere([hand.contains(event)[0]
+                                  for hand in self.hands])
+        ind_sel = ind_sel.flatten()
+        if len(ind_sel) == 0:
+            return False
+        ind_sel = ind_sel[0]
+        self.dragged_ind = ind_sel
+        self.dragged_hand = self.hands[ind_sel]
+        self.dragged_offset = [event.xdata - self.dragged_hand.xy[0],
+                               event.ydata - self.dragged_hand.xy[1]]
+        return True
+
+    def prepare_for_drag(self):
+        for hand in self.hands + self.minihands:
+            hand.set_animated(True)
+        self.line.set_animated(True)
+        self.canvas.draw()
+        self.background = self.canvas.copy_from_bbox(self.ax.bbox)
+        for hand in self.hands + self.minihands:
+            self.ax.draw_artist(hand)
+        self.ax.draw_artist(self.rect)
+        self.canvas.blit(self.ax.bbox)
+
+    def drag_to(self, event):
+        if self.dragged_hand is None:
+            return None
+        # Update lims
+        self.__update_hands()
+        new_xlim = event.xdata - self.dragged_offset[0]
+        new_xlim += self.dragged_hand.ind_xlim*self.hand_size
+        new_ylim = event.ydata - self.dragged_offset[1]
+        new_ylim += self.dragged_hand.ind_ylim*self.hand_size
+        self.lims[0][self.dragged_hand.ind_xlim] = new_xlim
+        self.lims[1][self.dragged_hand.ind_ylim] = new_ylim
+        self.ensure_lims_in_image()
+        # Update rectangle
+        self.update_line()
+        # Update handlers
+        self.update_hands()
+        # Redraw
+        self.canvas.restore_region(self.background)
+        for hand in self.hands + self.minihands:
+            self.ax.draw_artist(hand)
+        self.ax.draw_artist(self.rect)
+        # blit just the redrawn area
+        self.canvas.blit(self.ax.bbox)
+
+    def unselect_hand(self):
+        self.dragged_hand = None
+        self.dragged_ind = None
+        self.dragged_offset = None
+
+    def finish_drag(self):
+        for hand in self.hands + self.minihands:
+            hand.set_animated(False)
+        self.line.set_animated(False)
+        self.background = None
+
+    def is_dragging(self):
+        if self.dragged_hand is not None:
+            return True
+        else:
+            return False
 
 class RectangleHandler(object):
     def __init__(self, canvas, fig, ax):
@@ -168,6 +260,7 @@ class BaselineHandler(object):
             self.ax.add_patch(hand)
         self.line = self.ax.plot([0, 0], [0, 0],
                                  color=self.baseline_color,
+                                 lw=0.5,
                                  ls="-")[0]
         self.dragged_ind = None
         self.dragged_hand = None
@@ -182,8 +275,11 @@ class BaselineHandler(object):
         self.update_hands()
 
     def update_line(self):
-        self.line.set_data([self.pt1[0], self.pt2[0]],
-                           [self.pt1[1], self.pt2[1]])
+        sizex = abs(self.ax.viewLim.width)
+        pt1, pt2 = Baseline.get_baseline_from_points([self.pt1, self.pt2],
+                                                     xmin=0,
+                                                     xmax=sizex)
+        self.line.set_data([pt1[0], pt2[0]], [pt1[1], pt2[1]])
 
     def update_hand_size(self):
         sizex = abs(self.ax.viewLim.width)
@@ -254,6 +350,133 @@ class BaselineHandler(object):
         for hand in self.hands:
             hand.set_animated(False)
         self.line.set_animated(False)
+        self.background = None
+
+    def is_dragging(self):
+        if self.dragged_hand is not None:
+            return True
+        else:
+            return False
+
+
+class ScalingHandler(object):
+    def __init__(self, canvas, fig, ax):
+        self.fig = fig
+        self.ax = ax
+        self.canvas = canvas
+        self.background = None
+        self.pts = []
+        self.pts_color = 'g'
+        self.hand_ratio = 1/500
+        self.hand_size = 0
+        self.hands = []
+        self.minihands = []
+        for i in range(2):
+            self.hands.append(mpl.patches.Circle([-1000, -1000],
+                                                 radius=self.hand_size/2,
+                                                 color=self.pts_color,
+                                                 alpha=0.25))
+            self.minihands.append(mpl.patches.Circle([-1000, -1000],
+                                                     radius=self.hand_size/20,
+                                                     color=self.pts_color,
+                                                     alpha=1))
+            self.ax.add_patch(self.hands[-1])
+            self.ax.add_patch(self.minihands[-1])
+        self.dragged_ind = None
+        self.dragged_hand = None
+        self.dragged_offset = [0, 0]
+
+    def add_point(self, event):
+        self.update_hand_size()
+        pos = (event.xdata, event.ydata)
+        if len(self.pts) == 0:
+            hand = self.hands[0]
+            minihand = self.minihands[0]
+        elif len(self.pts) == 1:
+            hand = self.hands[1]
+            minihand = self.minihands[1]
+        else:
+            return None
+        hand.set_center(pos)
+        minihand.set_center(pos)
+        self.pts.append(pos)
+
+    def reset(self):
+        self.pts = []
+        for hand in self.hands + self.minihands:
+            hand.set_center([-1000, -1000])
+        self.canvas.draw()
+
+    def get_scale(self):
+        if len(self.pts) != 2:
+            return None
+        return ((self.pts[0][0] - self.pts[1][0])**2
+                + (self.pts[0][1] - self.pts[1][1])**2)**.5
+
+    def update_hand_size(self):
+        sizex = abs(self.ax.viewLim.width)
+        sizey = abs(self.ax.viewLim.height)
+        self.hand_size = (self.hand_ratio*sizex*sizey)**.5
+        if self.hand_size > np.min([sizex, sizey])/2:
+            self.hand_size = int(np.min([sizex, sizey])/2) - 1
+        for hand in self.hands:
+            hand.set_radius(self.hand_size/2)
+        for hand in self.minihands:
+            hand.set_radius(self.hand_size/20)
+
+    def update_hands(self):
+        self.hands[0].set_center(self.pts[0])
+        self.hands[1].set_center(self.pts[1])
+        self.minihands[0].set_center(self.pts[0])
+        self.minihands[1].set_center(self.pts[1])
+
+    def select_hand_at_point(self, event):
+        ind_sel = np.argwhere([hand.contains(event)[0]
+                               for hand in self.hands])
+        ind_sel = ind_sel.flatten()
+        if len(ind_sel) == 0:
+            return False
+        ind_sel = ind_sel[0]
+        self.dragged_ind = ind_sel
+        self.dragged_hand = self.hands[ind_sel]
+        center = self.dragged_hand.get_center()
+        self.dragged_offset = [event.xdata - center[0],
+                               event.ydata - center[1]]
+        return True
+
+    def prepare_for_drag(self):
+        for hand in self.hands + self.minihands:
+            hand.set_animated(True)
+        self.canvas.draw()
+        self.background = self.canvas.copy_from_bbox(self.ax.bbox)
+        for hand in self.hands + self.minihands:
+            self.ax.draw_artist(hand)
+        self.canvas.blit(self.ax.bbox)
+
+    def drag_to(self, event):
+        if self.dragged_hand is None:
+            return None
+        # Update lims
+        new_x = event.xdata - self.dragged_offset[0]
+        new_y = event.ydata - self.dragged_offset[1]
+        self.pts[self.dragged_ind] = [new_x, new_y]
+        # Update handlers
+        self.update_hands()
+        # Redraw
+        self.canvas.restore_region(self.background)
+        for hand in self.hands + self.minihands:
+            self.ax.draw_artist(hand)
+        # blit just the redrawn area
+        self.canvas.blit(self.ax.bbox)
+
+    def unselect_hand(self):
+        self.dragged_hand = None
+        self.dragged_ind = None
+        self.dragged_offset = None
+
+    def finish_drag(self):
+        for hand in self.hands + self.minihands:
+            hand.set_animated(False)
         self.background = None
 
     def is_dragging(self):
