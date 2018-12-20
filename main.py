@@ -100,6 +100,8 @@ class AppWindow(QMainWindow):
         self.tab1_enable_cropping()
         # Enable baseline
         self.tab1_enable_baseline()
+        # Enable scaling
+        self.tab1_enable_scaling()
 
     def tab1_import_video(self):
         filepath = select_file('Open video')[0]
