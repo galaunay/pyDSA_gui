@@ -6,6 +6,12 @@ from pyDSA.baseline import Baseline
 
 from mpl_handlers import BaselineHandler, RectangleHandler, ScalingHandler
 
+colors = {'baseline': 'tab:blue',
+          'crop_area': 'tab:red',
+          'scaling': 'tab:green',
+          'edge': 'tab:green',
+          'fit': 'tab:orange'}
+
 
 # class MplPlotWidget(Canvas):
 #     def __init__(self, parent=None):
@@ -44,6 +50,7 @@ class MplWidgetImport(Canvas):
         # Plot
         super(MplWidgetImport, self).__init__(Figure())
         self.setParent(parent)
+        self.parent = parent
         self.figure = Figure(dpi=100, figsize=(200, 200))
         self.canvas = Canvas(self.figure)
         self.ax = self.figure.add_axes([0, 0, 1, 1])
@@ -151,13 +158,15 @@ class MplWidgetDetect(Canvas):
                                  cmap=plt.cm.binary_r)
         # baseline
         self.baseline = self.ax.plot([0, 0], [0, 0],
-                                     color='b',
+                                     color=colors['baseline'],
                                      lw=0.5,
                                      ls="-")[0]
         # edges
         self.edge = self.ax.plot([0], [0],
-                                 color='g',
+                                 color=colors['edge'],
                                  marker='o',
+                                 mec='k',
+                                 alpha=0.5,
                                  ls='none')[0]
         # Clean stuff !
         self.ax.set_xticks([])
@@ -191,5 +200,69 @@ class MplWidgetDetect(Canvas):
 
     def update_edge(self, edge, draw=True):
         self.edge.set_data(*edge)
+        if draw:
+            self.draw()
+
+
+class MplWidgetFit(Canvas):
+    def __init__(self, parent=None):
+        # Plot
+        super(MplWidgetFit, self).__init__(Figure())
+        self.setParent(parent)
+        self.figure = Figure(dpi=100, figsize=(200, 200))
+        self.canvas = Canvas(self.figure)
+        self.ax = self.figure.add_axes([0, 0, 1, 1])
+        # Image
+        self.data = np.random.rand(200, 300)
+        self.im = self.ax.imshow(self.data,
+                                 cmap=plt.cm.binary_r)
+        # baseline
+        self.baseline = self.ax.plot([0, 0], [0, 0],
+                                     color=colors['baseline'],
+                                     lw=0.5,
+                                     ls="-")[0]
+        # edges
+        self.fit = self.ax.plot([0], [0],
+                                color=colors['fit'],
+                                ls='-')[0]
+        self.fit_center = self.ax.plot([0], [0],
+                                       color=colors['fit'],
+                                       marker='o',
+                                       ls='none')[0]
+        # Clean stuff !
+        self.ax.set_xticks([])
+        self.ax.set_xticklabels([])
+        self.ax.set_yticks([])
+        self.ax.set_yticklabels([])
+
+    def update_image(self, im, replot=False, draw=True):
+        self.data = im.transpose()[::-1]
+        if replot:
+            self.im = self.ax.imshow(self.data,
+                                     cmap=plt.cm.binary_r)
+            # clean stuff !
+            self.ax.set_xticks([])
+            self.ax.set_xticklabels([])
+            self.ax.set_yticks([])
+            self.ax.set_yticklabels([])
+        else:
+            self.im.set_data(self.data)
+        if draw:
+            self.draw()
+
+    def update_baseline(self, pt1, pt2, draw=True):
+        sizex = abs(self.ax.viewLim.width)
+        pt1, pt2 = Baseline.get_baseline_from_points([pt1, pt2],
+                                                     xmin=0, xmax=sizex)
+        self.baseline.set_data([[pt1[0], pt2[0]],
+                                [pt1[1], pt2[1]]])
+        if draw:
+            self.draw()
+
+    def update_fit(self, fit, fit_center, draw=True):
+        if fit_center is None:
+            fit_center = [[0], [0]]
+        self.fit.set_data(*fit)
+        self.fit_center.set_data(fit_center)
         if draw:
             self.draw()

@@ -634,10 +634,319 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab">
+      <widget class="QWidget" name="tabfit">
        <attribute name="title">
         <string>Fitting</string>
        </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_11">
+        <item>
+         <widget class="QFrame" name="frame_3">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>2</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>150</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="baseSize">
+           <size>
+            <width>150</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_9">
+           <item>
+            <widget class="QGroupBox" name="tab3_circle_box">
+             <property name="title">
+              <string>Circle</string>
+             </property>
+             <property name="flat">
+              <bool>false</bool>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_10">
+              <item>
+               <widget class="QLabel" name="label_19">
+                <property name="text">
+                 <string>Ignore lower part</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSlider" name="tab3_circle_ymin">
+                <property name="maximum">
+                 <number>999999999</number>
+                </property>
+                <property name="value">
+                 <number>0</number>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="tab3_ellipse_box">
+             <property name="title">
+              <string>Ellipse</string>
+             </property>
+             <property name="flat">
+              <bool>false</bool>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_16">
+              <item>
+               <widget class="QLabel" name="label_21">
+                <property name="text">
+                 <string>Ignore lower part</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSlider" name="tab3_ellipse_ymin">
+                <property name="maximum">
+                 <number>999999999</number>
+                </property>
+                <property name="value">
+                 <number>0</number>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="tab3_polyline_box">
+             <property name="title">
+              <string>Polyline</string>
+             </property>
+             <property name="flat">
+              <bool>false</bool>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_17">
+              <item>
+               <widget class="QLabel" name="label_12">
+                <property name="text">
+                 <string>Degree</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="tab3_polyline_deg">
+                <property name="minimum">
+                 <number>1</number>
+                </property>
+                <property name="maximum">
+                 <number>50</number>
+                </property>
+                <property name="value">
+                 <number>5</number>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="tab3_spline_box">
+             <property name="title">
+              <string>Spline</string>
+             </property>
+             <property name="flat">
+              <bool>false</bool>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_18">
+              <item>
+               <widget class="QLabel" name="label_13">
+                <property name="text">
+                 <string>Degree</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="tab3_spline_deg">
+                <property name="minimum">
+                 <number>1</number>
+                </property>
+                <property name="maximum">
+                 <number>5</number>
+                </property>
+                <property name="value">
+                 <number>5</number>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_14">
+                <property name="text">
+                 <string>Smooth</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSlider" name="tab3_spline_smooth">
+                <property name="maximum">
+                 <number>100</number>
+                </property>
+                <property name="value">
+                 <number>75</number>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_7">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_15">
+          <item>
+           <layout class="QGridLayout" name="gridLayout_3">
+            <item row="1" column="1">
+             <widget class="MplWidgetFit" name="mplwidgetfit" native="true">
+              <property name="cursor">
+               <cursorShape>ArrowCursor</cursorShape>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <spacer name="verticalSpacer_8">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="1" column="2">
+             <spacer name="horizontalSpacer_5">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="1">
+             <spacer name="verticalSpacer_9">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="1" column="0">
+             <spacer name="horizontalSpacer_6">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_10">
+            <item>
+             <widget class="QLabel" name="label_20">
+              <property name="text">
+               <string>Frames</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="tab3_spinbox">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSlider" name="tab3_frameslider">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="tab_3">
        <attribute name="title">
@@ -702,12 +1011,18 @@
    <header>MPLWidget</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>MplWidgetFit</class>
+   <extends>QWidget</extends>
+   <header>MPLWidget</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <resources/>
  <connections>
   <connection>
    <sender>tab1_frameslider</sender>
-   <signal>sliderMoved(int)</signal>
+   <signal>valueChanged(int)</signal>
    <receiver>tab1_spinbox</receiver>
    <slot>setValue(int)</slot>
    <hints>
@@ -770,22 +1085,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>tab1_frameslider</sender>
-   <signal>sliderMoved(int)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>tab1_set_current_frame(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>378</x>
-     <y>675</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>0</x>
-     <y>667</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>tab1_spinbox</sender>
    <signal>valueChanged(int)</signal>
    <receiver>MainWindow</receiver>
@@ -834,22 +1133,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>tab2_frameslider</sender>
-   <signal>sliderMoved(int)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>tab2_set_current_frame(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>545</x>
-     <y>666</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>541</x>
-     <y>698</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>tab2_spinbox</sender>
    <signal>valueChanged(int)</signal>
    <receiver>MainWindow</receiver>
@@ -867,7 +1150,7 @@
   </connection>
   <connection>
    <sender>tab2_frameslider</sender>
-   <signal>sliderMoved(int)</signal>
+   <signal>valueChanged(int)</signal>
    <receiver>tab2_spinbox</receiver>
    <slot>setValue(int)</slot>
    <hints>
@@ -1105,6 +1388,198 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>tab3_spinbox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>tab3_frameslider</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>253</x>
+     <y>666</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>347</x>
+     <y>672</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab3_frameslider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>tab3_spinbox</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>403</x>
+     <y>668</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>254</x>
+     <y>661</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab3_spinbox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab3_set_current_frame(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>226</x>
+     <y>657</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>180</x>
+     <y>697</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab3_circle_box</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab3_toggle_circle(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>37</x>
+     <y>83</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>5</x>
+     <y>97</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab3_ellipse_box</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab3_toggle_ellipse(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>63</x>
+     <y>167</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>6</x>
+     <y>174</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab3_polyline_box</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab3_toggle_polyline(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>54</x>
+     <y>250</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-98</x>
+     <y>255</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab3_spline_box</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab3_toggle_spline(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>54</x>
+     <y>352</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-9</x>
+     <y>317</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab3_circle_ymin</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab3_update_fit()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>64</x>
+     <y>131</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-5</x>
+     <y>131</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab3_ellipse_ymin</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab3_update_fit()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>70</x>
+     <y>218</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>3</x>
+     <y>224</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab3_polyline_deg</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab3_update_fit()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>69</x>
+     <y>301</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>8</x>
+     <y>323</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab3_spline_deg</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab3_update_fit()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>87</x>
+     <y>398</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>3</x>
+     <y>413</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab3_spline_smooth</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab3_update_fit()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>119</x>
+     <y>443</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>3</x>
+     <y>496</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tab1_import_image()</slot>
@@ -1119,5 +1594,11 @@
   <slot>tab2_update_edge()</slot>
   <slot>tab2_toggle_contour(bool)</slot>
   <slot>tab2_toggle_canny(bool)</slot>
+  <slot>tab3_set_current_frame(int)</slot>
+  <slot>tab3_toggle_circle(bool)</slot>
+  <slot>tab3_toggle_ellipse(bool)</slot>
+  <slot>tab3_toggle_polyline(bool)</slot>
+  <slot>tab3_toggle_spline(bool)</slot>
+  <slot>tab3_update_fit()</slot>
  </slots>
 </ui>
