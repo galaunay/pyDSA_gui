@@ -314,8 +314,8 @@ class AppWindow(QMainWindow):
                                        self.ui.tab3_ellipse_box,
                                        self.ui.tab3_polyline_box,
                                        self.ui.tab3_spline_box]])
-        # if not np.any(checks):
-        #     self.dsa.fit_method = None
+        if not np.any(checks):
+            self.dsa.fit_method = None
 
     def tab3_toggle_circle(self, toggle):
         if toggle:

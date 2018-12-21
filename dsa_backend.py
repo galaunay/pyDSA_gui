@@ -38,7 +38,6 @@ class DSA(object):
         # Cache
 
     def reset_cache(self, edge=True, fit=True):
-        print('reset cache')
         if edge:
             self.edge_cache = [None]*len(self.ims)
         if fit:
@@ -101,7 +100,7 @@ class DSA(object):
                 return False
         self.baseline_pt1 = pt1
         self.baseline_pt2 = pt2
-        deltay = self.current_crop_lims[1][1]
+        deltay = abs(self.ui.mplwidgetimport.ax.viewLim.height)
         new_pt1 = [pt1[0], deltay - pt1[1]]
         new_pt2 = [pt2[0], deltay - pt2[1]]
         self.ims.set_baseline(new_pt1, new_pt2)
@@ -115,8 +114,6 @@ class DSA(object):
     def get_baseline(self, cropped=False):
         pt1 = self.baseline_pt1.copy()
         pt2 = self.baseline_pt2.copy()
-        print(self.current_crop_lims)
-        print(pt1)
         if cropped:
             deltax = self.current_crop_lims[0][0]
             deltay = self.sizey - self.current_crop_lims[1][1]
@@ -172,41 +169,44 @@ class DSA(object):
                 break
         # Use cache if available
         fit = self.fit_cache[self.current_ind]
-        if fit is None:
-            # Ensure the edge is computed
-            edge_params = self.app.tab2_get_params()
-            self.get_current_edge(edge_params)
-            if self.current_edge is None:
-                return [[0], [0]], [[0], [0]]
-            # Get params
-            circle_args = params[0]
-            ellipse_args = params[1]
-            polyline_args = params[2]
-            spline_args = params[3]
-            # Fit
-            if self.fit_method == 'circle':
+        # Ensure the edge is computed
+        edge_params = self.app.tab2_get_params()
+        self.get_current_edge(edge_params)
+        if self.current_edge is None:
+            return [[0], [0]], [[0], [0]]
+        # Get params
+        circle_args = params[0]
+        ellipse_args = params[1]
+        polyline_args = params[2]
+        spline_args = params[3]
+        # Fit
+        if self.fit_method == 'circle':
+            if fit is None:
                 fit = self.current_edge.fit_circle(**circle_args)
-                pts = fit.get_fit_as_points()
-                fit_center = fit.fits[0].copy()
-            elif self.fit_method == 'ellipse':
+            pts = fit.get_fit_as_points()
+            fit_center = fit.fits[0].copy()
+        elif self.fit_method == 'ellipse':
+            if fit is None:
                 fit = self.current_edge.fit_ellipse(**ellipse_args)
-                pts = fit.get_fit_as_points()
-                fit_center = fit.fits[0].copy()
-            elif self.fit_method == 'polyline':
+            pts = fit.get_fit_as_points()
+            fit_center = fit.fits[0].copy()
+        elif self.fit_method == 'polyline':
+            if fit is None:
                 fit = self.current_edge.fit_polyline(**polyline_args)
-                pts = fit.get_fit_as_points()
-                fit_center = [[-999], [-999]]
-            elif self.fit_method == 'spline':
+            pts = fit.get_fit_as_points()
+            fit_center = [[-999], [-999]]
+        elif self.fit_method == 'spline':
+            if fit is None:
                 fit = self.current_edge.fit_spline(**spline_args)
-                pts = fit.get_fit_as_points()
-                fit_center = [[-999], [-999]]
-            else:
-                self.app.log.log('please select a fitting method', level=1)
-                return [[0], [0]], [[-999], [-999]]
-            # Update cache
-            self.fit_cache[self.current_ind] = fit
-            self.fit_cache_params = params
-            self.fit_cache_method = self.fit_method
+            pts = fit.get_fit_as_points()
+            fit_center = [[-999], [-999]]
+        else:
+            self.app.log.log('please select a fitting method', level=1)
+            return [[0], [0]], [[-999], [-999]]
+        # Update cache
+        self.fit_cache[self.current_ind] = fit
+        self.fit_cache_params = params
+        self.fit_cache_method = self.fit_method
         self.current_fit = fit
         # Return fit pts
         deltax = self.current_crop_lims[0][0]
