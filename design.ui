@@ -198,7 +198,7 @@
             <item row="1" column="1">
              <widget class="MplWidgetImport" name="mplwidgetimport" native="true">
               <property name="cursor">
-               <cursorShape>CrossCursor</cursorShape>
+               <cursorShape>ArrowCursor</cursorShape>
               </property>
              </widget>
             </item>

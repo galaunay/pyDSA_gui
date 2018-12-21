@@ -30,7 +30,9 @@ class AppWindow(QMainWindow):
         self.log = Log(self.ui.logarea, self.ui.statusbar)
         self._disable_frame_updater = False
         self.tab2_initialized = False
+        self.tab2_already_opened = False
         self.tab3_initialized = False
+        self.tab3_already_opened = False
         self.last_tab = 0
 
     def tab_changed(self, tab_nmb):
@@ -65,6 +67,10 @@ class AppWindow(QMainWindow):
         self.ui.tab1_frameslider.setEnabled(True)
         self.ui.tab1_spinbox.setEnabled(True)
 
+    def tab1_disable_frame_sliders(self):
+        self.ui.tab1_frameslider.setEnabled(False)
+        self.ui.tab1_spinbox.setEnabled(False)
+
     def tab1_enable_cropping(self):
         self.ui.reset_crop.setEnabled(True)
         crop_lims = [0, self.dsa.current_raw_im.shape[0],
@@ -85,6 +91,7 @@ class AppWindow(QMainWindow):
 
     def tab1_import_image(self):
         filepath = select_file('Open image')[0]
+        self.dsa = DSA(self)
         try:
             self.dsa.import_image(filepath)
         except:
@@ -92,15 +99,21 @@ class AppWindow(QMainWindow):
             return None
         self.ui.mplwidgetimport.update_image(self.dsa.current_raw_im.values,
                                              replot=True)
+        # Disable frame sliders
+        self.tab1_disable_frame_sliders()
         # Enable cropping sliders
         self.tab1_enable_cropping()
         # Enable baseline
         self.tab1_enable_baseline()
         # Enable scaling
         self.tab1_enable_scaling()
+        # De-init other tabs
+        self.tab2_initialized = False
+        self.tab3_initialized = False
 
     def tab1_import_video(self):
         filepath = select_file('Open video')[0]
+        self.dsa = DSA(self)
         try:
             self.dsa.import_video(filepath)
         except:
@@ -116,6 +129,9 @@ class AppWindow(QMainWindow):
         self.tab1_enable_baseline()
         # Enable scaling
         self.tab1_enable_scaling()
+        # De-init other tabs
+        self.tab2_initialized = False
+        self.tab3_initialized = False
 
     def tab1_set_current_frame(self, ind):
         self.dsa.set_current(ind - 1)
@@ -138,11 +154,14 @@ class AppWindow(QMainWindow):
         # enable slider if necessary
         if self.dsa.nmb_frames > 1:
             self.tab2_enable_frame_sliders()
+        else:
+            self.tab2_disable_frame_sliders()
 
     def tab2_switch_to_tab(self):
-        draw = True
         if not self.tab2_initialized:
             self.tab2_initialize()
+        draw = True
+        if not self.tab2_already_opened:
             draw = False
         # Replot the plot
         self.ui.mplwidgetdetect.update_image(
@@ -153,12 +172,12 @@ class AppWindow(QMainWindow):
         # Update the curent frame
         self._disable_frame_updater = True
         self.ui.tab2_frameslider.setValue(self.dsa.current_ind + 1)
-        self.ui.tab2_spinbox.setValue(self.dsa.current_ind + 1)
         self._disable_frame_updater = False
         # update the detected edge
         self.tab2_update_edge(draw=draw)
         #
         self.tab2_initialized = True
+        self.tab2_already_opened = True
 
     def tab2_set_current_frame(self, ind):
         if self._disable_frame_updater:
@@ -180,6 +199,12 @@ class AppWindow(QMainWindow):
         self.ui.tab2_spinbox.setMaximum(self.dsa.nmb_frames)
         self.ui.tab2_frameslider.setEnabled(True)
         self.ui.tab2_spinbox.setEnabled(True)
+        self._disable_frame_updater = False
+
+    def tab2_disable_frame_sliders(self):
+        self._disable_frame_updater = True
+        self.ui.tab2_frameslider.setEnabled(False)
+        self.ui.tab2_spinbox.setEnabled(False)
         self._disable_frame_updater = False
 
     def tab2_get_params(self):
@@ -232,11 +257,14 @@ class AppWindow(QMainWindow):
         # enable slider if necessary
         if self.dsa.nmb_frames > 1:
             self.tab3_enable_frame_sliders()
+        else:
+            self.tab3_disable_frame_sliders()
 
     def tab3_switch_to_tab(self):
-        draw = True
         if not self.tab3_initialized:
             self.tab3_initialize()
+        draw = True
+        if not self.tab3_already_opened:
             draw = False
         # Update the plot only if necessary
         self.dsa.update_crop_lims()
@@ -249,7 +277,6 @@ class AppWindow(QMainWindow):
         # Update the curent frame
         self._disable_frame_updater = True
         self.ui.tab3_frameslider.setValue(self.dsa.current_ind + 1)
-        self.ui.tab3_spinbox.setValue(self.dsa.current_ind + 1)
         self._disable_frame_updater = False
         # update the detected edge
         self.tab3_update_fit(draw=draw)
@@ -259,6 +286,7 @@ class AppWindow(QMainWindow):
         self.ui.tab3_ellipse_ymin.setMaximum(sizey)
         #
         self.tab3_initialized = True
+        self.tab3_already_opened = True
 
     def tab3_set_current_frame(self, ind):
         if self._disable_frame_updater:
@@ -278,6 +306,12 @@ class AppWindow(QMainWindow):
         self.ui.tab3_spinbox.setMaximum(self.dsa.nmb_frames)
         self.ui.tab3_frameslider.setEnabled(True)
         self.ui.tab3_spinbox.setEnabled(True)
+        self._disable_frame_updater = False
+
+    def tab3_disable_frame_sliders(self):
+        self._disable_frame_updater = True
+        self.ui.tab3_frameslider.setEnabled(False)
+        self.ui.tab3_spinbox.setEnabled(False)
         self._disable_frame_updater = False
 
     def tab3_get_params(self):

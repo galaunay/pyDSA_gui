@@ -38,10 +38,11 @@ class DSA(object):
         # Cache
 
     def reset_cache(self, edge=True, fit=True):
-        if edge:
-            self.edge_cache = [None]*len(self.ims)
-        if fit:
-            self.fit_cache = [None]*len(self.ims)
+        if self.nmb_frames is not None:
+            if edge:
+                self.edge_cache = [None]*self.nmb_frames
+            if fit:
+                self.fit_cache = [None]*self.nmb_frames
 
     def import_image(self, filepath):
         self.ims = dsa.import_from_image(filepath, cache_infos=False)
