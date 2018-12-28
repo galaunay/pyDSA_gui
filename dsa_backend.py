@@ -7,6 +7,8 @@ class DSA(object):
     def __init__(self, app):
         self.app = app
         self.ui = app.ui
+        self.log = app.log
+        self.log.log('DSA backend: initializing backend', level=1)
         self.current_ind = 0
         # Images
         self.nmb_frames = None
@@ -45,6 +47,7 @@ class DSA(object):
                 self.fit_cache = [None]*self.nmb_frames
 
     def import_image(self, filepath):
+        self.log.log(f'DSA backend: Importing image: {filepath}', level=1)
         self.ims = dsa.import_from_image(filepath, cache_infos=False)
         self.current_raw_im = self.ims
         self.reset_cache()
@@ -53,6 +56,7 @@ class DSA(object):
         self.sizey = self.current_raw_im.shape[1]
 
     def import_images(self, filepaths):
+        self.log.log(f'DSA backend: Importing image set: {filepaths}', level=1)
         self.ims = dsa.TemporalImages(filepath=None, cache_infos=False)
         filepaths.sort()
         for i, filepath in enumerate(filepaths):
@@ -65,6 +69,7 @@ class DSA(object):
         self.sizey = self.current_raw_im.shape[1]
 
     def import_video(self, filepath):
+        self.log.log(f'DSA backend: Importing video: {filepath}', level=1)
         self.ims = dsa.import_from_video(filepath, cache_infos=False)
         self.current_raw_im = self.ims[0]
         self.reset_cache()
@@ -85,6 +90,7 @@ class DSA(object):
             self.current_cropped_im = self.ims_cropped[self.current_ind]
 
     def update_crop_lims(self):
+        self.log.log('DSA backend: Updating cropping limits', level=1)
         xlims, ylims = self.ui.mplwidgetimport.rect_hand.lims
         sizey = abs(self.ui.mplwidgetimport.ax.viewLim.height)
         ylims = np.sort(sizey - ylims)
@@ -105,6 +111,7 @@ class DSA(object):
         return True
 
     def update_baselines(self):
+        self.log.log('DSA backend: Updating baselines', level=1)
         pt1 = self.ui.mplwidgetimport.baseline_hand.pt1
         pt2 = self.ui.mplwidgetimport.baseline_hand.pt2
         if self.baseline_pt1 is not None:
@@ -137,6 +144,7 @@ class DSA(object):
         return pt1, pt2
 
     def get_current_edge(self, params):
+        self.log.log('DSA backend: Computing edges for current image', level=1)
         # Reset cache if not valid anymore
         if self.edge_cache_method != self.edge_detection_method:
             self.reset_cache()
@@ -173,6 +181,7 @@ class DSA(object):
         return pts
 
     def get_current_fit(self, params):
+        self.log.log('DSA backend: Computing fits for current image', level=1)
         # Reset cache if not valid anymre
         if self.fit_cache_method != self.fit_method:
             self.reset_cache()
@@ -229,3 +238,17 @@ class DSA(object):
         fit_center[0] = fit_center[0] - deltax
         fit_center[1] = deltay - fit_center[1]
         return pts, fit_center
+
+    def get_current_ca(self):
+        try:
+            self.current_fit.compute_contact_angle()
+        except:
+            self.log.log('Failed to compute contact angles', level=3)
+        lines = self.current_fit._get_angle_display_lines()
+        lines = lines[0:2]
+        lines = np.array(lines)
+        deltax = self.current_crop_lims[0][0]
+        deltay = self.current_crop_lims[1][1]
+        lines[:, 0] -= deltax
+        lines[:, 1] = deltay - lines[:, 1]
+        return lines

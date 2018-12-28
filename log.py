@@ -21,4 +21,5 @@ class Log(object):
         self.display_area.setTextColor(self.level_colors[level - 1])
         self.display_area.append(self.logs[-1])
         # Display in statu bar
-        self.status_bar.showMessage(text)
+        if level >= 3:
+            self.status_bar.showMessage(f"Error: {message}")

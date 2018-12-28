@@ -15,11 +15,13 @@ def select_file(message="Open file", filetypes=None):
                                            filter=filetypes)
     return filepath
 
+
 def select_files(message="Open files", filetypes=None):
     dialog = QDialog()
     filepath = QFileDialog.getOpenFileNames(dialog, message,
-                                           filter=filetypes)
+                                            filter=filetypes)
     return filepath
+
 
 class AppWindow(QMainWindow):
     def __init__(self):
@@ -30,15 +32,15 @@ class AppWindow(QMainWindow):
         # self.ui.progressbar = QtWidgets.QProgressBar()
         # self.ui.progressbar.setMaximumSize(QtCore.QSize(150, 16777215))
         # self.ui.statusbar.addPermanentWidget(self.ui.progressbar)
-        self.show()
-        self.dsa = DSA(self)
         self.log = Log(self.ui.logarea, self.ui.statusbar)
+        self.dsa = DSA(self)
         self._disable_frame_updater = False
         self.tab2_initialized = False
         self.tab2_already_opened = False
         self.tab3_initialized = False
         self.tab3_already_opened = False
         self.last_tab = 0
+        self.show()
 
     def tab_changed(self, tab_nmb):
         # Do nothing if no imported images
@@ -299,13 +301,13 @@ class AppWindow(QMainWindow):
             self.dsa.current_cropped_im.values,
             replot=True, draw=draw)
         self.dsa.update_baselines()
-        self.ui.mplwidgetfit.update_baseline(*self.dsa.get_baseline(),
-                                             draw=draw)
+        pt1, pt2 = self.dsa.get_baseline(cropped=True)
+        self.ui.mplwidgetfit.update_baseline(pt1, pt2, draw=draw)
         # Update the curent frame
         self._disable_frame_updater = True
         self.ui.tab3_frameslider.setValue(self.dsa.current_ind + 1)
         self._disable_frame_updater = False
-        # update the detected edge
+        # update the edge fit and baseline
         self.tab3_update_fit(draw=draw)
         # update the 'ignore lower part' slider upper bound
         sizey = abs(self.ui.mplwidgetimport.ax.viewLim.height)
@@ -359,6 +361,8 @@ class AppWindow(QMainWindow):
             fit = [[], []]
             fit_center = [[], []]
         self.ui.mplwidgetfit.update_fit(fit, fit_center, draw=draw)
+        cas = self.dsa.get_current_ca()
+        self.ui.mplwidgetfit.update_ca(cas, draw=draw)
 
     def _tab3_uncheck_others(self, box):
         checks = [b.setChecked(False)

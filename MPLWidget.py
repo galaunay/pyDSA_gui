@@ -10,7 +10,8 @@ colors = {'baseline': 'tab:blue',
           'crop_area': 'tab:red',
           'scaling': 'tab:green',
           'edge': 'tab:green',
-          'fit': 'tab:orange'}
+          'fit': 'tab:orange',
+          'ca': 'tab:blue'}
 
 
 # class MplPlotWidget(Canvas):
@@ -165,7 +166,7 @@ class MplWidgetDetect(Canvas):
         self.edge = self.ax.plot([0], [0],
                                  color=colors['edge'],
                                  marker='o',
-                                 mec='k',
+                                 ms=3,
                                  alpha=0.5,
                                  ls='none')[0]
         # Clean stuff !
@@ -229,6 +230,17 @@ class MplWidgetFit(Canvas):
                                        color=colors['fit'],
                                        marker='o',
                                        ls='none')[0]
+        # contact angles
+        self.ca_r = self.ax.plot([], [],
+                                 color=colors['ca'],
+                                 marker='o',
+                                 ms=3,
+                                 ls='-')[0]
+        self.ca_l = self.ax.plot([], [],
+                                 color=colors['ca'],
+                                 marker='o',
+                                 ms=3,
+                                 ls='-')[0]
         # Clean stuff !
         self.ax.set_xticks([])
         self.ax.set_xticklabels([])
@@ -264,5 +276,12 @@ class MplWidgetFit(Canvas):
             fit_center = [[0], [0]]
         self.fit.set_data(*fit)
         self.fit_center.set_data(fit_center)
+        if draw:
+            self.draw()
+
+    def update_ca(self, cas, draw=True):
+        ca1, ca2 = cas
+        self.ca_r.set_data(*ca1)
+        self.ca_l.set_data(*ca2)
         if draw:
             self.draw()

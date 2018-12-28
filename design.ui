@@ -323,7 +323,7 @@
            <item>
             <widget class="QGroupBox" name="tab2_canny_box">
              <property name="title">
-              <string>Canny edges</string>
+              <string>Cann&amp;y edges</string>
              </property>
              <property name="flat">
               <bool>false</bool>
@@ -468,7 +468,7 @@
                    <string>&amp;1</string>
                   </property>
                   <property name="checked">
-                   <bool>true</bool>
+                   <bool>false</bool>
                   </property>
                  </widget>
                 </item>
@@ -476,6 +476,9 @@
                  <widget class="QRadioButton" name="tab2_nmb_edges_2">
                   <property name="text">
                    <string>&amp;2</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
                   </property>
                  </widget>
                 </item>
@@ -742,7 +745,7 @@
            <item>
             <widget class="QGroupBox" name="tab3_polyline_box">
              <property name="title">
-              <string>Polyline</string>
+              <string>Pol&amp;yline</string>
              </property>
              <property name="flat">
               <bool>false</bool>
