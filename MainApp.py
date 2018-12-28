@@ -15,6 +15,11 @@ def select_file(message="Open file", filetypes=None):
                                            filter=filetypes)
     return filepath
 
+def select_files(message="Open files", filetypes=None):
+    dialog = QDialog()
+    filepath = QFileDialog.getOpenFileNames(dialog, message,
+                                           filter=filetypes)
+    return filepath
 
 class AppWindow(QMainWindow):
     def __init__(self):
@@ -101,6 +106,28 @@ class AppWindow(QMainWindow):
                                              replot=True)
         # Disable frame sliders
         self.tab1_disable_frame_sliders()
+        # Enable cropping sliders
+        self.tab1_enable_cropping()
+        # Enable baseline
+        self.tab1_enable_baseline()
+        # Enable scaling
+        self.tab1_enable_scaling()
+        # De-init other tabs
+        self.tab2_initialized = False
+        self.tab3_initialized = False
+
+    def tab1_import_images(self):
+        filepaths = select_files('Open images')[0]
+        self.dsa = DSA(self)
+        try:
+            self.dsa.import_images(filepaths)
+        except:
+            self.log.log(f"Couldn't import files: {filepaths}", level=3)
+            return None
+        self.ui.mplwidgetimport.update_image(self.dsa.current_raw_im.values,
+                                             replot=True)
+        # Enable frame sliders
+        self.tab1_enable_frame_sliders()
         # Enable cropping sliders
         self.tab1_enable_cropping()
         # Enable baseline

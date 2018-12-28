@@ -52,6 +52,18 @@ class DSA(object):
         self.sizex = self.current_raw_im.shape[0]
         self.sizey = self.current_raw_im.shape[1]
 
+    def import_images(self, filepaths):
+        self.ims = dsa.TemporalImages(filepath=None, cache_infos=False)
+        filepaths.sort()
+        for i, filepath in enumerate(filepaths):
+            tmpim = dsa.import_from_image(filepath, cache_infos=False)
+            self.ims.add_field(tmpim, time=i+1, unit_times="", copy=False)
+        self.current_raw_im = self.ims[0]
+        self.reset_cache()
+        self.nmb_frames = len(self.ims)
+        self.sizex = self.current_raw_im.shape[0]
+        self.sizey = self.current_raw_im.shape[1]
+
     def import_video(self, filepath):
         self.ims = dsa.import_from_video(filepath, cache_infos=False)
         self.current_raw_im = self.ims[0]
