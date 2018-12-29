@@ -35,6 +35,7 @@ class AppWindow(QMainWindow):
         self.log = Log(self.ui.logarea, self.ui.statusbar)
         self.dsa = DSA(self)
         self._disable_frame_updater = False
+        self.tab1_filepath = ""
         self.tab2_initialized = False
         self.tab2_already_opened = False
         self.tab3_initialized = False
@@ -101,12 +102,13 @@ class AppWindow(QMainWindow):
         self.ui.tab1_remove_scaling_btn.setEnabled(True)
 
     def tab1_import_image(self):
-        filepath = select_file('Open image')[0]
+        self.filepath_type = 'image'
+        self.filepath = select_file('Open image')[0]
         self.dsa = DSA(self)
         try:
-            self.dsa.import_image(filepath)
+            self.dsa.import_image(self.filepath)
         except:
-            self.log.log(f"Couldn't import image: {filepath}", level=3)
+            self.log.log(f"Couldn't import image: {self.filepath}", level=3)
             return None
         self.ui.mplwidgetimport.update_image(self.dsa.current_raw_im.values,
                                              replot=True)
@@ -123,12 +125,13 @@ class AppWindow(QMainWindow):
         self.tab3_initialized = False
 
     def tab1_import_images(self):
-        filepaths = select_files('Open images')[0]
+        self.filepath_type = 'images'
+        self.filepath = select_files('Open images')[0]
         self.dsa = DSA(self)
         try:
-            self.dsa.import_images(filepaths)
+            self.dsa.import_images(self.filepath)
         except:
-            self.log.log(f"Couldn't import files: {filepaths}", level=3)
+            self.log.log(f"Couldn't import files: {self.filepath}", level=3)
             return None
         self.ui.mplwidgetimport.update_image(self.dsa.current_raw_im.values,
                                              replot=True)
@@ -145,12 +148,13 @@ class AppWindow(QMainWindow):
         self.tab3_initialized = False
 
     def tab1_import_video(self):
-        filepath = select_file('Open video')[0]
+        self.filepath_type = 'video'
+        self.filepath = select_file('Open video')[0]
         self.dsa = DSA(self)
         try:
-            self.dsa.import_video(filepath)
+            self.dsa.import_video(self.filepath)
         except:
-            self.log.log(f"Couldn't import video: {filepath}", level=3)
+            self.log.log(f"Couldn't import video: {self.filepath}", level=3)
             return None
         self.ui.mplwidgetimport.update_image(self.dsa.current_raw_im.values,
                                              replot=True)
@@ -486,6 +490,14 @@ class AppWindow(QMainWindow):
     def tab4_toggle_axis2(self, toggle):
         self.tab4_use_yaxis2 = toggle
         self.tab4_update_plot(index=0)
+
+    # Menu
+    def export_as_script(self):
+        filepath = self.filepath
+        params_im = self.tab1_get_params()
+        params_edges = self.tab2_get_params()
+        params_fit = self.tab3_get_params()
+        raise Exception('Not implemented yet')
 
 
 if __name__ == '__main__':
