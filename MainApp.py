@@ -39,6 +39,8 @@ class AppWindow(QMainWindow):
         self.tab2_already_opened = False
         self.tab3_initialized = False
         self.tab3_already_opened = False
+        self.tab4_initialized = False
+        self.tab4_use_yaxis2 = False
         self.last_tab = 0
         self.show()
 
@@ -57,6 +59,8 @@ class AppWindow(QMainWindow):
             self.tab2_switch_to_tab()
         elif tab_nmb == 2:
             self.tab3_switch_to_tab()
+        elif tab_nmb == 3:
+            self.tab4_switch_to_tab()
         # Update last tab
         self.last_tab = tab_nmb
 
@@ -413,6 +417,75 @@ class AppWindow(QMainWindow):
         else:
             self._tab3_update_fit_method()
         self.tab3_update_fit()
+
+    # TAB4
+    def tab4_initialize(self):
+        # Add option to combo boxes
+        for opts in ['Frame number', 'Time']:
+            self.ui.tab4_combo_xaxis.insertItem(100, opts)
+        for opts in ['CA (mean)', 'CA (left)', 'CA (right)', 'Base radius']:
+            self.ui.tab4_combo_xaxis.insertItem(100, opts)
+            self.ui.tab4_combo_yaxis.insertItem(100, opts)
+            self.ui.tab4_combo_yaxis2.insertItem(100, opts)
+        # Set defauts
+        self.ui.tab4_combo_xaxis.setCurrentIndex(0)
+        self.ui.tab4_combo_yaxis.setCurrentIndex(0)
+        self.ui.tab4_combo_yaxis2.setCurrentIndex(3)
+        self.tab4_initialized = True
+
+    def tab4_switch_to_tab(self):
+        # initialize if needed
+        if not self.tab4_initialized:
+            self.tab4_initialize()
+        # compute edges for every frames !
+        params = self.tab2_get_params()
+        try:
+            self.dsa.compute_edges(params)
+        except Exception:
+            self.log.log("Something wrong happened during edge detection",
+                         level=3)
+        # compute fits for every frames !
+        params = self.tab3_get_params()
+        try:
+            self.dsa.compute_fits(params)
+        except Exception:
+            self.log.log("Something wrong happened during edge fitting",
+                         level=3)
+        # compute contact angles for every frames !
+        try:
+            self.dsa.compute_cas()
+        except Exception:
+            self.log.log("Something wrong happened during contact angles "
+                         "computation",
+                         level=3)
+        #
+        self.tab4_update_plot(0, replot=True)
+
+    def tab4_update_plot(self, index, replot=False, draw=True):
+        if not self.tab4_initialized:
+            return None
+        # get things to plot
+        xaxis = self.ui.tab4_combo_xaxis.currentText()
+        yaxis = self.ui.tab4_combo_yaxis.currentText()
+        x = self.dsa.get_plotable_quantity(xaxis)
+        y = self.dsa.get_plotable_quantity(yaxis)
+        if self.tab4_use_yaxis2:
+            yaxis2 = self.ui.tab4_combo_yaxis2.currentText()
+            y2 = self.dsa.get_plotable_quantity(yaxis2)
+        else:
+            yaxis2 = ""
+            y2 = [np.nan]*len(x)
+        #
+        self.ui.mplwidgetanalyze.update_plots(x, y, y2,
+                                              xname=xaxis,
+                                              yname=yaxis,
+                                              y2name=yaxis2,
+                                              replot=replot,
+                                              draw=draw)
+
+    def tab4_toggle_axis2(self, toggle):
+        self.tab4_use_yaxis2 = toggle
+        self.tab4_update_plot(index=0)
 
 
 if __name__ == '__main__':

@@ -37,7 +37,6 @@ class DSA(object):
         self.fit_cache = []
         self.fit_cache_params = [None]*3
         self.fit_cache_method = None
-        # Cache
 
     def reset_cache(self, edge=True, fit=True):
         if self.nmb_frames is not None:
@@ -252,3 +251,69 @@ class DSA(object):
         lines[:, 0] -= deltax
         lines[:, 1] = deltay - lines[:, 1]
         return lines
+
+    def get_plotable_quantity(self, quant):
+        # fits should be computed already...
+        if self.fits is None:
+            raise Exception('Need to compute everything first !')
+        #
+        if quant == 'Frame number':
+            return np.arange(1, len(self.ims) + 1, 1)
+        elif quant == 'Time':
+            return np.arange(1, len(self.ims) + 1, 1)*self.ims.dt
+        elif quant == 'CA (right)':
+            return self.fits.get_contact_angles()[:, 0]
+        elif quant == 'CA (left)':
+            return 180 - self.fits.get_contact_angles()[:, 1]
+        elif quant == 'CA (mean)':
+            thetas = self.fits.get_contact_angles()
+            thetas[:, 1] = 180 - thetas[:, 1]
+            return np.mean(thetas, axis=1)
+        elif quant == 'Base radius':
+            return self.fits.get_base_diameters()
+        elif quant == 'Height':
+            return self.fits.get_drop_heights()
+        elif quant == 'Area':
+            return self.fits.get_drop_areas()
+        elif quant == 'Volume':
+            return self.fits.get_drop_volumes()
+        else:
+            raise Exception(f'Non-plottable quantity: {quant}')
+
+    def compute_edges(self, params):
+        self.log.log('DSA backend: Computing edges for the image set', level=1)
+        # Get params
+        canny_args = params[0].copy()
+        canny_args.update(params[-1])
+        contour_args = params[1].copy()
+        contour_args.update(params[-1])
+        # Edge detection
+        if self.edge_detection_method == 'canny':
+            self.edges = self.ims.edge_detection(**canny_args)
+        elif self.edge_detection_method == 'contour':
+            self.edges = self.ims.edge_detection_contour(**contour_args)
+        else:
+            raise Exception()
+
+    def compute_fits(self, params):
+        self.log.log('DSA backend: fitting edges for the image set', level=1)
+        # Get params
+        circle_args = params[0]
+        ellipse_args = params[1]
+        polyline_args = params[2]
+        spline_args = params[3]
+        # Fit
+        if self.fit_method == 'circle':
+            self.fits = self.edges.fit_circle(**circle_args)
+        elif self.fit_method == 'ellipse':
+            self.fits = self.edges.fit_ellipse(**ellipse_args)
+        elif self.fit_method == 'polyline':
+            self.fits = self.edges.fit_polyline(**polyline_args)
+        elif self.fit_method == 'spline':
+            self.fits = self.edges.fit_spline(**spline_args)
+        else:
+            self.app.log.log('please select a fitting method', level=1)
+            return [[0], [0]], [[-999], [-999]]
+
+    def compute_cas(self):
+        self.fits.compute_contact_angle()

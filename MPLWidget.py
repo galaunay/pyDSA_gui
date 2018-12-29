@@ -11,7 +11,10 @@ colors = {'baseline': 'tab:blue',
           'scaling': 'tab:green',
           'edge': 'tab:green',
           'fit': 'tab:orange',
-          'ca': 'tab:blue'}
+          'ca': 'tab:blue',
+          'plot1': 'tab:blue',
+          'plot2': 'tab:red'}
+
 
 
 # class MplPlotWidget(Canvas):
@@ -283,5 +286,46 @@ class MplWidgetFit(Canvas):
         ca1, ca2 = cas
         self.ca_r.set_data(*ca1)
         self.ca_l.set_data(*ca2)
+        if draw:
+            self.draw()
+
+
+class MplWidgetAnalyze(Canvas):
+    def __init__(self, parent=None):
+        # Plot
+        super(MplWidgetAnalyze, self).__init__(Figure())
+        self.setParent(parent)
+        self.figure = Figure(dpi=100, figsize=(200, 200))
+        self.canvas = Canvas(self.figure)
+        # self.ax = self.figure.add_axes([0.1, 0.1, 0.9, 0.9])
+        self.ax = self.figure.subplots(1, 1)
+        self.ax2 = self.ax.twinx()
+        # plots
+        self.plot1 = None
+        self.plot2 = None
+        # grid
+        self.ax.grid()
+
+    def update_plots(self, x, y, y2, xname, yname, y2name,
+                     draw=True, replot=False):
+        if replot or self.plot1 is None:
+            self.ax.clear()
+            self.ax2.clear()
+            self.plot1 = self.ax.plot(x, y,
+                                      color=colors['plot1'])[0]
+            self.plot2 = self.ax2.plot(x, y2,
+                                       color=colors['plot2'])[0]
+            self.ax.grid()
+        else:
+            self.plot1.set_data(x, y)
+            self.plot2.set_data(x, y2)
+        self.ax.relim()
+        self.ax.autoscale(True)
+        self.ax.set_xlabel(xname)
+        self.ax.set_ylabel(yname)
+        self.ax2.relim()
+        self.ax2.autoscale(True)
+        self.ax2.set_xlabel(xname)
+        self.ax2.set_ylabel(y2name)
         if draw:
             self.draw()
