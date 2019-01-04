@@ -16,6 +16,10 @@ class DSA(object):
         self.sizey = None
         self.ims = None
         self.current_raw_im = None
+        # Crop (time)
+        self.nmb_cropped_frames = None
+        self.first_frame = 0
+        self.last_frame = None
         # Crop
         self.ims_cropped = None
         self.current_crop_lims = None
@@ -64,6 +68,8 @@ class DSA(object):
         self.current_raw_im = self.ims[0]
         self.reset_cache()
         self.nmb_frames = len(self.ims)
+        self.last_frame = len(self.ims) - 1
+        self.nmb_cropped_frames = self.nmb_frames
         self.sizex = self.current_raw_im.shape[0]
         self.sizey = self.current_raw_im.shape[1]
 
@@ -73,6 +79,8 @@ class DSA(object):
         self.current_raw_im = self.ims[0]
         self.reset_cache()
         self.nmb_frames = len(self.ims)
+        self.last_frame = len(self.ims) - 1
+        self.nmb_cropped_frames = self.nmb_frames
         self.sizex = self.current_raw_im.shape[0]
         self.sizey = self.current_raw_im.shape[1]
 
@@ -129,6 +137,13 @@ class DSA(object):
         self.reset_cache()
         # return
         return True
+
+    def update_frame_lims(self):
+        first = self.ui.tab1_frameslider_first.value()
+        last = self.ui.tab1_frameslider_last.value()
+        self.nmb_cropped_frames = last - first
+        self.first_frame = first
+        self.last_frame = last
 
     def get_baseline(self, cropped=False):
         pt1 = self.baseline_pt1.copy()
@@ -258,9 +273,18 @@ class DSA(object):
             raise Exception('Need to compute everything first !')
         #
         if quant == 'Frame number':
-            return np.arange(1, len(self.ims) + 1, 1)
+            return np.arange(self.first_frame, self.last_frame + 1, 1)
         elif quant == 'Time':
-            return np.arange(1, len(self.ims) + 1, 1)*self.ims.dt
+            return np.arange(self.first_frame, self.last_frame + 1, 1)*self.ims.dt
+        elif quant == 'Position (x, right)':
+            _, pt2s = self.fits.get_drop_positions()
+            return pt2s[:, 0]
+        elif quant == 'Position (x, left)':
+            pt1s, _ = self.fits.get_drop_positions()
+            return pt1s[:, 0]
+        elif quant == 'Position (x, center)':
+            xys = self.fits.get_drop_centers()
+            return xys[:, 0]
         elif quant == 'CA (right)':
             return self.fits.get_contact_angles()[:, 0]
         elif quant == 'CA (left)':
@@ -287,11 +311,14 @@ class DSA(object):
         canny_args.update(params[-1])
         contour_args = params[1].copy()
         contour_args.update(params[-1])
+        # Only use the asked images
+        tmp_ims = self.ims.crop(intervt=[self.first_frame, self.last_frame],
+                                ind=True)
         # Edge detection
         if self.edge_detection_method == 'canny':
-            self.edges = self.ims.edge_detection(**canny_args)
+            self.edges = tmp_ims.edge_detection(**canny_args)
         elif self.edge_detection_method == 'contour':
-            self.edges = self.ims.edge_detection_contour(**contour_args)
+            self.edges = tmp_ims.edge_detection_contour(**contour_args)
         else:
             raise Exception()
 

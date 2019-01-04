@@ -53,6 +53,7 @@ class AppWindow(QMainWindow):
         if self.last_tab == 0:
             self.dsa.update_crop_lims()
             self.dsa.update_baselines()
+            self.dsa.update_frame_lims()
         # First tab
         if tab_nmb == 0:
             self.tab1_switch_to_tab()
@@ -69,15 +70,23 @@ class AppWindow(QMainWindow):
     def tab1_switch_to_tab(self):
         # Update the frame number
         self.ui.tab1_frameslider.setValue(self.dsa.current_ind + 1)
-        self.ui.tab1_spinbox.setValue(self.dsa.current_ind + 1)
+        self.ui.tab1_spinbox_frame.setValue(self.dsa.current_ind + 1)
 
     def tab1_enable_frame_sliders(self):
-        self.ui.tab1_frameslider.setMinimum(1)
-        self.ui.tab1_frameslider.setMaximum(self.dsa.nmb_frames)
-        self.ui.tab1_spinbox.setMinimum(1)
-        self.ui.tab1_spinbox.setMaximum(self.dsa.nmb_frames)
-        self.ui.tab1_frameslider.setEnabled(True)
-        self.ui.tab1_spinbox.setEnabled(True)
+        for slide in [self.ui.tab1_frameslider,
+                      self.ui.tab1_frameslider_first,
+                      self.ui.tab1_frameslider_last]:
+            slide.setEnabled(True)
+            slide.setMinimum(1)
+            slide.setMaximum(self.dsa.nmb_frames)
+        for spin in [self.ui.tab1_spinbox_frame,
+                     self.ui.tab1_spinbox_first,
+                     self.ui.tab1_spinbox_last]:
+            spin.setEnabled(True)
+            spin.setMinimum(1)
+            spin.setMaximum(self.dsa.nmb_frames)
+        self.ui.tab1_frameslider_last.setValue(self.dsa.nmb_frames)
+        self.ui.tab1_spinbox_frame.setValue(0)
 
     def tab1_disable_frame_sliders(self):
         self.ui.tab1_frameslider.setEnabled(False)
@@ -174,6 +183,16 @@ class AppWindow(QMainWindow):
         self.dsa.set_current(ind - 1)
         self.ui.mplwidgetimport.update_image(self.dsa.current_raw_im.values)
 
+    def tab1_set_first_frame(self, ind):
+        # self.ui.tab1_frameslider.setValue(ind)
+        self.ui.tab1_spinbox_frame.setValue(ind)
+        pass
+
+    def tab1_set_last_frame(self, ind):
+        # self.ui.tab1_frameslider.setValue(ind)
+        self.ui.tab1_spinbox_frame.setValue(ind)
+        pass
+
     def tab1_reset_crop(self):
         crop_lims = [0, self.dsa.current_raw_im.shape[0],
                      0, self.dsa.current_raw_im.shape[1]]
@@ -230,10 +249,10 @@ class AppWindow(QMainWindow):
 
     def tab2_enable_frame_sliders(self):
         self._disable_frame_updater = True
-        self.ui.tab2_frameslider.setMinimum(1)
-        self.ui.tab2_frameslider.setMaximum(self.dsa.nmb_frames)
-        self.ui.tab2_spinbox.setMinimum(1)
-        self.ui.tab2_spinbox.setMaximum(self.dsa.nmb_frames)
+        self.ui.tab2_frameslider.setMinimum(self.dsa.first_frame)
+        self.ui.tab2_frameslider.setMaximum(self.dsa.last_frame)
+        self.ui.tab2_spinbox.setMinimum(self.dsa.first_frame)
+        self.ui.tab2_spinbox.setMaximum(self.dsa.last_frame)
         self.ui.tab2_frameslider.setEnabled(True)
         self.ui.tab2_spinbox.setEnabled(True)
         self._disable_frame_updater = False
@@ -337,10 +356,10 @@ class AppWindow(QMainWindow):
 
     def tab3_enable_frame_sliders(self):
         self._disable_frame_updater = True
-        self.ui.tab3_frameslider.setMinimum(1)
-        self.ui.tab3_frameslider.setMaximum(self.dsa.nmb_frames)
-        self.ui.tab3_spinbox.setMinimum(1)
-        self.ui.tab3_spinbox.setMaximum(self.dsa.nmb_frames)
+        self.ui.tab3_frameslider.setMinimum(self.dsa.first_frame)
+        self.ui.tab3_frameslider.setMaximum(self.dsa.last_frame)
+        self.ui.tab3_spinbox.setMinimum(self.dsa.first_frame)
+        self.ui.tab3_spinbox.setMaximum(self.dsa.last_frame)
         self.ui.tab3_frameslider.setEnabled(True)
         self.ui.tab3_spinbox.setEnabled(True)
         self._disable_frame_updater = False
@@ -427,7 +446,9 @@ class AppWindow(QMainWindow):
         # Add option to combo boxes
         for opts in ['Frame number', 'Time']:
             self.ui.tab4_combo_xaxis.insertItem(100, opts)
-        for opts in ['CA (mean)', 'CA (left)', 'CA (right)', 'Base radius']:
+        for opts in ['CA (mean)', 'CA (left)', 'CA (right)', 'Base radius',
+                     'Position (x, center)', 'Position (x, right)',
+                     'Position (x, left)']:
             self.ui.tab4_combo_xaxis.insertItem(100, opts)
             self.ui.tab4_combo_yaxis.insertItem(100, opts)
             self.ui.tab4_combo_yaxis2.insertItem(100, opts)
