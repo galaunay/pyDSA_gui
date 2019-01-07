@@ -18,7 +18,7 @@ class DSA(object):
         self.current_raw_im = None
         # Crop (time)
         self.nmb_cropped_frames = None
-        self.first_frame = 0
+        self.first_frame = 1
         self.last_frame = None
         # Crop
         self.ims_cropped = None
@@ -29,18 +29,20 @@ class DSA(object):
         self.baseline_pt2 = None
         # Edges
         self.edge_detection_method = 'canny'
-        self.edges = None
         self.current_edge = None
         self.edge_cache = []
         self.edge_cache_params = [None]*3
         self.edge_cache_method = None
+        self.edges = None
+        self.edges_old_params = None
         # Fit
         self.fit_method = 'ellipse'
-        self.fits = None
         self.current_fit = None
         self.fit_cache = []
         self.fit_cache_params = [None]*3
         self.fit_cache_method = None
+        self.fits = None
+        self.fits_old_params = None
 
     def reset_cache(self, edge=True, fit=True):
         if self.nmb_frames is not None:
@@ -311,9 +313,37 @@ class DSA(object):
         canny_args.update(params[-1])
         contour_args = params[1].copy()
         contour_args.update(params[-1])
+        # Check if need to recompute
+        new_args = {'canny': canny_args,
+                    'contour': contour_args}
+        new_params = {'cropt': [self.first_frame + 0, self.last_frame + 0],
+                      'cropx': self.current_crop_lims[0].copy(),
+                      'cropy': self.current_crop_lims[1].copy(),
+                      'detection_method': self.edge_detection_method,
+                      'args': new_args[self.edge_detection_method]}
+        need_recompute = False
+        if self.edges_old_params is None or self.edges is None:
+            need_recompute = True
+        elif self.edges_old_params['detection_method'] != self.edge_detection_method:
+            need_recompute = True
+        else:
+            for crop in ['cropt', 'cropx', 'cropy']:
+                if np.any(new_params[crop] != self.edges_old_params[crop]):
+                    need_recompute = True
+                    break
+            for key in new_params['args'].keys():
+                if new_params['args'][key] != self.edges_old_params['args'][key]:
+                    need_recompute = True
+                    break
+        if not need_recompute:
+            return None
+        else:
+            self.edges_old_params = new_params
+            self.fits = None
         # Only use the asked images
-        tmp_ims = self.ims.crop(intervt=[self.first_frame, self.last_frame],
-                                ind=True)
+        tmp_ims = self.ims_cropped.crop(intervt=[self.first_frame - 1,
+                                                 self.last_frame - 1],
+                                        ind=True)
         # Edge detection
         if self.edge_detection_method == 'canny':
             self.edges = tmp_ims.edge_detection(**canny_args)
@@ -329,6 +359,28 @@ class DSA(object):
         ellipse_args = params[1]
         polyline_args = params[2]
         spline_args = params[3]
+        # Check if need to recompute
+        new_args = {'circle': circle_args,
+                    'ellipse': ellipse_args,
+                    'polyline': polyline_args,
+                    'spline': spline_args}[self.fit_method]
+        new_params = {'method': self.fit_method,
+                      'args': new_args}
+        need_recompute = False
+        if self.fits_old_params is None or self.fits is None:
+            need_recompute = True
+        elif new_params['method'] != self.fits_old_params['method']:
+            need_recompute = True
+        else:
+            old_args = self.fits_old_params['args']
+            for key in new_args.keys():
+                if new_args[key] != old_args[key]:
+                    need_recompute = True
+                    break
+        if not need_recompute:
+            return None
+        else:
+            self.fits_old_params = new_params
         # Fit
         if self.fit_method == 'circle':
             self.fits = self.edges.fit_circle(**circle_args)
