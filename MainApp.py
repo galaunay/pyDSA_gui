@@ -89,8 +89,14 @@ class AppWindow(QMainWindow):
         self.ui.tab1_spinbox_frame.setValue(0)
 
     def tab1_disable_frame_sliders(self):
-        self.ui.tab1_frameslider.setEnabled(False)
-        self.ui.tab1_spinbox.setEnabled(False)
+        for slide in [self.ui.tab1_frameslider,
+                      self.ui.tab1_frameslider_first,
+                      self.ui.tab1_frameslider_last]:
+            slide.setEnabled(False)
+        for spin in [self.ui.tab1_spinbox_frame,
+                     self.ui.tab1_spinbox_first,
+                     self.ui.tab1_spinbox_last]:
+            spin.setEnabled(False)
 
     def tab1_enable_cropping(self):
         self.ui.reset_crop.setEnabled(True)
@@ -229,6 +235,11 @@ class AppWindow(QMainWindow):
         self._disable_frame_updater = True
         self.ui.tab2_frameslider.setValue(self.dsa.current_ind + 1)
         self._disable_frame_updater = False
+        # Update the first and last frames
+        self.ui.tab2_frameslider.setMinimum(self.dsa.first_frame)
+        self.ui.tab2_frameslider.setMaximum(self.dsa.last_frame)
+        self.ui.tab2_spinbox.setMinimum(self.dsa.first_frame)
+        self.ui.tab2_spinbox.setMaximum(self.dsa.last_frame)
         # update the detected edge
         self.tab2_update_edge(draw=draw)
         #
@@ -443,6 +454,8 @@ class AppWindow(QMainWindow):
 
     # TAB4
     def tab4_initialize(self):
+        if self.dsa.nmb_frames == 1:
+            return None
         # Add option to combo boxes
         for opts in ['Frame number', 'Time']:
             self.ui.tab4_combo_xaxis.insertItem(100, opts)
@@ -501,6 +514,7 @@ class AppWindow(QMainWindow):
             yaxis2 = ""
             y2 = [np.nan]*len(x)
         #
+        # check length
         self.ui.mplwidgetanalyze.update_plots(x, y, y2,
                                               xname=xaxis,
                                               yname=yaxis,
