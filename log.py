@@ -31,6 +31,8 @@ class Log(object):
         t = str(timedelta(seconds=int(time.time()-self.t0)))
         text = f"{t}  {self.levels[level-1]}: {message}"
         self.logs.append(text)
+        # Print in shell
+        print(text)
         # Update log tab
         self.display_area.setTextColor(self.level_colors[level - 1])
         self.display_area.append(self.logs[-1])
