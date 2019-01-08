@@ -319,6 +319,12 @@ class MplWidgetAnalyze(Canvas):
         else:
             self.plot1.set_data(x, y)
             self.plot2.set_data(x, y2)
+        # disable second axe if not needed
+        if np.all(np.isnan(y2)):
+            self.ax2.set_visible(False)
+        else:
+            self.ax2.set_visible(True)
+        #
         self.ax.relim()
         self.ax.autoscale(True)
         self.ax.set_xlabel(xname)
