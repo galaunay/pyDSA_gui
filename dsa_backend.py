@@ -60,6 +60,17 @@ class DSA(object):
         self.sizex = self.current_raw_im.shape[0]
         self.sizey = self.current_raw_im.shape[1]
 
+    def _import_images_hook(self, i, maxi):
+        i += 1  # base 0 to base 1
+        text = f'Importing image set: {int(np.round(i/maxi*100))}%'
+        # log
+        if i == maxi:
+            self.log.log(text, level=1)
+        # Show in statusbar
+        if text != self.ui.statusbar.currentMessage():
+            self.ui.statusbar.showMessage(text)
+            self.ui.statusbar.repaint()
+
     def import_images(self, filepaths):
         self.log.log(f'DSA backend: Importing image set: {filepaths}', level=1)
         self.ims = dsa.TemporalImages(filepath=None, cache_infos=False)
@@ -67,6 +78,7 @@ class DSA(object):
         for i, filepath in enumerate(filepaths):
             tmpim = dsa.import_from_image(filepath, cache_infos=False)
             self.ims.add_field(tmpim, time=i+1, unit_times="", copy=False)
+            self._import_images_hook(i, len(filepaths))
         self.current_raw_im = self.ims[0]
         self.reset_cache()
         self.nmb_frames = len(self.ims)
@@ -75,9 +87,21 @@ class DSA(object):
         self.sizex = self.current_raw_im.shape[0]
         self.sizey = self.current_raw_im.shape[1]
 
+    def _import_video_hook(self, i, maxi):
+        i += 1  # base 0 to base 1
+        # Show in statusbar
+        text = f'Importing video: {int(np.round(i/maxi*100))}%'
+        # log
+        if i == maxi:
+            self.log.log(text, level=1)
+        if text != self.ui.statusbar.currentMessage():
+            self.ui.statusbar.showMessage(text)
+            self.ui.statusbar.repaint()
+
     def import_video(self, filepath):
         self.log.log(f'DSA backend: Importing video: {filepath}', level=1)
-        self.ims = dsa.import_from_video(filepath, cache_infos=False)
+        self.ims = dsa.import_from_video(filepath, cache_infos=False,
+                                         iteration_hook=self._import_video_hook)
         self.current_raw_im = self.ims[0]
         self.reset_cache()
         self.nmb_frames = len(self.ims)
@@ -306,6 +330,17 @@ class DSA(object):
         else:
             raise Exception(f'Non-plottable quantity: {quant}')
 
+    def _edges_computation_hook(self, i, maxi):
+        i += 1  # base 0 to base 1
+        text = f'Detecting edges: {int(np.round(i/maxi*100))}%'
+        # log
+        if i == maxi:
+            self.log.log(text, level=1)
+        # Show in statusbar
+        if text != self.ui.statusbar.currentMessage():
+            self.ui.statusbar.showMessage(text)
+            self.ui.statusbar.repaint()
+
     def compute_edges(self, params):
         self.log.log('DSA backend: Computing edges for the image set', level=1)
         # Get params
@@ -346,11 +381,27 @@ class DSA(object):
                                         ind=True)
         # Edge detection
         if self.edge_detection_method == 'canny':
-            self.edges = tmp_ims.edge_detection(**canny_args)
+            self.edges = tmp_ims.edge_detection(
+                iteration_hook=self._edges_computation_hook,
+                **canny_args)
         elif self.edge_detection_method == 'contour':
-            self.edges = tmp_ims.edge_detection_contour(**contour_args)
+            self.edges = tmp_ims.edge_detection_contour(
+                iteration_hook=self._fits_computation_hook,
+                **contour_args)
         else:
             raise Exception()
+
+    def _fits_computation_hook(self, i, maxi):
+        i += 1  # base 0 to base 1
+        interv = int(maxi/9)
+        text = f'Fittings edges: {int(np.round(i/maxi*100))}%'
+        # log
+        if i == maxi:
+            self.log.log(text, level=1)
+        # Show in statusbar
+        if text != self.ui.statusbar.currentMessage():
+            self.ui.statusbar.showMessage(text)
+            self.ui.statusbar.repaint()
 
     def compute_fits(self, params):
         self.log.log('DSA backend: fitting edges for the image set', level=1)
@@ -383,13 +434,21 @@ class DSA(object):
             self.fits_old_params = new_params
         # Fit
         if self.fit_method == 'circle':
-            self.fits = self.edges.fit_circle(**circle_args)
+            self.fits = self.edges.fit_circle(
+                iteration_hook=self._fits_computation_hook,
+                **circle_args)
         elif self.fit_method == 'ellipse':
-            self.fits = self.edges.fit_ellipse(**ellipse_args)
+            self.fits = self.edges.fit_ellipse(
+                iteration_hook=self._fits_computation_hook,
+                **ellipse_args)
         elif self.fit_method == 'polyline':
-            self.fits = self.edges.fit_polyline(**polyline_args)
+            self.fits = self.edges.fit_polyline(
+                iteration_hook=self._fits_computation_hook,
+                **polyline_args)
         elif self.fit_method == 'spline':
-            self.fits = self.edges.fit_spline(**spline_args)
+            self.fits = self.edges.fit_spline(
+                iteration_hook=self._fits_computation_hook,
+                **spline_args)
         else:
             self.app.log.log('please select a fitting method', level=1)
             return [[0], [0]], [[-999], [-999]]

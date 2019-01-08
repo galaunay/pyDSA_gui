@@ -14,6 +14,20 @@ class Log(object):
                              for col in ['grey', 'orange', 'red']]
 
     def log(self, message, level):
+        """
+        Log a new message.
+
+        Parameters
+        ----------
+        messages: string
+           Message to log.
+
+        level: int in [1, 2, 3]
+           Level of the messages:
+           1: just log to log tab
+           2: log to log tab and display in minibar
+           3: log in log tab and display in minibar in red !
+        """
         t = str(timedelta(seconds=int(time.time()-self.t0)))
         text = f"{t}  {self.levels[level-1]}: {message}"
         self.logs.append(text)
@@ -21,5 +35,7 @@ class Log(object):
         self.display_area.setTextColor(self.level_colors[level - 1])
         self.display_area.append(self.logs[-1])
         # Display in statu bar
-        if level >= 3:
+        if level == 2:
+            self.status_bar.showMessage(f"{message}")
+        elif level == 3:
             self.status_bar.showMessage(f"Error: {message}")
