@@ -28,10 +28,16 @@ class AppWindow(QMainWindow):
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        # # Add progress bar to status bar
-        # self.ui.progressbar = QtWidgets.QProgressBar()
-        # self.ui.progressbar.setMaximumSize(QtCore.QSize(150, 16777215))
-        # self.ui.statusbar.addPermanentWidget(self.ui.progressbar)
+        # Status bar
+        self.statusbar_delay = 2000
+        self.ui.progressbar = QtWidgets.QProgressBar()
+        self.ui.progressbar.setMaximumSize(QtCore.QSize(250, 16777215))
+        self.ui.progressbar.setTextVisible(True)
+        self.ui.progressbar.setFormat("%p%")
+        self.ui.progressbar.setValue(0)
+        self.ui.progressbar.setVisible(False)
+        self.ui.statusbar.addPermanentWidget(self.ui.progressbar)
+        #
         self.log = Log(self.ui.logarea, self.ui.statusbar)
         self.dsa = DSA(self)
         self._disable_frame_updater = False
@@ -505,16 +511,39 @@ class AppWindow(QMainWindow):
         # get things to plot
         xaxis = self.ui.tab4_combo_xaxis.currentText()
         yaxis = self.ui.tab4_combo_yaxis.currentText()
-        x = self.dsa.get_plotable_quantity(xaxis)
-        y = self.dsa.get_plotable_quantity(yaxis)
+        try:
+            x = self.dsa.get_plotable_quantity(xaxis)
+        except Exception:
+            self.log.log(f"Couldn't get the quantity {xaxis}",
+                         level=3)
+            x = []
+        try:
+            y = self.dsa.get_plotable_quantity(yaxis)
+        except Exception:
+            self.log.log(f"Couldn't get the quantity {yaxis}",
+                         level=3)
+            y = [np.nan]*len(x)
         if self.tab4_use_yaxis2:
             yaxis2 = self.ui.tab4_combo_yaxis2.currentText()
-            y2 = self.dsa.get_plotable_quantity(yaxis2)
+            try:
+                y2 = self.dsa.get_plotable_quantity(yaxis2)
+            except Exception:
+                self.log.log(f"Couldn't get the quantity {yaxis2}",
+                             level=3)
+                y2 = [np.nan]*len(x)
         else:
             yaxis2 = ""
             y2 = [np.nan]*len(x)
+        # if no x
+        if len(x) == 0:
+            y = []
+            y2 = []
         #
         # check length
+        if len(x) != len(y):
+            self.log.log('Incoherence in plottable quantities length',
+                         level=3)
+            return None
         self.ui.mplwidgetanalyze.update_plots(x, y, y2,
                                               xname=xaxis,
                                               yname=yaxis,

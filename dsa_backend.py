@@ -1,6 +1,5 @@
 import pyDSA as dsa
 import numpy as np
-from pyDSA.helpers import get_ellipse_points
 
 
 class DSA(object):
@@ -60,25 +59,39 @@ class DSA(object):
         self.sizex = self.current_raw_im.shape[0]
         self.sizey = self.current_raw_im.shape[1]
 
-    def _import_images_hook(self, i, maxi):
-        i += 1  # base 0 to base 1
-        text = f'Importing image set: {int(np.round(i/maxi*100))}%'
-        # log
-        if i == maxi:
-            self.log.log(text, level=1)
-        # Show in statusbar
-        if text != self.ui.statusbar.currentMessage():
-            self.ui.statusbar.showMessage(text)
-            self.ui.statusbar.repaint()
+    def get_progressbar_hook(self, text_progress, text_finished):
+        def hook(i, maxi):
+            # base 0 to base 1
+            i += 1
+            # update progressbar
+            self.ui.progressbar.setVisible(True)
+            self.ui.progressbar.setMaximum(maxi)
+            self.ui.progressbar.setValue(i)
+            # Add message to statusbar
+            if text_progress != self.ui.statusbar.currentMessage():
+                self.ui.statusbar.showMessage(text_progress,
+                                              self.app.statusbar_delay)
+                self.ui.statusbar.repaint()
+            # Add to log when finished
+            if i == maxi:
+                self.ui.progressbar.setVisible(False)
+                self.log.log(text_finished, level=1)
+                self.ui.statusbar.showMessage(text_finished,
+                                              self.app.statusbar_delay)
+        return hook
 
     def import_images(self, filepaths):
+        if len(filepaths) == 0:
+            return None
         self.log.log(f'DSA backend: Importing image set: {filepaths}', level=1)
         self.ims = dsa.TemporalImages(filepath=None, cache_infos=False)
         filepaths.sort()
+        import_hook = self.get_progressbar_hook('Importing image set',
+                                                'Imported image set')
         for i, filepath in enumerate(filepaths):
             tmpim = dsa.import_from_image(filepath, cache_infos=False)
             self.ims.add_field(tmpim, time=i+1, unit_times="", copy=False)
-            self._import_images_hook(i, len(filepaths))
+            import_hook(i, len(filepaths))
         self.current_raw_im = self.ims[0]
         self.reset_cache()
         self.nmb_frames = len(self.ims)
@@ -87,21 +100,12 @@ class DSA(object):
         self.sizex = self.current_raw_im.shape[0]
         self.sizey = self.current_raw_im.shape[1]
 
-    def _import_video_hook(self, i, maxi):
-        i += 1  # base 0 to base 1
-        # Show in statusbar
-        text = f'Importing video: {int(np.round(i/maxi*100))}%'
-        # log
-        if i == maxi:
-            self.log.log(text, level=1)
-        if text != self.ui.statusbar.currentMessage():
-            self.ui.statusbar.showMessage(text)
-            self.ui.statusbar.repaint()
-
     def import_video(self, filepath):
         self.log.log(f'DSA backend: Importing video: {filepath}', level=1)
+        hook = self.get_progressbar_hook('Importing video',
+                                         'Video imported')
         self.ims = dsa.import_from_video(filepath, cache_infos=False,
-                                         iteration_hook=self._import_video_hook)
+                                         iteration_hook=hook)
         self.current_raw_im = self.ims[0]
         self.reset_cache()
         self.nmb_frames = len(self.ims)
@@ -296,7 +300,8 @@ class DSA(object):
     def get_plotable_quantity(self, quant):
         # fits should be computed already...
         if self.fits is None:
-            raise Exception('Need to compute everything first !')
+            self.log.log('Fit need to be computed first', level=3)
+            return []
         #
         if quant == 'Frame number':
             return np.arange(self.first_frame, self.last_frame + 1, 1)
@@ -329,17 +334,6 @@ class DSA(object):
             return self.fits.get_drop_volumes()
         else:
             raise Exception(f'Non-plottable quantity: {quant}')
-
-    def _edges_computation_hook(self, i, maxi):
-        i += 1  # base 0 to base 1
-        text = f'Detecting edges: {int(np.round(i/maxi*100))}%'
-        # log
-        if i == maxi:
-            self.log.log(text, level=1)
-        # Show in statusbar
-        if text != self.ui.statusbar.currentMessage():
-            self.ui.statusbar.showMessage(text)
-            self.ui.statusbar.repaint()
 
     def compute_edges(self, params):
         self.log.log('DSA backend: Computing edges for the image set', level=1)
@@ -380,28 +374,16 @@ class DSA(object):
                                                  self.last_frame - 1],
                                         ind=True)
         # Edge detection
+        hook = self.get_progressbar_hook('Detecting edges',
+                                         'Detected edges')
         if self.edge_detection_method == 'canny':
-            self.edges = tmp_ims.edge_detection(
-                iteration_hook=self._edges_computation_hook,
-                **canny_args)
+            self.edges = tmp_ims.edge_detection(iteration_hook=hook,
+                                                **canny_args)
         elif self.edge_detection_method == 'contour':
-            self.edges = tmp_ims.edge_detection_contour(
-                iteration_hook=self._fits_computation_hook,
-                **contour_args)
+            self.edges = tmp_ims.edge_detection_contour(iteration_hook=hook,
+                                                        **contour_args)
         else:
             raise Exception()
-
-    def _fits_computation_hook(self, i, maxi):
-        i += 1  # base 0 to base 1
-        interv = int(maxi/9)
-        text = f'Fittings edges: {int(np.round(i/maxi*100))}%'
-        # log
-        if i == maxi:
-            self.log.log(text, level=1)
-        # Show in statusbar
-        if text != self.ui.statusbar.currentMessage():
-            self.ui.statusbar.showMessage(text)
-            self.ui.statusbar.repaint()
 
     def compute_fits(self, params):
         self.log.log('DSA backend: fitting edges for the image set', level=1)
@@ -433,22 +415,20 @@ class DSA(object):
         else:
             self.fits_old_params = new_params
         # Fit
+        hook = self.get_progressbar_hook('Fitting edges',
+                                         'Fitted edges')
         if self.fit_method == 'circle':
-            self.fits = self.edges.fit_circle(
-                iteration_hook=self._fits_computation_hook,
-                **circle_args)
+            self.fits = self.edges.fit_circle(iteration_hook=hook,
+                                              **circle_args)
         elif self.fit_method == 'ellipse':
-            self.fits = self.edges.fit_ellipse(
-                iteration_hook=self._fits_computation_hook,
-                **ellipse_args)
+            self.fits = self.edges.fit_ellipse(iteration_hook=hook,
+                                               **ellipse_args)
         elif self.fit_method == 'polyline':
-            self.fits = self.edges.fit_polyline(
-                iteration_hook=self._fits_computation_hook,
-                **polyline_args)
+            self.fits = self.edges.fit_polyline(iteration_hook=hook,
+                                                **polyline_args)
         elif self.fit_method == 'spline':
-            self.fits = self.edges.fit_spline(
-                iteration_hook=self._fits_computation_hook,
-                **spline_args)
+            self.fits = self.edges.fit_spline(iteration_hook=hook,
+                                              **spline_args)
         else:
             self.app.log.log('please select a fitting method', level=1)
             return [[0], [0]], [[-999], [-999]]
