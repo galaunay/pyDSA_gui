@@ -89,9 +89,14 @@ class DSA(object):
         import_hook = self.get_progressbar_hook('Importing image set',
                                                 'Imported image set')
         for i, filepath in enumerate(filepaths):
-            tmpim = dsa.import_from_image(filepath, cache_infos=False)
-            self.ims.add_field(tmpim, time=i+1, unit_times="", copy=False)
-            import_hook(i, len(filepaths))
+            try:
+                tmpim = dsa.import_from_image(filepath, cache_infos=False)
+                self.ims.add_field(tmpim, time=i+1, unit_times="", copy=False)
+                import_hook(i, len(filepaths))
+            except IOError:
+                self.log.log(f"Cannot import '{filepath}': not a valid image",
+                             level=3)
+                raise IOError()
         self.current_raw_im = self.ims[0]
         self.reset_cache()
         self.nmb_frames = len(self.ims)
@@ -188,6 +193,9 @@ class DSA(object):
         return pt1, pt2
 
     def get_current_edge(self, params):
+        if self.edge_detection_method is None:
+            self.current_edge = None
+            return [[], []]
         self.log.log('DSA backend: Computing edges for current image', level=1)
         # Reset cache if not valid anymore
         if self.edge_cache_method != self.edge_detection_method:
@@ -205,12 +213,18 @@ class DSA(object):
             contour_args = params[1].copy()
             contour_args.update(params[-1])
             # Edge detection
-            if self.edge_detection_method == 'canny':
-                edge = self.current_cropped_im.edge_detection(**canny_args)
-            elif self.edge_detection_method == 'contour':
-                edge = self.current_cropped_im.edge_detection_contour(**contour_args)
-            else:
-                raise Exception()
+            try:
+                if self.edge_detection_method == 'canny':
+                    edge = self.current_cropped_im.edge_detection(**canny_args)
+                elif self.edge_detection_method == 'contour':
+                    edge = self.current_cropped_im.edge_detection_contour(**contour_args)
+                else:
+                    raise Exception()
+            except Exception:
+                self.log.log("Couldn't find edges for the current frame",
+                             level=2)
+                self.current_edge = None
+                return [[], []]
             # Update cache
             self.edge_cache[self.current_ind] = edge
             self.edge_cache_params = params
@@ -267,7 +281,6 @@ class DSA(object):
             pts = fit.get_fit_as_points()
             fit_center = [[-999], [-999]]
         else:
-            self.app.log.log('please select a fitting method', level=1)
             return [[0], [0]], [[-999], [-999]]
         # Update cache
         self.fit_cache[self.current_ind] = fit
@@ -284,10 +297,13 @@ class DSA(object):
         return pts, fit_center
 
     def get_current_ca(self):
+        if self.current_fit is None:
+            return [[np.nan, np.nan], [np.nan, np.nan]]
         try:
             self.current_fit.compute_contact_angle()
         except:
-            self.log.log('Failed to compute contact angles', level=3)
+            self.log.log('Failed to compute contact angles', level=2)
+            return [[np.nan, np.nan], [np.nan, np.nan]]
         lines = self.current_fit._get_angle_display_lines()
         lines = lines[0:2]
         lines = np.array(lines)
@@ -434,4 +450,7 @@ class DSA(object):
             return [[0], [0]], [[-999], [-999]]
 
     def compute_cas(self):
-        self.fits.compute_contact_angle()
+        if self.fits.fits[0].thetas is None:
+            hook = self.get_progressbar_hook('Computing contact angles',
+                                             'Computed contact angles')
+            self.fits.compute_contact_angle(iteration_hook=hook)

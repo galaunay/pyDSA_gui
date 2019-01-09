@@ -4,8 +4,9 @@ import time
 
 
 class Log(object):
-    def __init__(self, display_area, status_bar):
+    def __init__(self, display_area, status_bar, delay):
         self.logs = []
+        self.delay = delay
         self.display_area = display_area
         self.status_bar = status_bar
         self.t0 = time.time()
@@ -38,6 +39,6 @@ class Log(object):
         self.display_area.append(self.logs[-1])
         # Display in statu bar
         if level == 2:
-            self.status_bar.showMessage(f"{message}")
+            self.status_bar.showMessage(f"{message}", self.delay)
         elif level == 3:
-            self.status_bar.showMessage(f"Error: {message}")
+            self.status_bar.showMessage(f"Error: {message}", self.delay)

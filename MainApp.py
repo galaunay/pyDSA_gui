@@ -28,8 +28,11 @@ class AppWindow(QMainWindow):
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        # Status bar
+        # Variables
         self.statusbar_delay = 2000
+        self._disable_frame_updater = False
+        self.dsa = None
+        # Add Progress bar to status bar
         self.ui.progressbar = QtWidgets.QProgressBar()
         self.ui.progressbar.setMaximumSize(QtCore.QSize(250, 16777215))
         self.ui.progressbar.setTextVisible(True)
@@ -37,10 +40,10 @@ class AppWindow(QMainWindow):
         self.ui.progressbar.setValue(0)
         self.ui.progressbar.setVisible(False)
         self.ui.statusbar.addPermanentWidget(self.ui.progressbar)
-        #
-        self.log = Log(self.ui.logarea, self.ui.statusbar)
-        self.dsa = DSA(self)
-        self._disable_frame_updater = False
+        # Initialize log
+        self.log = Log(self.ui.logarea, self.ui.statusbar,
+                       self.statusbar_delay)
+        # Tab-related variables
         self.tab1_filepath = ""
         self.tab2_initialized = False
         self.tab2_already_opened = False
@@ -49,18 +52,19 @@ class AppWindow(QMainWindow):
         self.tab4_initialized = False
         self.tab4_use_yaxis2 = False
         self.last_tab = 0
+        # Show it !
         self.show()
 
     def tab_changed(self, tab_nmb):
-        # Do nothing if no imported images
+        # Do nothing if no imported image yet
         if self.dsa.ims is None:
             return None
-        # Update dsa backend if last tab is import tab
+        # Update dsa backend if the last tab is the import tab
         if self.last_tab == 0:
             self.dsa.update_crop_lims()
             self.dsa.update_baselines()
             self.dsa.update_frame_lims()
-        # First tab
+        # Do switch to tab
         if tab_nmb == 0:
             self.tab1_switch_to_tab()
         elif tab_nmb == 1:
@@ -69,7 +73,7 @@ class AppWindow(QMainWindow):
             self.tab3_switch_to_tab()
         elif tab_nmb == 3:
             self.tab4_switch_to_tab()
-        # Update last tab
+        # Update the last tab
         self.last_tab = tab_nmb
 
     # TAB 1
@@ -123,14 +127,18 @@ class AppWindow(QMainWindow):
         self.ui.tab1_remove_scaling_btn.setEnabled(True)
 
     def tab1_import_image(self):
+        # Select image to import
         self.filepath_type = 'image'
         self.filepath = select_file('Open image')[0]
+        # Import image
         self.dsa = DSA(self)
         try:
             self.dsa.import_image(self.filepath)
-        except:
-            self.log.log(f"Couldn't import image: {self.filepath}", level=3)
+        except IOError:
+            self.log.log(f"Cannot import '{self.filepath}': not a valid image",
+                         level=3)
             return None
+        # Update image display
         self.ui.mplwidgetimport.update_image(self.dsa.current_raw_im.values,
                                              replot=True)
         # Disable frame sliders
@@ -141,19 +149,26 @@ class AppWindow(QMainWindow):
         self.tab1_enable_baseline()
         # Enable scaling
         self.tab1_enable_scaling()
-        # De-init other tabs
+        # De-init next tabs
         self.tab2_initialized = False
         self.tab3_initialized = False
 
     def tab1_import_images(self):
+        # Select images to import
         self.filepath_type = 'images'
         self.filepath = select_files('Open images')[0]
+        # Check
+        if len(self.filepath) == 0:
+            return None
+        # Import images
         self.dsa = DSA(self)
         try:
             self.dsa.import_images(self.filepath)
-        except:
-            self.log.log(f"Couldn't import files: {self.filepath}", level=3)
+        except IOError:
+            self.log.log(f"Couldn't import selected files: {self.filepath}",
+                         level=3)
             return None
+        # Update images display
         self.ui.mplwidgetimport.update_image(self.dsa.current_raw_im.values,
                                              replot=True)
         # Enable frame sliders
@@ -169,14 +184,18 @@ class AppWindow(QMainWindow):
         self.tab3_initialized = False
 
     def tab1_import_video(self):
+        # Select video to import
         self.filepath_type = 'video'
         self.filepath = select_file('Open video')[0]
+        # Import video
         self.dsa = DSA(self)
         try:
             self.dsa.import_video(self.filepath)
-        except:
-            self.log.log(f"Couldn't import video: {self.filepath}", level=3)
+        except IOError:
+            self.log.log(f"Couldn't import '{self.filepath}':"
+                         " not a valid video", level=3)
             return None
+        # Update video display
         self.ui.mplwidgetimport.update_image(self.dsa.current_raw_im.values,
                                              replot=True)
         # Enable frame sliders
@@ -196,14 +215,10 @@ class AppWindow(QMainWindow):
         self.ui.mplwidgetimport.update_image(self.dsa.current_raw_im.values)
 
     def tab1_set_first_frame(self, ind):
-        # self.ui.tab1_frameslider.setValue(ind)
         self.ui.tab1_spinbox_frame.setValue(ind)
-        pass
 
     def tab1_set_last_frame(self, ind):
-        # self.ui.tab1_frameslider.setValue(ind)
         self.ui.tab1_spinbox_frame.setValue(ind)
-        pass
 
     def tab1_reset_crop(self):
         crop_lims = [0, self.dsa.current_raw_im.shape[0],
@@ -231,7 +246,7 @@ class AppWindow(QMainWindow):
         draw = True
         if not self.tab2_already_opened:
             draw = False
-        # Replot the plot
+        # Replot
         self.ui.mplwidgetdetect.update_image(
             self.dsa.current_cropped_im.values,
             replot=True, draw=draw)
@@ -260,7 +275,7 @@ class AppWindow(QMainWindow):
         self.ui.mplwidgetdetect.update_image(self.dsa.current_cropped_im.values,
                                              replot=False)
         # update edge
-        # TODO: replotting the edge markersfor each frame take time,
+        # TODO: replotting the edge markers for each frame take time,
         #       It may be a better idea to use imshow to display edges
         self.tab2_update_edge()
 
@@ -281,8 +296,6 @@ class AppWindow(QMainWindow):
         self._disable_frame_updater = False
 
     def tab2_get_params(self):
-        contour = {}
-        options = {}
         canny = {'threshold1': self.ui.tab2_canny_threshold1.value(),
                  'threshold2': self.ui.tab2_canny_threshold2.value(),
                  'dilatation_steps': self.ui.tab2_canny_dilatation_steps.value(),
@@ -301,10 +314,9 @@ class AppWindow(QMainWindow):
         params = self.tab2_get_params()
         try:
             edge = self.dsa.get_current_edge(params)
-        except Exception:
-            self.log.log("Couldn't find a drop on the current frame",
-                         level=2)
-            edge = [[], []]
+        except:
+            self.log.log('Unknown error during edge detection', level=3)
+            return None
         self.ui.mplwidgetdetect.update_edge(edge, draw=draw)
 
     def tab2_toggle_canny(self, toggle):
@@ -399,13 +411,16 @@ class AppWindow(QMainWindow):
         params = self.tab3_get_params()
         try:
             fit, fit_center = self.dsa.get_current_fit(params)
-        except Exception:
-            self.log.log("Couldn't find a fit for the current edge",
-                         level=2)
-            fit = [[], []]
-            fit_center = [[], []]
+        except:
+            self.log.log('Unknown error during edge fitting', level=3)
+            return None
         self.ui.mplwidgetfit.update_fit(fit, fit_center, draw=draw)
-        cas = self.dsa.get_current_ca()
+        try:
+            cas = self.dsa.get_current_ca()
+        except:
+            self.log.log('Unknown error during contact angle computation',
+                         level=3)
+            return None
         self.ui.mplwidgetfit.update_ca(cas, draw=draw)
 
     def _tab3_uncheck_others(self, box):
@@ -481,29 +496,39 @@ class AppWindow(QMainWindow):
         # initialize if needed
         if not self.tab4_initialized:
             self.tab4_initialize()
+        # Clean
+        self.tab4_clean_plot()
         # compute edges for every frames !
         params = self.tab2_get_params()
         try:
             self.dsa.compute_edges(params)
-        except Exception:
-            self.log.log("Something wrong happened during edge detection",
-                         level=3)
+        except:
+            self.log.log('Unknown error during edges detection', level=3)
+            return None
         # compute fits for every frames !
         params = self.tab3_get_params()
         try:
             self.dsa.compute_fits(params)
-        except Exception:
-            self.log.log("Something wrong happened during edge fitting",
-                         level=3)
+        except:
+            self.log.log('Unknown error during edges fitting', level=3)
+            return None
         # compute contact angles for every frames !
         try:
             self.dsa.compute_cas()
-        except Exception:
-            self.log.log("Something wrong happened during contact angles "
-                         "computation",
+        except:
+            self.log.log('Unknown error during contact angle computation',
                          level=3)
+            return None
         #
         self.tab4_update_plot(0, replot=True)
+
+    def tab4_clean_plot(self):
+        self.ui.mplwidgetanalyze.update_plots([], [], [],
+                                              xname="",
+                                              yname="",
+                                              y2name="",
+                                              replot=False,
+                                              draw=True)
 
     def tab4_update_plot(self, index, replot=False, draw=True):
         if not self.tab4_initialized:
@@ -513,22 +538,22 @@ class AppWindow(QMainWindow):
         yaxis = self.ui.tab4_combo_yaxis.currentText()
         try:
             x = self.dsa.get_plotable_quantity(xaxis)
-        except Exception:
-            self.log.log(f"Couldn't get the quantity {xaxis}",
+        except:
+            self.log.log(f"Unknown error while gathering '{xaxis}'",
                          level=3)
             x = []
         try:
             y = self.dsa.get_plotable_quantity(yaxis)
-        except Exception:
-            self.log.log(f"Couldn't get the quantity {yaxis}",
+        except:
+            self.log.log(f"Unknown error while gathering '{yaxis}'",
                          level=3)
             y = [np.nan]*len(x)
         if self.tab4_use_yaxis2:
             yaxis2 = self.ui.tab4_combo_yaxis2.currentText()
             try:
                 y2 = self.dsa.get_plotable_quantity(yaxis2)
-            except Exception:
-                self.log.log(f"Couldn't get the quantity {yaxis2}",
+            except:
+                self.log.log(f"Unknown error while gathering '{yaxis2}'",
                              level=3)
                 y2 = [np.nan]*len(x)
         else:
