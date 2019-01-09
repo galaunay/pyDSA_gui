@@ -16,8 +16,7 @@ class DSA(object):
         self.ims = None
         self.current_raw_im = None
         # Crop (time)
-        self.nmb_cropped_frames = None
-        self.first_frame = 1
+        self.first_frame = None
         self.last_frame = None
         # Crop
         self.ims_cropped = None
@@ -80,6 +79,7 @@ class DSA(object):
                                               self.app.statusbar_delay)
         return hook
 
+    # TODO: add time and space scaling to GUI !
     def import_images(self, filepaths):
         if len(filepaths) == 0:
             return None
@@ -100,8 +100,8 @@ class DSA(object):
         self.current_raw_im = self.ims[0]
         self.reset_cache()
         self.nmb_frames = len(self.ims)
-        self.last_frame = len(self.ims) - 1
-        self.nmb_cropped_frames = self.nmb_frames
+        self.first_frame = 1
+        self.last_frame = len(self.ims)
         self.sizex = self.current_raw_im.shape[0]
         self.sizey = self.current_raw_im.shape[1]
 
@@ -114,19 +114,19 @@ class DSA(object):
         self.current_raw_im = self.ims[0]
         self.reset_cache()
         self.nmb_frames = len(self.ims)
-        self.last_frame = len(self.ims) - 1
-        self.nmb_cropped_frames = self.nmb_frames
+        self.first_frame = 1
+        self.last_frame = len(self.ims)
         self.sizex = self.current_raw_im.shape[0]
         self.sizey = self.current_raw_im.shape[1]
 
     def set_current(self, ind):
         if self.nmb_frames == 1:
             return None
-        self.current_ind = ind
         if self.ims is None:
-            raise Exception()
+            return None
         if ind > self.nmb_frames:
-            raise Exception()
+            return None
+        self.current_ind = ind
         self.current_raw_im = self.ims[ind]
         if self.ims_cropped is not None:
             self.current_cropped_im = self.ims_cropped[self.current_ind]
@@ -174,11 +174,8 @@ class DSA(object):
         return True
 
     def update_frame_lims(self):
-        first = self.ui.tab1_frameslider_first.value()
-        last = self.ui.tab1_frameslider_last.value()
-        self.nmb_cropped_frames = last - first
-        self.first_frame = first
-        self.last_frame = last
+        self.first_frame = self.ui.tab1_frameslider_first.value()
+        self.last_frame = self.ui.tab1_frameslider_last.value()
 
     def get_baseline(self, cropped=False):
         pt1 = self.baseline_pt1.copy()
@@ -206,7 +203,7 @@ class DSA(object):
                 break
         # Use cache if possible
         edge = self.edge_cache[self.current_ind]
-        if self.edge_cache[self.current_ind] is None:
+        if edge is None:
             # Get params
             canny_args = params[0].copy()
             canny_args.update(params[-1])
@@ -362,6 +359,8 @@ class DSA(object):
         new_args = {'canny': canny_args,
                     'contour': contour_args}
         new_params = {'cropt': [self.first_frame + 0, self.last_frame + 0],
+                      'baseline_pt1': self.baseline_pt1.copy(),
+                      'baseline_pt2': self.baseline_pt2.copy(),
                       'cropx': self.current_crop_lims[0].copy(),
                       'cropy': self.current_crop_lims[1].copy(),
                       'detection_method': self.edge_detection_method,
@@ -372,7 +371,8 @@ class DSA(object):
         elif self.edges_old_params['detection_method'] != self.edge_detection_method:
             need_recompute = True
         else:
-            for crop in ['cropt', 'cropx', 'cropy']:
+            for crop in ['cropt', 'cropx', 'cropy',
+                         'baseline_pt1', 'baseline_pt2']:
                 if np.any(new_params[crop] != self.edges_old_params[crop]):
                     need_recompute = True
                     break
