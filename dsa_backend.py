@@ -1,5 +1,7 @@
 import pyDSA as dsa
+import re
 import numpy as np
+from IMTreatment.utils import make_unit
 
 
 class DSA(object):
@@ -15,6 +17,9 @@ class DSA(object):
         self.sizey = None
         self.ims = None
         self.current_raw_im = None
+        # Scaling
+        self.dt = 1*make_unit('s')
+        self.dx = 1*make_unit('')
         # Crop (time)
         self.first_frame = None
         self.last_frame = None
@@ -151,6 +156,18 @@ class DSA(object):
         self.reset_cache()
         # return
         return True
+
+    def update_dx_and_dt(self):
+        self.dt = float(self.ui.tab1_set_dt_text.text())*make_unit('s')
+        dx_real = self.ui.mplwidgetimport.get_scale()
+        if dx_real is not None:
+            dx_txt = self.ui.tab1_set_scaling_text.text()
+            match = re.match(r'\s*([0-9.]+)\s*(.*)\s*', dx_txt)
+            dx_txt = float(match.groups()[0])
+            dx_unit = match.groups()[1]
+            self.dx = dx_txt/dx_real*make_unit(dx_unit)
+        else:
+            self.dx = make_unit('')
 
     def update_baselines(self):
         self.log.log('DSA backend: Updating baselines', level=1)
@@ -316,35 +333,38 @@ class DSA(object):
             self.log.log('Fit need to be computed first', level=3)
             return []
         #
+        unit_x = self.dx.strUnit()[1:-1]
+        unit_t = self.dt.strUnit()[1:-1]
         if quant == 'Frame number':
-            return np.arange(self.first_frame, self.last_frame + 1, 1)
+            return np.arange(self.first_frame, self.last_frame + 1, 1), ""
         elif quant == 'Time':
-            return np.arange(self.first_frame, self.last_frame + 1, 1)*self.ims.dt
+            return (np.arange(self.first_frame, self.last_frame + 1, 1)
+                    * self.dt.asNumber()), unit_t
         elif quant == 'Position (x, right)':
             _, pt2s = self.fits.get_drop_positions()
-            return pt2s[:, 0]
+            return pt2s[:, 0], unit_x
         elif quant == 'Position (x, left)':
             pt1s, _ = self.fits.get_drop_positions()
-            return pt1s[:, 0]
+            return pt1s[:, 0], unit_x
         elif quant == 'Position (x, center)':
             xys = self.fits.get_drop_centers()
-            return xys[:, 0]
+            return xys[:, 0], unit_x
         elif quant == 'CA (right)':
-            return self.fits.get_contact_angles()[:, 0]
+            return self.fits.get_contact_angles()[:, 0], "°"
         elif quant == 'CA (left)':
-            return 180 - self.fits.get_contact_angles()[:, 1]
+            return 180 - self.fits.get_contact_angles()[:, 1], "°"
         elif quant == 'CA (mean)':
             thetas = self.fits.get_contact_angles()
             thetas[:, 1] = 180 - thetas[:, 1]
-            return np.mean(thetas, axis=1)
+            return np.mean(thetas, axis=1), "°"
         elif quant == 'Base radius':
-            return self.fits.get_base_diameters()
+            return self.fits.get_base_diameters(), unit_x
         elif quant == 'Height':
-            return self.fits.get_drop_heights()
+            return self.fits.get_drop_heights(), unit_x
         elif quant == 'Area':
-            return self.fits.get_drop_areas()
+            return self.fits.get_drop_areas(), f'{unit_x}^2'
         elif quant == 'Volume':
-            return self.fits.get_drop_volumes()
+            return self.fits.get_drop_volumes(), f'{unit_x}^3'
         else:
             raise Exception(f'Non-plottable quantity: {quant}')
 
@@ -361,6 +381,8 @@ class DSA(object):
         new_params = {'cropt': [self.first_frame + 0, self.last_frame + 0],
                       'baseline_pt1': self.baseline_pt1.copy(),
                       'baseline_pt2': self.baseline_pt2.copy(),
+                      'dt': self.dt,
+                      'dx': self.dx,
                       'cropx': self.current_crop_lims[0].copy(),
                       'cropy': self.current_crop_lims[1].copy(),
                       'detection_method': self.edge_detection_method,
@@ -371,6 +393,13 @@ class DSA(object):
         elif self.edges_old_params['detection_method'] != self.edge_detection_method:
             need_recompute = True
         else:
+            for d in ['dx', 'dt']:
+                if new_params[d].strUnit() != self.edges_old_params[d].strUnit():
+                    need_recompute = True
+                    break
+                elif new_params[d].asNumber() != self.edges_old_params[d].asNumber():
+                    need_recompute = True
+                    break
             for crop in ['cropt', 'cropx', 'cropy',
                          'baseline_pt1', 'baseline_pt2']:
                 if np.any(new_params[crop] != self.edges_old_params[crop]):
@@ -389,6 +418,9 @@ class DSA(object):
         tmp_ims = self.ims_cropped.crop(intervt=[self.first_frame - 1,
                                                  self.last_frame - 1],
                                         ind=True)
+        # Scale
+        tmp_ims.scale(scalet=self.dt, scalex=self.dx, scaley=self.dx,
+                      inplace=True)
         # Edge detection
         hook = self.get_progressbar_hook('Detecting edges',
                                          'Detected edges')

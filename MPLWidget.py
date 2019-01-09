@@ -147,6 +147,9 @@ class MplWidgetImport(Canvas):
             self.baseline_hand.finish_drag()
             self.baseline_hand.unselect_hand()
 
+    def get_scale(self):
+        return self.scaling_hand.get_scale()
+
 
 class MplWidgetDetect(Canvas):
     def __init__(self, parent=None):

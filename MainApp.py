@@ -62,6 +62,7 @@ class AppWindow(QMainWindow):
         # Update dsa backend if the last tab is the import tab
         if self.last_tab == 0:
             self.dsa.update_crop_lims()
+            self.dsa.update_dx_and_dt()
             self.dsa.update_baselines()
             self.dsa.update_frame_lims()
         # Do switch to tab
@@ -125,6 +126,9 @@ class AppWindow(QMainWindow):
         self.ui.tab1_set_scaling_btn.setEnabled(True)
         self.ui.tab1_set_scaling_text.setEnabled(True)
         self.ui.tab1_remove_scaling_btn.setEnabled(True)
+
+    def tab1_enable_dt_scaling(self):
+        self.ui.tab1_set_dt_text.setEnabled(True)
 
     def tab1_import_image(self):
         # Select image to import
@@ -206,6 +210,7 @@ class AppWindow(QMainWindow):
         self.tab1_enable_baseline()
         # Enable scaling
         self.tab1_enable_scaling()
+        self.tab1_enable_dt_scaling()
         # De-init other tabs
         self.tab2_initialized = False
         self.tab3_initialized = False
@@ -537,28 +542,32 @@ class AppWindow(QMainWindow):
         xaxis = self.ui.tab4_combo_xaxis.currentText()
         yaxis = self.ui.tab4_combo_yaxis.currentText()
         try:
-            x = self.dsa.get_plotable_quantity(xaxis)
+            x, unit_x = self.dsa.get_plotable_quantity(xaxis)
         except:
             self.log.log(f"Unknown error while gathering '{xaxis}'",
                          level=3)
             x = []
+            unit_x = ""
         try:
-            y = self.dsa.get_plotable_quantity(yaxis)
+            y, unit_y = self.dsa.get_plotable_quantity(yaxis)
         except:
             self.log.log(f"Unknown error while gathering '{yaxis}'",
                          level=3)
             y = [np.nan]*len(x)
+            unit_y = ""
         if self.tab4_use_yaxis2:
             yaxis2 = self.ui.tab4_combo_yaxis2.currentText()
             try:
-                y2 = self.dsa.get_plotable_quantity(yaxis2)
+                y2, unit_y2 = self.dsa.get_plotable_quantity(yaxis2)
             except:
                 self.log.log(f"Unknown error while gathering '{yaxis2}'",
                              level=3)
                 y2 = [np.nan]*len(x)
+                unit_y2 = ""
         else:
             yaxis2 = ""
             y2 = [np.nan]*len(x)
+            unit_y2 = ""
         # if no x
         if len(x) == 0:
             y = []
@@ -569,10 +578,15 @@ class AppWindow(QMainWindow):
             self.log.log('Incoherence in plottable quantities length',
                          level=3)
             return None
+        # Names
+        xname = f'{xaxis} [{unit_x}]'
+        yname = f'{yaxis} [{unit_y}]'
+        yname2 = f'{yaxis2} [{unit_y2}]'
+        #
         self.ui.mplwidgetanalyze.update_plots(x, y, y2,
-                                              xname=xaxis,
-                                              yname=yaxis,
-                                              y2name=yaxis2,
+                                              xname=xname,
+                                              yname=yname,
+                                              y2name=yname2,
                                               replot=replot,
                                               draw=draw)
 
