@@ -1400,8 +1400,8 @@
    <slot>tab2_set_current_frame(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>232</x>
-     <y>635</y>
+     <x>161</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>255</x>
@@ -1416,12 +1416,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>285</x>
-     <y>639</y>
+     <x>161</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
-     <x>232</x>
-     <y>635</y>
+     <x>161</x>
+     <y>94</y>
     </hint>
    </hints>
   </connection>
@@ -1432,12 +1432,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>232</x>
-     <y>635</y>
+     <x>161</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
-     <x>285</x>
-     <y>639</y>
+     <x>161</x>
+     <y>94</y>
     </hint>
    </hints>
   </connection>
@@ -1480,8 +1480,8 @@
    <slot>tab2_update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>39</x>
-     <y>125</y>
+     <x>48</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>6</x>
@@ -1496,8 +1496,8 @@
    <slot>tab2_update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>39</x>
-     <y>176</y>
+     <x>48</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -1512,8 +1512,8 @@
    <slot>tab2_update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>39</x>
-     <y>227</y>
+     <x>48</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>4</x>
@@ -1528,8 +1528,8 @@
    <slot>tab2_update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>39</x>
-     <y>278</y>
+     <x>48</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>3</x>
@@ -1544,8 +1544,8 @@
    <slot>tab2_update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>39</x>
-     <y>371</y>
+     <x>48</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>5</x>
@@ -1560,8 +1560,8 @@
    <slot>tab2_update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>39</x>
-     <y>505</y>
+     <x>48</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -1576,8 +1576,8 @@
    <slot>tab2_update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>39</x>
-     <y>556</y>
+     <x>48</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -1592,8 +1592,8 @@
    <slot>tab2_update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>96</x>
-     <y>456</y>
+     <x>105</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>4</x>
@@ -1608,8 +1608,8 @@
    <slot>tab2_update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>40</x>
-     <y>456</y>
+     <x>49</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -1624,8 +1624,8 @@
    <slot>tab2_toggle_contour(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>46</x>
-     <y>320</y>
+     <x>55</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -1672,12 +1672,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>272</x>
-     <y>658</y>
+     <x>161</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
-     <x>387</x>
-     <y>653</y>
+     <x>161</x>
+     <y>94</y>
     </hint>
    </hints>
   </connection>
@@ -1688,8 +1688,8 @@
    <slot>tab3_set_current_frame(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>272</x>
-     <y>658</y>
+     <x>161</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>180</x>
@@ -1704,12 +1704,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>387</x>
-     <y>653</y>
+     <x>161</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
-     <x>272</x>
-     <y>658</y>
+     <x>161</x>
+     <y>94</y>
     </hint>
    </hints>
   </connection>
@@ -1720,8 +1720,8 @@
    <slot>tab3_update_fit()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>146</x>
-     <y>451</y>
+     <x>117</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>3</x>
@@ -1736,8 +1736,8 @@
    <slot>tab3_toggle_spline(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>81</x>
-     <y>420</y>
+     <x>90</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -1752,8 +1752,8 @@
    <slot>tab3_update_fit()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>126</x>
-     <y>409</y>
+     <x>117</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>3</x>
@@ -1768,8 +1768,8 @@
    <slot>tab3_toggle_polyline(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>81</x>
-     <y>327</y>
+     <x>90</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -1784,8 +1784,8 @@
    <slot>tab3_update_fit()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>108</x>
-     <y>316</y>
+     <x>117</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>8</x>
@@ -1800,8 +1800,8 @@
    <slot>tab3_toggle_ellipse(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>90</x>
-     <y>235</y>
+     <x>99</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>6</x>
@@ -1816,8 +1816,8 @@
    <slot>tab3_update_fit()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>109</x>
-     <y>223</y>
+     <x>117</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>3</x>
@@ -1832,8 +1832,8 @@
    <slot>tab3_update_fit()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>103</x>
-     <y>139</y>
+     <x>112</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -1864,8 +1864,8 @@
    <slot>tab4_update_plot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>122</x>
-     <y>121</y>
+     <x>117</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>117</x>
@@ -1880,8 +1880,8 @@
    <slot>tab4_update_plot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>92</x>
-     <y>179</y>
+     <x>101</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>139</x>
@@ -1896,8 +1896,8 @@
    <slot>tab4_toggle_axis2(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>58</x>
-     <y>245</y>
+     <x>67</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>159</x>
@@ -1912,8 +1912,8 @@
    <slot>tab4_update_plot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>103</x>
-     <y>253</y>
+     <x>112</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>282</x>
@@ -2062,6 +2062,22 @@
     <hint type="destinationlabel">
      <x>0</x>
      <y>641</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab1_spinbox_last</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>tab1_frameslider_last</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>245</x>
+     <y>653</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>469</x>
+     <y>651</y>
     </hint>
    </hints>
   </connection>

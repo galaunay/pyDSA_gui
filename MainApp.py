@@ -1,10 +1,12 @@
 import sys
-from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QFileDialog,\
+from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog,\
     QDialog
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5 import QtWidgets, QtCore
 from design import Ui_MainWindow
 import numpy as np
 
+from IMTreatment.utils import make_unit
+import re
 from dsa_backend import DSA
 from log import Log
 
@@ -51,20 +53,24 @@ class AppWindow(QMainWindow):
         self.tab3_already_opened = False
         self.tab4_initialized = False
         self.tab4_use_yaxis2 = False
+        self.tab4_already_opened = False
         self.last_tab = 0
         # Show it !
         self.show()
 
     def tab_changed(self, tab_nmb):
         # Do nothing if no imported image yet
-        if self.dsa.ims is None:
+        if self.dsa is None:
             return None
-        # Update dsa backend if the last tab is the import tab
+        # Update precomputed images if the last tab is the import tab
         if self.last_tab == 0:
-            self.dsa.update_crop_lims()
-            self.dsa.update_dx_and_dt()
-            self.dsa.update_baselines()
-            self.dsa.update_frame_lims()
+            self.dsa.precompute_images(self.tab1_get_params())
+            # Ensure current image is in the selected range
+            cropt = self.dsa.precomp_old_params['cropt']
+            if self.dsa.current_ind > cropt[1] - 1:
+                self.dsa.set_current(cropt[1] - 1)
+            elif self.dsa.current_ind < cropt[0] - 1:
+                self.dsa.set_current(cropt[0] - 1)
         # Do switch to tab
         if tab_nmb == 0:
             self.tab1_switch_to_tab()
@@ -111,13 +117,12 @@ class AppWindow(QMainWindow):
 
     def tab1_enable_cropping(self):
         self.ui.reset_crop.setEnabled(True)
-        crop_lims = [0, self.dsa.current_raw_im.shape[0],
-                     0, self.dsa.current_raw_im.shape[1]]
+        im = self.dsa.get_current_raw_im()
+        crop_lims = [0, im.shape[0], 0, im.shape[1]]
         self.ui.mplwidgetimport.update_crop_area(*crop_lims)
 
     def tab1_enable_baseline(self):
-        w = self.dsa.current_raw_im.shape[0]
-        h = self.dsa.current_raw_im.shape[1]
+        w, h =  self.dsa.get_current_raw_im().shape
         pt1 = [1/10*w, 2/3*h]
         pt2 = [9/10*w, 2/3*h]
         self.ui.mplwidgetimport.update_baseline(pt1, pt2)
@@ -143,8 +148,8 @@ class AppWindow(QMainWindow):
                          level=3)
             return None
         # Update image display
-        self.ui.mplwidgetimport.update_image(self.dsa.current_raw_im.values,
-                                             replot=True)
+        im = self.dsa.get_current_raw_im()
+        self.ui.mplwidgetimport.update_image(im.values, replot=True)
         # Disable frame sliders
         self.tab1_disable_frame_sliders()
         # Enable cropping sliders
@@ -173,8 +178,8 @@ class AppWindow(QMainWindow):
                          level=3)
             return None
         # Update images display
-        self.ui.mplwidgetimport.update_image(self.dsa.current_raw_im.values,
-                                             replot=True)
+        im = self.dsa.get_current_raw_im()
+        self.ui.mplwidgetimport.update_image(im.values, replot=True)
         # Enable frame sliders
         self.tab1_enable_frame_sliders()
         # Enable cropping sliders
@@ -199,9 +204,12 @@ class AppWindow(QMainWindow):
             self.log.log(f"Couldn't import '{self.filepath}':"
                          " not a valid video", level=3)
             return None
+        except ImportError:
+            self.log.log(f"Couldn't import '{self.filepath}':", level=3)
+            return None
         # Update video display
-        self.ui.mplwidgetimport.update_image(self.dsa.current_raw_im.values,
-                                             replot=True)
+        im = self.dsa.get_current_raw_im()
+        self.ui.mplwidgetimport.update_image(im.values, replot=True)
         # Enable frame sliders
         self.tab1_enable_frame_sliders()
         # Enable cropping sliders
@@ -217,7 +225,8 @@ class AppWindow(QMainWindow):
 
     def tab1_set_current_frame(self, ind):
         self.dsa.set_current(ind - 1)
-        self.ui.mplwidgetimport.update_image(self.dsa.current_raw_im.values)
+        im = self.dsa.get_current_raw_im()
+        self.ui.mplwidgetimport.update_image(im.values)
 
     def tab1_set_first_frame(self, ind):
         self.ui.tab1_spinbox_frame.setValue(ind)
@@ -226,8 +235,8 @@ class AppWindow(QMainWindow):
         self.ui.tab1_spinbox_frame.setValue(ind)
 
     def tab1_reset_crop(self):
-        crop_lims = [0, self.dsa.current_raw_im.shape[0],
-                     0, self.dsa.current_raw_im.shape[1]]
+        im = self.dsa.get_current_raw_im()
+        crop_lims = [0, im.shape[0], 0, im.shape[1]]
         self.ui.mplwidgetimport.update_crop_area(*crop_lims)
 
     def tab1_set_scaling(self):
@@ -236,6 +245,49 @@ class AppWindow(QMainWindow):
     def tab1_remove_scaling(self):
         self.ui.mplwidgetimport.is_scaling = False
         self.ui.mplwidgetimport.scaling_hand.reset()
+
+    def tab1_get_params(self, arg=None):
+        dic = {}
+        # dt and dt
+        if arg is None or arg == 'dt':
+            dt = float(self.ui.tab1_set_dt_text.text())*make_unit('s')
+            dic['dt'] = dt
+        if arg is None or arg == 'dx':
+            dx_real = self.ui.mplwidgetimport.get_scale()
+            if dx_real is not None:
+                dx_txt = self.ui.tab1_set_scaling_text.text()
+                match = re.match(r'\s*([0-9.]+)\s*(.*)\s*', dx_txt)
+                dx_txt = float(match.groups()[0])
+                dx_unit = match.groups()[1]
+                dx = dx_txt/dx_real*make_unit(dx_unit)
+            else:
+                dx = make_unit('')
+            dic['dx'] = dx
+        # cropx and cropy
+        if arg is None or arg == 'lims':
+            xlims, ylims = self.ui.mplwidgetimport.rect_hand.lims
+            sizey = abs(self.ui.mplwidgetimport.ax.viewLim.height)
+            ylims = np.sort(sizey - ylims)
+            lims = np.array([xlims, ylims])
+            dic['lims'] = lims
+        # baseline pts
+        if arg is None or arg == 'baseline_pts':
+            pt1 = self.ui.mplwidgetimport.baseline_hand.pt1
+            pt2 = self.ui.mplwidgetimport.baseline_hand.pt2
+            deltay = abs(self.ui.mplwidgetimport.ax.viewLim.height)
+            base_pt1 = [pt1[0], deltay - pt1[1]]
+            base_pt2 = [pt2[0], deltay - pt2[1]]
+            dic['baseline_pts'] = [base_pt1, base_pt2]
+        # cropt
+        if arg is None or arg == 'cropt':
+            first_frame = self.ui.tab1_frameslider_first.value()
+            last_frame = self.ui.tab1_frameslider_last.value()
+            dic['cropt'] = [first_frame, last_frame]
+        # return
+        if arg is None:
+            return dic
+        else:
+            return dic[arg]
 
     # TAB 2
     def tab2_initialize(self):
@@ -252,20 +304,20 @@ class AppWindow(QMainWindow):
         if not self.tab2_already_opened:
             draw = False
         # Replot
-        self.ui.mplwidgetdetect.update_image(
-            self.dsa.current_cropped_im.values,
-            replot=True, draw=draw)
-        pt1, pt2 = self.dsa.get_baseline(cropped=True)
+        im = self.dsa.get_current_precomp_im()
+        self.ui.mplwidgetdetect.update_image(im.values, replot=True, draw=draw)
+        pt1, pt2 = self.dsa.get_baseline_display_points()
         self.ui.mplwidgetdetect.update_baseline(pt1, pt2, draw=draw)
         # Update the curent frame
         self._disable_frame_updater = True
         self.ui.tab2_frameslider.setValue(self.dsa.current_ind + 1)
         self._disable_frame_updater = False
         # Update the first and last frames
-        self.ui.tab2_frameslider.setMinimum(self.dsa.first_frame)
-        self.ui.tab2_frameslider.setMaximum(self.dsa.last_frame)
-        self.ui.tab2_spinbox.setMinimum(self.dsa.first_frame)
-        self.ui.tab2_spinbox.setMaximum(self.dsa.last_frame)
+        cropt = self.dsa.precomp_old_params['cropt']
+        self.ui.tab2_frameslider.setMinimum(cropt[0])
+        self.ui.tab2_frameslider.setMaximum(cropt[1])
+        self.ui.tab2_spinbox.setMinimum(cropt[0])
+        self.ui.tab2_spinbox.setMaximum(cropt[1])
         # update the detected edge
         self.tab2_update_edge(draw=draw)
         #
@@ -277,8 +329,8 @@ class AppWindow(QMainWindow):
             return None
         self.dsa.set_current(ind - 1)
         # update image
-        self.ui.mplwidgetdetect.update_image(self.dsa.current_cropped_im.values,
-                                             replot=False)
+        im = self.dsa.get_current_precomp_im()
+        self.ui.mplwidgetdetect.update_image(im.values, replot=False)
         # update edge
         # TODO: replotting the edge markers for each frame take time,
         #       It may be a better idea to use imshow to display edges
@@ -286,10 +338,11 @@ class AppWindow(QMainWindow):
 
     def tab2_enable_frame_sliders(self):
         self._disable_frame_updater = True
-        self.ui.tab2_frameslider.setMinimum(self.dsa.first_frame)
-        self.ui.tab2_frameslider.setMaximum(self.dsa.last_frame)
-        self.ui.tab2_spinbox.setMinimum(self.dsa.first_frame)
-        self.ui.tab2_spinbox.setMaximum(self.dsa.last_frame)
+        cropt = self.dsa.precomp_old_params['cropt']
+        self.ui.tab2_frameslider.setMinimum(cropt[0])
+        self.ui.tab2_frameslider.setMaximum(cropt[1])
+        self.ui.tab2_spinbox.setMinimum(cropt[0])
+        self.ui.tab2_spinbox.setMaximum(cropt[1])
         self.ui.tab2_frameslider.setEnabled(True)
         self.ui.tab2_spinbox.setEnabled(True)
         self._disable_frame_updater = False
@@ -357,12 +410,9 @@ class AppWindow(QMainWindow):
         if not self.tab3_already_opened:
             draw = False
         # Update the plot only if necessary
-        self.dsa.update_crop_lims()
-        self.ui.mplwidgetfit.update_image(
-            self.dsa.current_cropped_im.values,
-            replot=True, draw=draw)
-        self.dsa.update_baselines()
-        pt1, pt2 = self.dsa.get_baseline(cropped=True)
+        im = self.dsa.get_current_precomp_im()
+        self.ui.mplwidgetfit.update_image(im.values, replot=True, draw=draw)
+        pt1, pt2 = self.dsa.get_baseline_display_points()
         self.ui.mplwidgetfit.update_baseline(pt1, pt2, draw=draw)
         # Update the curent frame
         self._disable_frame_updater = True
@@ -383,17 +433,18 @@ class AppWindow(QMainWindow):
             return None
         self.dsa.set_current(ind - 1)
         # update image
-        self.ui.mplwidgetfit.update_image(self.dsa.current_cropped_im.values,
-                                          replot=False)
+        im = self.dsa.get_current_precomp_im()
+        self.ui.mplwidgetfit.update_image(im.values, replot=False)
         # update fit
         self.tab3_update_fit()
 
     def tab3_enable_frame_sliders(self):
         self._disable_frame_updater = True
-        self.ui.tab3_frameslider.setMinimum(self.dsa.first_frame)
-        self.ui.tab3_frameslider.setMaximum(self.dsa.last_frame)
-        self.ui.tab3_spinbox.setMinimum(self.dsa.first_frame)
-        self.ui.tab3_spinbox.setMaximum(self.dsa.last_frame)
+        cropt = self.dsa.precomp_old_params['cropt']
+        self.ui.tab3_frameslider.setMinimum(cropt[0])
+        self.ui.tab3_frameslider.setMaximum(cropt[1])
+        self.ui.tab3_spinbox.setMinimum(cropt[0])
+        self.ui.tab3_spinbox.setMaximum(cropt[1])
         self.ui.tab3_frameslider.setEnabled(True)
         self.ui.tab3_spinbox.setEnabled(True)
         self._disable_frame_updater = False
@@ -501,8 +552,12 @@ class AppWindow(QMainWindow):
         # initialize if needed
         if not self.tab4_initialized:
             self.tab4_initialize()
+        # Do nothing if there is only one point...
+        if self.dsa.nmb_frames <= 1:
+            return None
         # Clean
-        self.tab4_clean_plot()
+        if self.tab4_already_opened:
+            self.tab4_clean_plot()
         # compute edges for every frames !
         params = self.tab2_get_params()
         try:
@@ -526,6 +581,7 @@ class AppWindow(QMainWindow):
             return None
         #
         self.tab4_update_plot(0, replot=True)
+        self.tab4_already_opened = True
 
     def tab4_clean_plot(self):
         self.ui.mplwidgetanalyze.update_plots([], [], [],
@@ -575,7 +631,8 @@ class AppWindow(QMainWindow):
         #
         # check length
         if len(x) != len(y):
-            self.log.log('Incoherence in plottable quantities length',
+            self.log.log('Incoherence in plottable quantities length:'
+                         f'\n{xaxis} is {len(x)} and {yaxis} is {len(y)}',
                          level=3)
             return None
         # Names
