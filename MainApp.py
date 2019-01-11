@@ -64,13 +64,10 @@ class AppWindow(QMainWindow):
             return None
         # Update precomputed images if the last tab is the import tab
         if self.last_tab == 0:
-            self.dsa.precompute_images(self.tab1_get_params())
-            # Ensure current image is in the selected range
-            cropt = self.dsa.precomp_old_params['cropt']
-            if self.dsa.current_ind > cropt[1] - 1:
-                self.dsa.set_current(cropt[1] - 1)
-            elif self.dsa.current_ind < cropt[0] - 1:
-                self.dsa.set_current(cropt[0] - 1)
+            if not self.tab1_check_inputs():
+                self.ui.tabWidget.setCurrentIndex(0)
+                return None
+            self.tab1_leave_tab()
         # Do switch to tab
         if tab_nmb == 0:
             self.tab1_switch_to_tab()
@@ -88,6 +85,32 @@ class AppWindow(QMainWindow):
         # Update the frame number
         self.ui.tab1_frameslider.setValue(self.dsa.current_ind + 1)
         self.ui.tab1_spinbox_frame.setValue(self.dsa.current_ind + 1)
+
+    def tab1_leave_tab(self):
+        # Precompute images
+        self.dsa.precompute_images(self.tab1_get_params())
+        # Ensure current image is in the selected range
+        cropt = self.dsa.precomp_old_params['cropt']
+        if self.dsa.current_ind > cropt[1] - 1:
+            self.dsa.set_current(cropt[1] - 1)
+        elif self.dsa.current_ind < cropt[0] - 1:
+            self.dsa.set_current(cropt[0] - 1)
+
+    def tab1_check_inputs(self):
+        try:
+            dt = self.tab1_get_params('dt')
+        except:
+            self.log.log("Bad format for 'dt'",
+                         level=2)
+            return False
+        try:
+            dx = self.tab1_get_params('dx')
+        except:
+            self.log.log("Bad format for 'dx'",
+                         level=2)
+            return False
+        return True
+
 
     def tab1_enable_frame_sliders(self):
         for slide in [self.ui.tab1_frameslider,
