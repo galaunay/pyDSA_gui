@@ -25,6 +25,9 @@ def select_files(message="Open files", filetypes=None):
     return filepath
 
 
+# TODO: Add slider for thresholds
+# TODO: Add export data to csv
+# TODO: Add export_as_script
 class AppWindow(QMainWindow):
     def __init__(self):
         super().__init__()
