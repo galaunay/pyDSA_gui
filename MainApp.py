@@ -28,6 +28,9 @@ def select_files(message="Open files", filetypes=None):
 # TODO: Add slider for thresholds
 # TODO: Add export data to csv
 # TODO: Add export_as_script
+# TODO: Add tests (QT5 tests ?)
+# TODO: Add circles fitting for ridge detection
+# TODO: Add keybindings
 class AppWindow(QMainWindow):
     def __init__(self):
         super().__init__()
