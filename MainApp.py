@@ -51,6 +51,8 @@ class AppWindow(QMainWindow):
         # Initialize log
         self.log = Log(self.ui.logarea, self.ui.statusbar,
                        self.statusbar_delay)
+        # Always start from the first tab
+        self.ui.tabWidget.setCurrentIndex(0)
         # Tab-related variables
         self.tab1_filepath = ""
         self.tab2_initialized = False
@@ -63,6 +65,34 @@ class AppWindow(QMainWindow):
         self.last_tab = 0
         # Show it !
         self.show()
+
+    def enable_options(self):
+        """ To run after importing at least an image"""
+        # tab1
+        self.ui.tab1_crop_box.setEnabled(True)
+        self.ui.tab1_scaling_box.setEnabled(True)
+        if self.dsa.nmb_frames > 1:
+            self.ui.tab1_time_box.setEnabled(True)
+        else:
+            self.ui.tab1_time_box.setEnabled(False)
+        # tab2
+        self.ui.tab2_canny_box.setEnabled(True)
+        self.ui.tab2_contour_box.setEnabled(True)
+        self.ui.tab2_options_box.setEnabled(True)
+        # tab3
+        self.ui.tab3_circle_box.setEnabled(True)
+        self.ui.tab3_ellipse_box.setEnabled(True)
+        self.ui.tab3_polyline_box.setEnabled(True)
+        self.ui.tab3_spline_box.setEnabled(True)
+        # tab4
+        if self.dsa.nmb_frames > 1:
+            self.ui.tab4_xaxis_box.setEnabled(True)
+            self.ui.tab4_yaxis_box.setEnabled(True)
+            self.ui.tab4_yaxis2_box.setEnabled(True)
+        else:
+            self.ui.tab4_xaxis_box.setEnabled(False)
+            self.ui.tab4_yaxis_box.setEnabled(False)
+            self.ui.tab4_yaxis2_box.setEnabled(False)
 
     def tab_changed(self, tab_nmb):
         # Do nothing if no imported image yet
@@ -117,7 +147,6 @@ class AppWindow(QMainWindow):
             return False
         return True
 
-
     def tab1_enable_frame_sliders(self):
         for slide in [self.ui.tab1_frameslider,
                       self.ui.tab1_frameslider_first,
@@ -145,24 +174,15 @@ class AppWindow(QMainWindow):
             spin.setEnabled(False)
 
     def tab1_enable_cropping(self):
-        self.ui.reset_crop.setEnabled(True)
         im = self.dsa.get_current_raw_im()
         crop_lims = [0, im.shape[0], 0, im.shape[1]]
         self.ui.mplwidgetimport.update_crop_area(*crop_lims)
 
     def tab1_enable_baseline(self):
-        w, h =  self.dsa.get_current_raw_im().shape
+        w, h = self.dsa.get_current_raw_im().shape
         pt1 = [1/10*w, 2/3*h]
         pt2 = [9/10*w, 2/3*h]
         self.ui.mplwidgetimport.update_baseline(pt1, pt2)
-
-    def tab1_enable_scaling(self):
-        self.ui.tab1_set_scaling_btn.setEnabled(True)
-        self.ui.tab1_set_scaling_text.setEnabled(True)
-        self.ui.tab1_remove_scaling_btn.setEnabled(True)
-
-    def tab1_enable_dt_scaling(self):
-        self.ui.tab1_set_dt_text.setEnabled(True)
 
     def tab1_import_image(self):
         # Select image to import
@@ -185,8 +205,8 @@ class AppWindow(QMainWindow):
         self.tab1_enable_cropping()
         # Enable baseline
         self.tab1_enable_baseline()
-        # Enable scaling
-        self.tab1_enable_scaling()
+        # Enable options
+        self.enable_options()
         # De-init next tabs
         self.tab2_initialized = False
         self.tab3_initialized = False
@@ -215,8 +235,8 @@ class AppWindow(QMainWindow):
         self.tab1_enable_cropping()
         # Enable baseline
         self.tab1_enable_baseline()
-        # Enable scaling
-        self.tab1_enable_scaling()
+        # Enable options
+        self.enable_options()
         # De-init other tabs
         self.tab2_initialized = False
         self.tab3_initialized = False
@@ -245,9 +265,8 @@ class AppWindow(QMainWindow):
         self.tab1_enable_cropping()
         # Enable baseline
         self.tab1_enable_baseline()
-        # Enable scaling
-        self.tab1_enable_scaling()
-        self.tab1_enable_dt_scaling()
+        # Enable options
+        self.enable_options()
         # De-init other tabs
         self.tab2_initialized = False
         self.tab3_initialized = False

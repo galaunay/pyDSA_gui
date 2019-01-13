@@ -21,7 +21,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -84,6 +84,9 @@
              <layout class="QVBoxLayout" name="verticalLayout_3">
               <item>
                <widget class="QPushButton" name="pushButton">
+                <property name="toolTip">
+                 <string>Import a single image (png, jpg, bmp, ...)</string>
+                </property>
                 <property name="text">
                  <string>Image</string>
                 </property>
@@ -91,6 +94,9 @@
               </item>
               <item>
                <widget class="QPushButton" name="pushButton_2">
+                <property name="toolTip">
+                 <string>Import a set of images (need to be sorted in alphabetical order)</string>
+                </property>
                 <property name="text">
                  <string>Images</string>
                 </property>
@@ -98,6 +104,9 @@
               </item>
               <item>
                <widget class="QPushButton" name="pushButton_3">
+                <property name="toolTip">
+                 <string>Import a video (avi,mp4,mkv,...)</string>
+                </property>
                 <property name="text">
                  <string>Video</string>
                 </property>
@@ -107,15 +116,18 @@
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="groupBox">
+            <widget class="QGroupBox" name="tab1_crop_box">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="title">
               <string>Crop</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_12">
               <item>
-               <widget class="QPushButton" name="reset_crop">
-                <property name="enabled">
-                 <bool>false</bool>
+               <widget class="QPushButton" name="tab1_reset_crop">
+                <property name="toolTip">
+                 <string>Reset the cropping window</string>
                 </property>
                 <property name="text">
                  <string>Reset</string>
@@ -126,15 +138,18 @@
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="groupBox_4">
+            <widget class="QGroupBox" name="tab1_scaling_box">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="title">
               <string>Scaling</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_14">
               <item>
                <widget class="QPushButton" name="tab1_set_scaling_btn">
-                <property name="enabled">
-                 <bool>false</bool>
+                <property name="toolTip">
+                 <string>Allow to select two scaling points on the current image</string>
                 </property>
                 <property name="text">
                  <string>Set scaling</string>
@@ -152,8 +167,8 @@
                 </item>
                 <item>
                  <widget class="QLineEdit" name="tab1_set_scaling_text">
-                  <property name="enabled">
-                   <bool>false</bool>
+                  <property name="toolTip">
+                   <string>Length separating the scaling points</string>
                   </property>
                   <property name="text">
                    <string>1mm</string>
@@ -164,8 +179,8 @@
               </item>
               <item>
                <widget class="QPushButton" name="tab1_remove_scaling_btn">
-                <property name="enabled">
-                 <bool>false</bool>
+                <property name="toolTip">
+                 <string>Remove the current scaling</string>
                 </property>
                 <property name="text">
                  <string>Remove</string>
@@ -176,7 +191,10 @@
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="groupBox_5">
+            <widget class="QGroupBox" name="tab1_time_box">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="title">
               <string>Time [s]</string>
              </property>
@@ -192,8 +210,8 @@
                 </item>
                 <item>
                  <widget class="QLineEdit" name="tab1_set_dt_text">
-                  <property name="enabled">
-                   <bool>false</bool>
+                  <property name="toolTip">
+                   <string>Interval of time between two frames (in second)</string>
                   </property>
                   <property name="text">
                    <string>1</string>
@@ -314,12 +332,18 @@
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
+                <property name="toolTip">
+                 <string>Frame number to display</string>
+                </property>
                </widget>
               </item>
               <item>
                <widget class="QSlider" name="tab1_frameslider">
                 <property name="enabled">
                  <bool>false</bool>
+                </property>
+                <property name="toolTip">
+                 <string>Frame number to display</string>
                 </property>
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
@@ -351,12 +375,18 @@
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
+                <property name="toolTip">
+                 <string>First frame to analyze</string>
+                </property>
                </widget>
               </item>
               <item>
                <widget class="QSlider" name="tab1_frameslider_first">
                 <property name="enabled">
                  <bool>false</bool>
+                </property>
+                <property name="toolTip">
+                 <string>First frame to analyze</string>
                 </property>
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
@@ -388,12 +418,18 @@
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
+                <property name="toolTip">
+                 <string>Last frame to analyze</string>
+                </property>
                </widget>
               </item>
               <item>
                <widget class="QSlider" name="tab1_frameslider_last">
                 <property name="enabled">
                  <bool>false</bool>
+                </property>
+                <property name="toolTip">
+                 <string>Last frame to analyze</string>
                 </property>
                 <property name="value">
                  <number>99</number>
@@ -423,7 +459,7 @@
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout_5">
         <item>
-         <widget class="QFrame" name="frame_2">
+         <widget class="QFrame" name="tab2_options">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
             <horstretch>2</horstretch>
@@ -451,6 +487,9 @@
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <item>
             <widget class="QGroupBox" name="tab2_canny_box">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="title">
               <string>Cann&amp;y edges</string>
              </property>
@@ -470,6 +509,15 @@
               </item>
               <item>
                <widget class="QSpinBox" name="tab2_canny_threshold1">
+                <property name="toolTip">
+                 <string>Canny edge upper threshold (lower this to detect more edges)</string>
+                </property>
+                <property name="statusTip">
+                 <string/>
+                </property>
+                <property name="whatsThis">
+                 <string>canny edge detection</string>
+                </property>
                 <property name="maximum">
                  <number>255</number>
                 </property>
@@ -487,6 +535,9 @@
               </item>
               <item>
                <widget class="QSpinBox" name="tab2_canny_threshold2">
+                <property name="toolTip">
+                 <string>Canny edge lower threshold (lower this to detect longer edges)</string>
+                </property>
                 <property name="maximum">
                  <number>255</number>
                 </property>
@@ -497,13 +548,19 @@
               </item>
               <item>
                <widget class="QLabel" name="label_8">
+                <property name="toolTip">
+                 <string>Smooth actor performed before </string>
+                </property>
                 <property name="text">
-                 <string>Smooth size</string>
+                 <string>Smoothing factor</string>
                 </property>
                </widget>
               </item>
               <item>
                <widget class="QSpinBox" name="tab2_canny_smooth_size">
+                <property name="toolTip">
+                 <string>Smooth the image before edge detection (increase this when the edge detection perform badly and the images are noisy)</string>
+                </property>
                 <property name="maximum">
                  <number>50</number>
                 </property>
@@ -521,6 +578,9 @@
               </item>
               <item>
                <widget class="QSpinBox" name="tab2_canny_dilatation_steps">
+                <property name="toolTip">
+                 <string>Dilate the detected edges (increase this if the edges are discontinuous in some points)</string>
+                </property>
                 <property name="maximum">
                  <number>50</number>
                 </property>
@@ -534,6 +594,9 @@
            </item>
            <item>
             <widget class="QGroupBox" name="tab2_contour_box">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="title">
               <string>Conto&amp;ur</string>
              </property>
@@ -556,6 +619,9 @@
               </item>
               <item>
                <widget class="QSlider" name="tab2_contour_level">
+                <property name="toolTip">
+                 <string>Level of gray of the isocontour (to adjust depending on the edge to detect)</string>
+                </property>
                 <property name="maximum">
                  <number>255</number>
                 </property>
@@ -571,7 +637,10 @@
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="groupBox_7">
+            <widget class="QGroupBox" name="tab2_options_box">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="title">
               <string>Options</string>
              </property>
@@ -603,6 +672,9 @@
                 </item>
                 <item>
                  <widget class="QRadioButton" name="tab2_nmb_edges_2">
+                  <property name="toolTip">
+                   <string>Number of separated edges to look for (set this to 1 if something else than the drop edge is detected)</string>
+                  </property>
                   <property name="text">
                    <string>&amp;2</string>
                   </property>
@@ -622,6 +694,9 @@
               </item>
               <item>
                <widget class="QSpinBox" name="tab2_ign_pixels">
+                <property name="toolTip">
+                 <string>Number of pixel ignored near the baseline (increase this if the drop edges are difficult to see near the baseline)</string>
+                </property>
                 <property name="maximum">
                  <number>50</number>
                 </property>
@@ -639,6 +714,9 @@
               </item>
               <item>
                <widget class="QSlider" name="tab2_size_ratio">
+                <property name="toolTip">
+                 <string>Maximal size ratio between separated edges (if applicable)</string>
+                </property>
                 <property name="maximum">
                  <number>100</number>
                 </property>
@@ -748,12 +826,18 @@
               <property name="enabled">
                <bool>false</bool>
               </property>
+              <property name="toolTip">
+               <string>Frame number to display</string>
+              </property>
              </widget>
             </item>
             <item>
              <widget class="QSlider" name="tab2_frameslider">
               <property name="enabled">
                <bool>false</bool>
+              </property>
+              <property name="toolTip">
+               <string>Frame number to display</string>
               </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
@@ -779,13 +863,7 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="maximumSize">
-           <size>
-            <width>150</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="baseSize">
+          <property name="minimumSize">
            <size>
             <width>150</width>
             <height>0</height>
@@ -800,6 +878,9 @@
           <layout class="QVBoxLayout" name="verticalLayout_9">
            <item>
             <widget class="QGroupBox" name="tab3_circle_box">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="title">
               <string>Circle</string>
              </property>
@@ -822,6 +903,9 @@
               </item>
               <item>
                <widget class="QSlider" name="tab3_circle_ymin">
+                <property name="toolTip">
+                 <string>Ignore the lower part of the drop</string>
+                </property>
                 <property name="maximum">
                  <number>999999999</number>
                 </property>
@@ -838,6 +922,9 @@
            </item>
            <item>
             <widget class="QGroupBox" name="tab3_ellipse_box">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="title">
               <string>Ellipse</string>
              </property>
@@ -857,6 +944,9 @@
               </item>
               <item>
                <widget class="QSlider" name="tab3_ellipse_ymin">
+                <property name="toolTip">
+                 <string>Ignore the lower part of the drop</string>
+                </property>
                 <property name="maximum">
                  <number>999999999</number>
                 </property>
@@ -873,6 +963,9 @@
            </item>
            <item>
             <widget class="QGroupBox" name="tab3_polyline_box">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="title">
               <string>Pol&amp;yline</string>
              </property>
@@ -895,6 +988,9 @@
               </item>
               <item>
                <widget class="QSpinBox" name="tab3_polyline_deg">
+                <property name="toolTip">
+                 <string>Degree of the polynomial (higher means better fit, but more sensitive to noise)</string>
+                </property>
                 <property name="minimum">
                  <number>1</number>
                 </property>
@@ -911,6 +1007,9 @@
            </item>
            <item>
             <widget class="QGroupBox" name="tab3_spline_box">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="title">
               <string>Spline</string>
              </property>
@@ -933,6 +1032,9 @@
               </item>
               <item>
                <widget class="QSpinBox" name="tab3_spline_deg">
+                <property name="toolTip">
+                 <string>Degree of the spline (up to 5)</string>
+                </property>
                 <property name="minimum">
                  <number>1</number>
                 </property>
@@ -953,6 +1055,9 @@
               </item>
               <item>
                <widget class="QSlider" name="tab3_spline_smooth">
+                <property name="toolTip">
+                 <string>Smoothiness of the spline</string>
+                </property>
                 <property name="maximum">
                  <number>100</number>
                 </property>
@@ -1062,12 +1167,18 @@
               <property name="enabled">
                <bool>false</bool>
               </property>
+              <property name="toolTip">
+               <string>Frame number to display</string>
+              </property>
              </widget>
             </item>
             <item>
              <widget class="QSlider" name="tab3_frameslider">
               <property name="enabled">
                <bool>false</bool>
+              </property>
+              <property name="toolTip">
+               <string>Frame number to display</string>
               </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
@@ -1087,21 +1198,9 @@
        <layout class="QHBoxLayout" name="horizontalLayout_9">
         <item>
          <widget class="QFrame" name="frame_4">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-            <horstretch>2</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
+          <property name="minimumSize">
            <size>
-            <width>150</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="baseSize">
-           <size>
-            <width>150</width>
+            <width>175</width>
             <height>0</height>
            </size>
           </property>
@@ -1113,7 +1212,10 @@
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_11">
            <item>
-            <widget class="QGroupBox" name="tab3_circle_box_2">
+            <widget class="QGroupBox" name="tab4_xaxis_box">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="title">
               <string>X axis</string>
              </property>
@@ -1128,13 +1230,23 @@
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_13">
               <item>
-               <widget class="QComboBox" name="tab4_combo_xaxis"/>
+               <widget class="QComboBox" name="tab4_combo_xaxis">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+               </widget>
               </item>
              </layout>
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="tab3_circle_box_3">
+            <widget class="QGroupBox" name="tab4_yaxis_box">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="title">
               <string>Y axis</string>
              </property>
@@ -1155,7 +1267,10 @@
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="tab3_circle_box_4">
+            <widget class="QGroupBox" name="tab4_yaxis2_box">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="title">
               <string>Y axis &amp;2</string>
              </property>
@@ -1362,7 +1477,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>reset_crop</sender>
+   <sender>tab1_reset_crop</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
    <slot>tab1_reset_crop()</slot>
@@ -1890,7 +2005,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>tab3_circle_box_4</sender>
+   <sender>tab4_yaxis2_box</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
    <slot>tab4_toggle_axis2(bool)</slot>
