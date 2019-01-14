@@ -33,6 +33,8 @@ def select_files(message="Open files", filetypes=None):
 # TODO: Add keybindings
 # TODO: Add interactive vertical selector to analyze tab
 # TODO: Make everything asynchroneous
+# TODO: Make it executable
+# TODO: Put it on pypi
 class AppWindow(QMainWindow):
     def __init__(self):
         super().__init__()
