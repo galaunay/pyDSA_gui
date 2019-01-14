@@ -25,3 +25,5 @@ __license__ = "GPL3"
 __version__ = ""
 __email__ = "gaby.launay@tutanota.com"
 __status__ = "Development"
+
+name = "pyDSAqt5"
