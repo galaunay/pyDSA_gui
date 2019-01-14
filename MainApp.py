@@ -31,6 +31,8 @@ def select_files(message="Open files", filetypes=None):
 # TODO: Add tests (QT5 tests ?)
 # TODO: Add circles fitting for ridge detection
 # TODO: Add keybindings
+# TODO: Add interactive vertical selector to analyze tab
+# TODO: Make everything asynchroneous
 class AppWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -682,7 +684,10 @@ class AppWindow(QMainWindow):
             self.log.log('Incoherence in plottable quantities length:'
                          f'\n{xaxis} is {len(x)} and {yaxis} is {len(y)}',
                          level=3)
-            return None
+            if len(x) < len(y):
+                y[0:len(x)]
+            else:
+                x[0:len(y)]
         # Names
         xname = f'{xaxis} [{unit_x}]'
         yname = f'{yaxis} [{unit_y}]'
@@ -710,6 +715,7 @@ class AppWindow(QMainWindow):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    app.setStyle('fusion')
     w = AppWindow()
     w.show()
     sys.exit(app.exec_())
