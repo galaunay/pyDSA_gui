@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from pyDSA.baseline import Baseline
 
-from mpl_handlers import BaselineHandler, RectangleHandler, ScalingHandler
+from .mpl_handlers import BaselineHandler, RectangleHandler, ScalingHandler
 
 colors = {'baseline': 'tab:blue',
           'crop_area': 'tab:red',

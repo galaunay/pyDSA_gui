@@ -21,7 +21,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -1416,7 +1416,7 @@
   <customwidget>
    <class>MplWidgetImport</class>
    <extends>QWidget</extends>
-   <header>MPLWidget</header>
+   <header>.MPLWidget</header>
    <container>1</container>
    <slots>
     <slot>plotSomeDataPoints(int)</slot>
@@ -1426,19 +1426,19 @@
   <customwidget>
    <class>MplWidgetDetect</class>
    <extends>QWidget</extends>
-   <header>MPLWidget</header>
+   <header>.MPLWidget</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>MplWidgetFit</class>
    <extends>QWidget</extends>
-   <header>MPLWidget</header>
+   <header>.MPLWidget</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>MplWidgetAnalyze</class>
    <extends>QWidget</extends>
-   <header>MPLWidget</header>
+   <header>.MPLWidget</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

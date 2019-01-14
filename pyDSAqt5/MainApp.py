@@ -2,13 +2,13 @@ import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog,\
     QDialog
 from PyQt5 import QtWidgets, QtCore
-from design import Ui_MainWindow
+from .design import Ui_MainWindow
 import numpy as np
 
 from IMTreatment.utils import make_unit
 import re
-from dsa_backend import DSA
-from log import Log
+from .dsa_backend import DSA
+from .log import Log
 
 
 def select_file(message="Open file", filetypes=None):
@@ -715,9 +715,13 @@ class AppWindow(QMainWindow):
         raise Exception('Not implemented yet')
 
 
-if __name__ == '__main__':
+def run():
     app = QApplication(sys.argv)
     app.setStyle('fusion')
     w = AppWindow()
     w.show()
     sys.exit(app.exec_())
+
+
+if __name__ == '__main__':
+    run()
