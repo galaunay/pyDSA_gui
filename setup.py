@@ -18,7 +18,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='pyDSAqt5',
-    version='0.1',
+    version='1.0',
     description='GUI for pydsa',
     author='Gaby Launay',
     author_email='gaby.launay@tutanota.com',
@@ -32,7 +32,8 @@ setup(
     ],
     keywords='GUI DSA drop shape contact angle hysteresis',
     packages=find_packages(exclude=['contrib', 'docs', 'tests', 'samples']),
-    install_requires=['pyQt5', 'IMTreatment', 'numpy', 'matplotlib'],
+    install_requires=['pyQt5', 'pyDSA==1.0', 'IMTreatment==1.0', 'numpy',
+                      'matplotlib'],
     extras_require={},
     setup_requires=['pytest-runner'],
     tests_require=['pytest'],
