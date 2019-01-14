@@ -29,6 +29,8 @@ def select_files(message="Open files", filetypes=None):
 # TODO: Add export data to csv
 # TODO: Add export_as_script
 # TODO: Add tests (QT5 tests ?)
+#       - http://johnnado.com/pyqt-qtest-example/
+#       - https://pypi.org/project/pytest-qt/
 # TODO: Add circles fitting for ridge detection
 # TODO: Add keybindings
 # TODO: Add interactive vertical selector to analyze tab
