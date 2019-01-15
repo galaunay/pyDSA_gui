@@ -8,3 +8,5 @@ test.info
 /5.png
 .eggs
 pyDSAqt5.egg-info
+dist
+build
