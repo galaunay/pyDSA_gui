@@ -33,7 +33,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from pyDSA.baseline import Baseline
 
-from .mpl_handlers import BaselineHandler, RectangleHandler, ScalingHandler
+from .mpl_handlers import BaselineHandler, RectangleHandler, ScalingHandler, \
+    VerticalLineHandler
 
 colors = {'baseline': 'tab:blue',
           'crop_area': 'tab:red',
@@ -42,7 +43,8 @@ colors = {'baseline': 'tab:blue',
           'fit': 'tab:orange',
           'ca': 'tab:blue',
           'plot1': 'tab:blue',
-          'plot2': 'tab:red'}
+          'plot2': 'tab:red',
+          'vertical line': 'tab:green'}
 
 
 
@@ -332,38 +334,137 @@ class MplWidgetAnalyze(Canvas):
         # self.ax = self.figure.add_axes([0.1, 0.1, 0.9, 0.9])
         self.ax = self.figure.subplots(1, 1)
         self.ax2 = self.ax.twinx()
+        self.ax3 = self.ax.twinx()
+        self.ax3.set_zorder(1)
+        self.ax3.set_xticks([])
+        self.ax3.set_yticks([])
         # plots
         self.plot1 = None
         self.plot2 = None
+        # Vertical line
+        self.vertical_line = VerticalLineHandler(
+            self,
+            self.figure,
+            self.ax3,
+            color=colors['vertical line'])
+        self.vertical_line.canvas.draw()
+        # Connect event handler
+        self.connect_press = self.mpl_connect('button_press_event',
+                                              self.on_press)
+        self.connect_release = self.mpl_connect('button_release_event',
+                                                self.on_release)
+        self.connect_motion = self.mpl_connect('motion_notify_event',
+                                               self.on_motion)
         # grid
         self.ax.grid()
 
+    def on_press(self, event):
+        print('Press')
+        # Check
+        if event.inaxes != self.ax3:
+            print('Not in axis')
+            return None
+        #
+        if self.vertical_line.select_hand_at_point(event):
+            print('In line !')
+            self.vertical_line.prepare_for_drag()
+        else:
+            print('Not in line !')
+
+    def on_motion(self, event):
+        # Check
+        if event.inaxes != self.ax3:
+            return None
+        #
+        if self.vertical_line.dragged_hand is not None:
+            self.vertical_line.drag_to(event)
+
+    def on_release(self, event):
+        if self.vertical_line.is_dragging():
+            self.vertical_line.finish_drag()
+            self.vertical_line.unselect_hand()
+
     def update_plots(self, x, y, y2, xname, yname, y2name,
                      draw=True, replot=False):
-        if replot or self.plot1 is None:
+        print('Update plots !')
+        if self.plot1 is None:
+            replot = True
+        # Completely replot is asked
+        if replot:
+            # Clean
             self.ax.clear()
             self.ax2.clear()
+            # Plots
             self.plot1 = self.ax.plot(x, y,
                                       color=colors['plot1'])[0]
             self.plot2 = self.ax2.plot(x, y2,
                                        color=colors['plot2'])[0]
             self.ax.grid()
         else:
+            # Update plots
             self.plot1.set_data(x, y)
             self.plot2.set_data(x, y2)
-        # disable second axe if not needed
-        if np.all(np.isnan(y2)):
-            self.ax2.set_visible(False)
-        else:
+        # Hide second axis if necessary
+        is_y2 = np.logical_not(np.all(np.isnan(y2)))
+        if is_y2:
             self.ax2.set_visible(True)
-        #
-        self.ax.relim()
-        self.ax.autoscale(True)
+        else:
+            self.ax2.set_visible(False)
+        # Update limits
+        self.update_lims(x, y, y2)
+        # Update the vertical line position
+        if len(x) > 1:
+            self.vertical_line.update_line_pos((np.max(x) + np.min(x))/2)
+        # Update labels
         self.ax.set_xlabel(xname)
         self.ax.set_ylabel(yname)
-        self.ax2.relim()
-        self.ax2.autoscale(True)
-        self.ax2.set_xlabel(xname)
-        self.ax2.set_ylabel(y2name)
+        if is_y2:
+            self.ax2.set_ylabel(y2name)
+        else:
+            self.ax2.set_ylabel("")
+        # Draw if asked
         if draw:
             self.draw()
+
+    def update_lims(self, x, y, y2):
+        # margin
+        margin = 1/50
+        # x
+        if len(x) <= 1:
+            x_min, x_max = -1, 1
+        else:
+            x_min, x_max = np.nanmin(x), np.nanmax(x)
+        if np.any(np.isnan([x_min, x_max])):
+            x_min = -1
+            x_max = 1
+        dx = x_max - x_min
+        if dx == 0:
+            dx = 0.1
+        self.ax.set_xlim(x_min - dx*margin, x_max + dx*margin)
+        # y
+        if len(y) <= 1:
+            y_min, y_max = -1, 1
+        else:
+            y_min, y_max = np.nanmin(y), np.nanmax(y)
+        if np.any(np.isnan([y_min, y_max])):
+            y_min = -1
+            y_max = 1
+        dy = y_max - y_min
+        if dy == 0:
+            dy = 0.1
+        self.ax.set_ylim(y_min - dy*margin, y_max + dy*margin)
+        # y2
+        if len(y2) <= 1:
+            y2_min, y2_max = -1, 1
+        else:
+            y2_min, y2_max = np.nanmin(y2), np.nanmax(y2)
+        if np.any(np.isnan([y2_min, y2_max])):
+            y2_min = -1
+            y2_max = 1
+        dy2 = y2_max - y2_min
+        if dy2 == 0:
+            dy2 = 0.1
+        self.ax2.set_ylim(y2_min - dy2*margin, y2_max + dy2*margin)
+        # dummy ax3
+        self.ax3.set_xlim(self.ax.get_xlim())
+        self.ax3.set_ylim(self.ax.get_xlim())

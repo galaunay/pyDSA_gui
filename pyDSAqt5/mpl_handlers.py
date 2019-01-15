@@ -39,7 +39,8 @@ class Handler(object):
         self.canvas = canvas
         self.background = None
         self.color = color
-        self.line = self.ax.plot([0], [0], color=self.color, lw=.5)[0]
+        self.line = None
+        self.create_line()
         self.hands = []
         self.minihands = []
         self.hand_ratio = hand_ratio
@@ -50,6 +51,10 @@ class Handler(object):
         self.dragged_hand = None
         self.dragged_offset = [0, 0]
         self.dragged_ind = None
+
+
+    def create_line(self):
+        self.line = self.ax.plot([0], [0], color=self.color, lw=.5)[0]
 
     def create_hands(self):
         raise Exception('Need to be defined !')
@@ -313,3 +318,59 @@ class ScalingHandler(Handler):
             return None
         return ((self.pts[0][0] - self.pts[1][0])**2
                 + (self.pts[0][1] - self.pts[1][1])**2)**.5
+
+
+class VerticalLineHandler(Handler):
+    def __init__(self, canvas, fig, ax, color):
+        self.pt = [0, 0]
+        super().__init__(canvas, fig, ax, color=color, hand_ratio=1/500)
+
+    def create_line(self):
+        self.line = self.ax.axvline(self.pt[0], color=self.color, lw=.5)
+
+    def create_hands(self):
+        self.update_hand_size()
+        self.hands.append(mpl.patches.Circle(self.pt,
+                                             radius=self.hand_size,
+                                             color=self.color,
+                                             alpha=0.25))
+
+    def update_hand_size(self):
+        self.hand_size = 2
+
+    def update_line(self):
+        ylims = self.ax.get_ylim()
+        pt1 = [self.pt[0], ylims[0]]
+        pt2 = [self.pt[0], ylims[1]]
+        print(f"Updating line to {pt1}, {pt2}")
+        self.line.set_data([pt1[0], pt2[0]], [0, 1])
+
+    def update_hands(self):
+        self.hands[0].set_center(self.pt)
+        xlims = self.ax.get_xlim()
+        ylims = self.ax.get_ylim()
+        print(f'xlims: {xlims}')
+        print(f'ylims: {ylims}')
+        print(f'radius: {(xlims[1] - xlims[0])/self.hand_size}')
+        self.hands[0].set_radius((xlims[1] - xlims[0])*self.hand_size/100)
+        # self.hands[0].set_widht = (xlims[1] - xlims[0])/20
+        # self.hands[0].set_height = (ylims[1] - ylims[0])/20
+
+    def update_from_event(self, event):
+        new_x = event.xdata
+        new_y = event.ydata
+        print(f"Updating position to {new_x}, {new_y}")
+        self.pt = [new_x, new_y]
+        self.update_hands()
+
+    def reset(self):
+        self.pt = [0, 0]
+        self.hands[0].set_center([-1000, -1000])
+        self.canvas.draw()
+
+    def update_line_pos(self, x):
+        # update
+        self.pt[0] = x
+        self.pt[1] = np.mean(self.ax.get_ylim())
+        self.update_hands()
+        self.update_line()
