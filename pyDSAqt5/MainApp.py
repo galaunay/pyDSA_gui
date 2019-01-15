@@ -66,7 +66,6 @@ def select_files(message="Open files", filetypes=None):
     return filepath
 
 
-# TODO: Add slider for thresholds
 # TODO: Add export_as_script
 # TODO: Add tests (QT5 tests ?)
 #       - http://johnnado.com/pyqt-qtest-example/
@@ -808,8 +807,8 @@ class AppWindow(QMainWindow):
         filepath = select_new_file("Save as")
         if len(filepath) == 0:
             return None
-        self.filepath = filepath[0]
-        if self.filepath[0] == "":
+        filepath = filepath[0]
+        if filepath[0] == "":
             return None
         # get data
         data = []
