@@ -67,14 +67,12 @@ def select_files(message="Open files", filetypes=None):
 
 
 # TODO: Add slider for thresholds
-# TODO: Add export data to csv
 # TODO: Add export_as_script
 # TODO: Add tests (QT5 tests ?)
 #       - http://johnnado.com/pyqt-qtest-example/
 #       - https://pypi.org/project/pytest-qt/
 # TODO: Add circles fitting for ridge detection
 # TODO: Add keybindings
-# TODO: Add interactive vertical selector to analyze tab
 # TODO: Make everything asynchroneous
 class AppWindow(QMainWindow):
     def __init__(self):
@@ -107,8 +105,10 @@ class AppWindow(QMainWindow):
         self.tab1_filepath = ""
         self.tab2_initialized = False
         self.tab2_already_opened = False
+        self.tab2_old_index = -1
         self.tab3_initialized = False
         self.tab3_already_opened = False
+        self.tab3_old_index = -1
         self.tab4_initialized = False
         self.tab4_use_yaxis2 = False
         self.tab4_already_opened = False
@@ -159,6 +159,10 @@ class AppWindow(QMainWindow):
                 self.ui.tabWidget.setCurrentIndex(0)
                 return None
             self.tab1_leave_tab()
+        elif self.last_tab == 1:
+            self.tab2_old_index = self.dsa.current_ind
+        elif self.last_tab == 2:
+            self.tab3_old_index = self.dsa.current_ind
         # Do switch to tab
         if tab_nmb == 0:
             self.tab1_switch_to_tab()
@@ -251,6 +255,9 @@ class AppWindow(QMainWindow):
             self.log.log(f"Cannot import '{self.filepath}': not a valid image",
                          level=3)
             return None
+        except:
+            self.log.log(f"Unknown error during image import", level=3)
+            return None
         # Update image display
         im = self.dsa.get_current_raw_im()
         self.ui.mplwidgetimport.update_image(im.values, replot=True)
@@ -281,6 +288,9 @@ class AppWindow(QMainWindow):
             self.log.log(f"Couldn't import selected files: {self.filepath}",
                          level=3)
             return None
+        except:
+            self.log.log(f"Unknown error during images import", level=3)
+            return None
         # Update images display
         im = self.dsa.get_current_raw_im()
         self.ui.mplwidgetimport.update_image(im.values, replot=True)
@@ -310,6 +320,9 @@ class AppWindow(QMainWindow):
             return None
         except ImportError:
             self.log.log(f"Couldn't import '{self.filepath}':", level=3)
+            return None
+        except:
+            self.log.log(f"Unknown error during video import", level=3)
             return None
         # Update video display
         im = self.dsa.get_current_raw_im()
@@ -405,6 +418,9 @@ class AppWindow(QMainWindow):
             self.tab2_initialize()
         draw = True
         if not self.tab2_already_opened:
+            draw = False
+        # Minor optimization, not really needed
+        if self.tab2_old_index == self.dsa.current_ind:
             draw = False
         # Replot
         im = self.dsa.get_current_precomp_im()
@@ -513,6 +529,9 @@ class AppWindow(QMainWindow):
             self.tab3_initialize()
         draw = True
         if not self.tab3_already_opened:
+            draw = False
+        # Minor optimization, not really needed
+        if self.tab3_old_index == self.dsa.current_ind:
             draw = False
         # Update the plot only if necessary
         im = self.dsa.get_current_precomp_im()
@@ -659,6 +678,9 @@ class AppWindow(QMainWindow):
         # initialize if needed
         if not self.tab4_initialized:
             self.tab4_initialize()
+        draw = True
+        # if not self.tab4_already_opened:
+        #     draw = False
         # Do nothing if there is only one point...
         if self.dsa.nmb_frames <= 1:
             return None
@@ -692,7 +714,7 @@ class AppWindow(QMainWindow):
                          level=3)
             return None
         #
-        self.tab4_update_plot(0, replot=True)
+        self.tab4_update_plot(0, replot=True, draw=draw)
         self.tab4_already_opened = True
 
     def tab4_clean_plot(self):
@@ -798,8 +820,6 @@ class AppWindow(QMainWindow):
             unit = tmpd[1]
             headers.append(f'{quant} [{unit}]')
         data = np.array(data).transpose()
-        print(f'data: {data}')
-        print(f'headers: {headers}')
         # Save as csv
         try:
             np.savetxt(filepath, data, delimiter=', ',
@@ -824,6 +844,7 @@ def run():
     app.setStyle('fusion')
     w = AppWindow()
     w.show()
+    # exit()
     sys.exit(app.exec_())
 
 

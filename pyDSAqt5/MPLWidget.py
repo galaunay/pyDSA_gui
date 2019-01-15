@@ -355,7 +355,6 @@ class MplWidgetAnalyze(Canvas):
             self.figure,
             self.ax3,
             color=colors['vertical line'])
-        self.vertical_line.canvas.draw()
         # Connect event handler
         self.connect_press = self.mpl_connect('button_press_event',
                                               self.on_press)
@@ -389,6 +388,9 @@ class MplWidgetAnalyze(Canvas):
 
     def update_plots(self, x, y, y2, xname, yname, y2name,
                      draw=True, replot=False):
+        # Because of issues with the vertical line hand...
+        if draw:
+            self.draw()
         # store
         self.current_x = x
         self.current_y = y
