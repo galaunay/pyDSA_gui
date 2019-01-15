@@ -343,7 +343,7 @@ class DSA(object):
             thetas[:, 1] = 180 - thetas[:, 1]
             return np.mean(thetas, axis=1), "°"
         elif quant == 'Base radius':
-            return self.fits.get_base_diameters(), unit_x
+            return self.fits.get_base_diameters()/2, unit_x
         elif quant == 'Height':
             return self.fits.get_drop_heights(), unit_x
         elif quant == 'Area':

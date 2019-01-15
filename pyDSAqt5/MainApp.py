@@ -783,8 +783,11 @@ class AppWindow(QMainWindow):
 
     def tab4_export_as_csv(self, toggle):
         # get fiel to save to
-        filepath = select_new_file("Save as")[0]
-        if len(self.filepath) == 0:
+        filepath = select_new_file("Save as")
+        if len(filepath) == 0:
+            return None
+        self.filepath = filepath[0]
+        if self.filepath[0] == "":
             return None
         # get data
         data = []
