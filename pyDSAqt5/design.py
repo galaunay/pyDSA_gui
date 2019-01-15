@@ -707,7 +707,7 @@ class Ui_MainWindow(object):
         self.tab2_contour_box.setTitle(_translate("MainWindow", "Conto&ur"))
         self.label_11.setText(_translate("MainWindow", "Level"))
         self.tab2_contour_level.setToolTip(_translate("MainWindow", "Level of gray of the isocontour (to adjust depending on the edge to detect)"))
-        self.tab2_options_box.setTitle(_translate("MainWindow", "Options"))
+        self.tab2_options_box.setTitle(_translate("MainWindow", "Generic options"))
         self.label_6.setText(_translate("MainWindow", "Number of edges"))
         self.tab2_nmb_edges_1.setText(_translate("MainWindow", "&1"))
         self.tab2_nmb_edges_2.setToolTip(_translate("MainWindow", "Number of separated edges to look for (set this to 1 if something else than the drop edge is detected)"))
