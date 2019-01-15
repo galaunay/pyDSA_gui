@@ -43,7 +43,7 @@ colors = {'baseline': 'tab:blue',
           'fit': 'tab:orange',
           'ca': 'tab:blue',
           'plot1': 'tab:blue',
-          'plot2': 'tab:red',
+          'plot2': 'tab:orange',
           'vertical line': 'tab:green'}
 
 
@@ -326,21 +326,29 @@ class MplWidgetFit(Canvas):
 
 class MplWidgetAnalyze(Canvas):
     def __init__(self, parent=None):
-        # Plot
+        # Figure and axis
         super(MplWidgetAnalyze, self).__init__(Figure())
         self.setParent(parent)
         self.figure = Figure(dpi=100, figsize=(200, 200))
         self.canvas = Canvas(self.figure)
-        # self.ax = self.figure.add_axes([0.1, 0.1, 0.9, 0.9])
         self.ax = self.figure.subplots(1, 1)
+        self.ax.yaxis.label.set_color(colors['plot1'])
+        self.ax.tick_params(axis='y', colors=colors['plot1'])
         self.ax2 = self.ax.twinx()
+        self.ax2.yaxis.label.set_color(colors['plot2'])
+        self.ax2.tick_params(axis='y', colors=colors['plot2'])
         self.ax3 = self.ax.twinx()
         self.ax3.set_zorder(1)
         self.ax3.set_xticks([])
         self.ax3.set_yticks([])
         # plots
+        self.current_x = []
+        self.current_y = []
+        self.current_y2 = []
         self.plot1 = None
         self.plot2 = None
+        self.indicator1 = None
+        self.indicator2 = None
         # Vertical line
         self.vertical_line = VerticalLineHandler(
             self,
@@ -359,17 +367,12 @@ class MplWidgetAnalyze(Canvas):
         self.ax.grid()
 
     def on_press(self, event):
-        print('Press')
         # Check
         if event.inaxes != self.ax3:
-            print('Not in axis')
             return None
         #
         if self.vertical_line.select_hand_at_point(event):
-            print('In line !')
             self.vertical_line.prepare_for_drag()
-        else:
-            print('Not in line !')
 
     def on_motion(self, event):
         # Check
@@ -386,7 +389,11 @@ class MplWidgetAnalyze(Canvas):
 
     def update_plots(self, x, y, y2, xname, yname, y2name,
                      draw=True, replot=False):
-        print('Update plots !')
+        # store
+        self.current_x = x
+        self.current_y = y
+        self.current_y2 = y2
+        # check
         if self.plot1 is None:
             replot = True
         # Completely replot is asked
@@ -399,6 +406,10 @@ class MplWidgetAnalyze(Canvas):
                                       color=colors['plot1'])[0]
             self.plot2 = self.ax2.plot(x, y2,
                                        color=colors['plot2'])[0]
+            self.indicator1 = self.ax.plot([], [], color=colors['plot1'],
+                                           marker="o", ls='none')[0]
+            self.indicator2 = self.ax2.plot([], [], color=colors['plot2'],
+                                            marker="o", ls='none')[0]
             self.ax.grid()
         else:
             # Update plots
@@ -430,7 +441,7 @@ class MplWidgetAnalyze(Canvas):
         # margin
         margin = 1/50
         # x
-        if len(x) <= 1:
+        if len(x) <= 1 or np.all(np.isnan(x)):
             x_min, x_max = -1, 1
         else:
             x_min, x_max = np.nanmin(x), np.nanmax(x)
@@ -442,7 +453,7 @@ class MplWidgetAnalyze(Canvas):
             dx = 0.1
         self.ax.set_xlim(x_min - dx*margin, x_max + dx*margin)
         # y
-        if len(y) <= 1:
+        if len(y) <= 1 or np.all(np.isnan(y)):
             y_min, y_max = -1, 1
         else:
             y_min, y_max = np.nanmin(y), np.nanmax(y)
@@ -454,7 +465,7 @@ class MplWidgetAnalyze(Canvas):
             dy = 0.1
         self.ax.set_ylim(y_min - dy*margin, y_max + dy*margin)
         # y2
-        if len(y2) <= 1:
+        if len(y2) <= 1 or np.all(np.isnan(y2)):
             y2_min, y2_max = -1, 1
         else:
             y2_min, y2_max = np.nanmin(y2), np.nanmax(y2)
@@ -468,3 +479,59 @@ class MplWidgetAnalyze(Canvas):
         # dummy ax3
         self.ax3.set_xlim(self.ax.get_xlim())
         self.ax3.set_ylim(self.ax.get_xlim())
+
+    def update_upstream(self):
+        """ Update the interface to reflect line modification"""
+        # Get the position of the selected points
+        xi = self.vertical_line.pt[0]
+        x = self.current_x
+        y = self.current_y
+        y2 = self.current_y2
+        yi = None
+        y2i = None
+        if len(self.current_x) != 0:
+            indx = np.argwhere(self.current_x > xi)
+            if len(indx) != 0:
+                indx = indx[0]
+                if len(indx) < 2:
+                    indx = indx[0]
+                    yi = self.linear_interp(x[indx - 1], x[indx],
+                                            y[indx - 1], y[indx],
+                                            xi)
+                    y2i = self.linear_interp(x[indx - 1], x[indx],
+                                             y2[indx - 1], y2[indx],
+                                             xi)
+        # Update the indicators
+        if xi is not None and yi is not None:
+            self.indicator1.set_data([xi], [yi])
+        else:
+            self.indicator1.set_data([], [])
+        if xi is not None and y2i is not None:
+            self.indicator2.set_data([xi], [y2i])
+        else:
+            self.indicator2.set_data([], [])
+        # Update interface
+        xi_t = ""
+        if xi is not None:
+            if not np.isnan(xi):
+                xi_t = f"{xi:.4f}"
+        self.ui.tab4_local_x_value.setText(xi_t)
+        yi_t = ""
+        if yi is not None:
+            if not np.isnan(yi):
+                yi_t = f"{yi:.4f}"
+        self.ui.tab4_local_y_value.setText(yi_t)
+        y2i_t = ""
+        if y2i is not None:
+            if not np.isnan(y2i):
+                y2i_t = f"{y2i:.4f}"
+        self.ui.tab4_local_y2_value.setText(y2i_t)
+
+    @staticmethod
+    def linear_interp(x1, x2, y1, y2, x):
+        if x1 > x:
+            return None
+        if x > x2:
+            return None
+        y = (abs(x1 - x)*y2 + abs(x2 - x)*y1)/abs(x1 - x2)
+        return y

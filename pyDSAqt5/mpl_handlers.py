@@ -52,7 +52,6 @@ class Handler(object):
         self.dragged_offset = [0, 0]
         self.dragged_ind = None
 
-
     def create_line(self):
         self.line = self.ax.plot([0], [0], color=self.color, lw=.5)[0]
 
@@ -115,7 +114,7 @@ class Handler(object):
         self.ax.draw_artist(self.line)
         self.canvas.blit(self.ax.bbox)
 
-    def drag_to(self, event):
+    def drag_to(self, event, blit=True):
         if self.dragged_hand is None:
             return None
         # Update hands
@@ -130,7 +129,8 @@ class Handler(object):
             self.ax.draw_artist(hand)
         self.ax.draw_artist(self.line)
         # blit just the redrawn area
-        self.canvas.blit(self.ax.bbox)
+        if blit:
+            self.canvas.blit(self.ax.bbox)
 
     def unselect_hand(self):
         self.dragged_hand = None
@@ -342,26 +342,20 @@ class VerticalLineHandler(Handler):
         ylims = self.ax.get_ylim()
         pt1 = [self.pt[0], ylims[0]]
         pt2 = [self.pt[0], ylims[1]]
-        print(f"Updating line to {pt1}, {pt2}")
         self.line.set_data([pt1[0], pt2[0]], [0, 1])
 
     def update_hands(self):
         self.hands[0].set_center(self.pt)
         xlims = self.ax.get_xlim()
         ylims = self.ax.get_ylim()
-        print(f'xlims: {xlims}')
-        print(f'ylims: {ylims}')
-        print(f'radius: {(xlims[1] - xlims[0])/self.hand_size}')
         self.hands[0].set_radius((xlims[1] - xlims[0])*self.hand_size/100)
-        # self.hands[0].set_widht = (xlims[1] - xlims[0])/20
-        # self.hands[0].set_height = (ylims[1] - ylims[0])/20
 
     def update_from_event(self, event):
         new_x = event.xdata
         new_y = event.ydata
-        print(f"Updating position to {new_x}, {new_y}")
         self.pt = [new_x, new_y]
         self.update_hands()
+        self.update_upstream()
 
     def reset(self):
         self.pt = [0, 0]
@@ -374,3 +368,28 @@ class VerticalLineHandler(Handler):
         self.pt[1] = np.mean(self.ax.get_ylim())
         self.update_hands()
         self.update_line()
+        self.update_upstream()
+
+    def update_upstream(self):
+        """ Update the interface to reflect line modification"""
+        # Get values at position
+        self.canvas.update_upstream()
+
+    def prepare_for_drag(self):
+        self.canvas.indicator1.set_animated(True)
+        self.canvas.indicator2.set_animated(True)
+        super(VerticalLineHandler, self).prepare_for_drag()
+        self.canvas.ax.draw_artist(self.canvas.indicator1)
+        self.canvas.ax2.draw_artist(self.canvas.indicator2)
+
+    def drag_to(self, event):
+        super(VerticalLineHandler, self).drag_to(event, blit=False)
+        self.canvas.ax.draw_artist(self.canvas.indicator1)
+        self.canvas.ax2.draw_artist(self.canvas.indicator2)
+        # blit just the redrawn area
+        self.canvas.blit(self.ax.bbox)
+
+    def finish_drag(self):
+        super(VerticalLineHandler, self).finish_drag()
+        self.canvas.indicator1.set_animated(False)
+        self.canvas.indicator2.set_animated(False)

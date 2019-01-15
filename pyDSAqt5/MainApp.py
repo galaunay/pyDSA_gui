@@ -124,10 +124,15 @@ class AppWindow(QMainWindow):
             self.ui.tab4_xaxis_box.setEnabled(True)
             self.ui.tab4_yaxis_box.setEnabled(True)
             self.ui.tab4_yaxis2_box.setEnabled(True)
+            self.ui.tab4_local_values_box.setEnabled(True)
+            self.ui.tab4_export_box.setEnabled(True)
         else:
             self.ui.tab4_xaxis_box.setEnabled(False)
             self.ui.tab4_yaxis_box.setEnabled(False)
             self.ui.tab4_yaxis2_box.setEnabled(False)
+            self.ui.tab4_local_values_box.setEnabled(False)
+            self.ui.tab4_export_box.setEnabled(False)
+        self.ui.mplwidgetanalyze.ui = self.ui
 
     def tab_changed(self, tab_nmb):
         # Do nothing if no imported image yet
@@ -456,7 +461,9 @@ class AppWindow(QMainWindow):
         try:
             edge = self.dsa.get_current_edge(params)
         except:
-            self.log.log('Unknown error during edge detection', level=3)
+            error = sys.exc_info()[0]
+            self.log.log(f'Unknown error during edge detection: {error}',
+                         level=3)
             return None
         self.ui.mplwidgetdetect.update_edge(edge, draw=draw)
 
@@ -551,13 +558,15 @@ class AppWindow(QMainWindow):
         try:
             fit, fit_center = self.dsa.get_current_fit(params)
         except:
-            self.log.log('Unknown error during edge fitting', level=3)
+            error = sys.exc_info()[0]
+            self.log.log(f'Unknown error during edge fitting: {error}', level=3)
             return None
         self.ui.mplwidgetfit.update_fit(fit, fit_center, draw=draw)
         try:
             cas = self.dsa.get_current_ca()
         except:
-            self.log.log('Unknown error during contact angle computation',
+            error = sys.exc_info()[0]
+            self.log.log(f'Unknown error during contact angle computation: {error}',
                          level=3)
             return None
         self.ui.mplwidgetfit.update_ca(cas, draw=draw)
@@ -646,20 +655,25 @@ class AppWindow(QMainWindow):
         try:
             self.dsa.compute_edges(params)
         except:
-            self.log.log('Unknown error during edges detection', level=3)
+            error = sys.exc_info()[0]
+            self.log.log(f'Unknown error during edges detection: {error}',
+                         level=3)
             return None
         # compute fits for every frames !
         params = self.tab3_get_params()
         try:
             self.dsa.compute_fits(params)
         except:
-            self.log.log('Unknown error during edges fitting', level=3)
+            error = sys.exc_info()[0]
+            self.log.log(f'Unknown error during edges fitting: {error}',
+                         level=3)
             return None
         # compute contact angles for every frames !
         try:
             self.dsa.compute_cas()
         except:
-            self.log.log('Unknown error during contact angle computation',
+            error = sys.exc_info()[0]
+            self.log.log(f'Unknown error during contact angle computation: {error}',
                          level=3)
             return None
         #
@@ -683,14 +697,16 @@ class AppWindow(QMainWindow):
         try:
             x, unit_x = self.dsa.get_plotable_quantity(xaxis)
         except:
-            self.log.log(f"Unknown error while gathering '{xaxis}'",
+            error = sys.exc_info()[0]
+            self.log.log(f"Unknown error while gathering '{xaxis}': {error}",
                          level=3)
             x = []
             unit_x = ""
         try:
             y, unit_y = self.dsa.get_plotable_quantity(yaxis)
         except:
-            self.log.log(f"Unknown error while gathering '{yaxis}'",
+            error = sys.exc_info()[0]
+            self.log.log(f"Unknown error while gathering '{yaxis}': {error}",
                          level=3)
             y = [np.nan]*len(x)
             unit_y = ""
@@ -699,7 +715,8 @@ class AppWindow(QMainWindow):
             try:
                 y2, unit_y2 = self.dsa.get_plotable_quantity(yaxis2)
             except:
-                self.log.log(f"Unknown error while gathering '{yaxis2}'",
+                error = sys.exc_info()[0]
+                self.log.log(f"Unknown error while gathering '{yaxis2}': {error}",
                              level=3)
                 y2 = [np.nan]*len(x)
                 unit_y2 = ""
@@ -707,6 +724,18 @@ class AppWindow(QMainWindow):
             yaxis2 = ""
             y2 = [np.nan]*len(x)
             unit_y2 = ""
+        # Update local values labels
+        self.ui.tab4_local_x_label.setText(f"{xaxis} [{unit_x}]")
+        self.ui.tab4_local_y_label.setText(f"{yaxis} [{unit_y}]")
+        if self.tab4_use_yaxis2:
+            self.ui.tab4_local_y2_label.setEnabled(True)
+            self.ui.tab4_local_y2_value.setEnabled(True)
+            self.ui.tab4_local_y2_label.setText(f"{yaxis2} [{unit_y2}]")
+        else:
+            self.ui.tab4_local_y2_label.setEnabled(False)
+            self.ui.tab4_local_y2_value.setEnabled(False)
+            self.ui.tab4_local_y2_label.setText("None")
+            self.ui.tab4_local_y2_value.setText("")
         # if no x
         if len(x) == 0:
             y = []
