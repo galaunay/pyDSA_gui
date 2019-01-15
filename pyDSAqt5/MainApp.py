@@ -31,18 +31,30 @@ import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog,\
     QDialog
 from PyQt5 import QtWidgets, QtCore
-from .design import Ui_MainWindow
 import numpy as np
 
 from IMTreatment.utils import make_unit
 import re
-from .dsa_backend import DSA
-from .log import Log
+try:
+    from .design import Ui_MainWindow
+    from .dsa_backend import DSA
+    from .log import Log
+except ModuleNotFoundError:
+    from design import Ui_MainWindow
+    from dsa_backend import DSA
+    from log import Log
 
 
 def select_file(message="Open file", filetypes=None):
     dialog = QDialog()
     filepath = QFileDialog.getOpenFileName(dialog, message,
+                                           filter=filetypes)
+    return filepath
+
+
+def select_new_file(message="New file", filetypes=None):
+    dialog = QDialog()
+    filepath = QFileDialog.getSaveFileName(dialog, message,
                                            filter=filetypes)
     return filepath
 
@@ -64,8 +76,6 @@ def select_files(message="Open files", filetypes=None):
 # TODO: Add keybindings
 # TODO: Add interactive vertical selector to analyze tab
 # TODO: Make everything asynchroneous
-# TODO: Make it executable
-# TODO: Put it on pypi
 class AppWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -75,6 +85,11 @@ class AppWindow(QMainWindow):
         self.statusbar_delay = 2000
         self._disable_frame_updater = False
         self.dsa = None
+        self.plottable_quant = [
+            'Frame number', 'Time', 'Position (x, right)',
+            'Position (x, left)', 'Position (x, center)',
+            'CA (right)', 'CA (left)', 'CA (mean)', 'Base radius',
+            'Height', 'Area', 'Volume']
         # Add Progress bar to status bar
         self.ui.progressbar = QtWidgets.QProgressBar()
         self.ui.progressbar.setMaximumSize(QtCore.QSize(250, 16777215))
@@ -766,9 +781,35 @@ class AppWindow(QMainWindow):
         self.tab4_use_yaxis2 = toggle
         self.tab4_update_plot(index=0)
 
+    def tab4_export_as_csv(self, toggle):
+        # get fiel to save to
+        filepath = select_new_file("Save as")[0]
+        if len(self.filepath) == 0:
+            return None
+        # get data
+        data = []
+        headers = []
+        for quant in self.plottable_quant:
+            tmpd = self.dsa.get_plotable_quantity(quant)
+            data.append(tmpd[0])
+            unit = tmpd[1]
+            headers.append(f'{quant} [{unit}]')
+        data = np.array(data).transpose()
+        print(f'data: {data}')
+        print(f'headers: {headers}')
+        # Save as csv
+        try:
+            np.savetxt(filepath, data, delimiter=', ',
+                       header=", ".join(headers))
+            self.log.log(f"Save data in {filepath}", level=1)
+        except:
+            error = sys.exc_info()[0]
+            self.log.log(f"Unknown error while exporting to csv: {error}",
+                         level=3)
+
+
     # Menu
     def export_as_script(self):
-        filepath = self.filepath
         params_im = self.tab1_get_params()
         params_edges = self.tab2_get_params()
         params_fit = self.tab3_get_params()
