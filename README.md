@@ -1,6 +1,6 @@
 # pyDSAqt5
 
-PyDSAqt5 is a graphical interface for [pyDSA](https://framagit.org/gabylaunay/pyDSA).
+PyDSAqt5 is a graphical interface for [pyDSA](https://framagit.org/gabylaunay/pyDSA), a drop shape analyzer.
 
 ## Dependencies
 
@@ -8,7 +8,7 @@ pyDSAqt5 relies on pyDSA and pyQt5
 
 ## Installation
 
-## Linux
+### Linux
 
 You will need [git](https://git-scm.com/) to be installed.
 
@@ -18,11 +18,11 @@ To install the dependencies that are not available on pipy, run:
 
 ``pip install 'git+https://framagit.org/gabylaunay/pyDSA.git#egg=pyDSA'``.
 
-Then install pyDSAqt5 with:
+Then install pyDSAqt5:
 
 ``pip install 'git+https://framagit.org/gabylaunay/pyDSAqt5.git#egg=pyDSAqt5'``
 
-## Anaconda
+### Anaconda
 
 Install git with:
 
