@@ -355,6 +355,16 @@ class DSA(object):
             elif quant == 'Position (x, left)':
                 pt1s, _ = self.fits.get_drop_positions()
                 return pt1s[:, 0], unit_x
+            elif quant == 'CL velocity (x, left)':
+                pt1s, _ = self.fits.get_drop_positions()
+                pt1s = pt1s[:, 0]
+                vel = np.gradient(pt1s, self.fits.dt)
+                return vel, f"{unit_x}/{unit_t}"
+            elif quant == 'CL velocity (x, right)':
+                _, pt2s = self.fits.get_drop_positions()
+                pt2s = pt2s[:, 0]
+                vel = np.gradient(pt2s, self.fits.dt)
+                return vel, f"{unit_x}/{unit_t}"
             elif quant == 'Position (x, center)':
                 xys = self.fits.get_drop_centers()
                 return xys[:, 0], unit_x

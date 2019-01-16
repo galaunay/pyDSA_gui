@@ -84,6 +84,7 @@ class AppWindow(QMainWindow):
         self.dsa = None
         self.plottable_quant = [
             'Frame number', 'Time', 'Position (x, right)',
+            'CL velocity (x, left)', 'CL velocity (x, right)',
             'Position (x, left)', 'Position (x, center)',
             'CA (right)', 'CA (left)', 'CA (mean)', 'Base radius',
             'Height', 'Area', 'Volume']
@@ -662,6 +663,7 @@ class AppWindow(QMainWindow):
         for opts in ['Frame number', 'Time']:
             self.ui.tab4_combo_xaxis.insertItem(100, opts)
         for opts in ['CA (mean)', 'CA (left)', 'CA (right)', 'Base radius',
+                     'CL velocity (x, left)', 'CL velocity (x, right)',
                      'Position (x, center)', 'Position (x, right)',
                      'Position (x, left)']:
             self.ui.tab4_combo_xaxis.insertItem(100, opts)
