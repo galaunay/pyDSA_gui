@@ -491,9 +491,7 @@ class AppWindow(QMainWindow):
         try:
             edge = self.dsa.get_current_edge(params)
         except:
-            error = sys.exc_info()[0]
-            self.log.log(f'Unknown error during edge detection: {error}',
-                         level=3)
+            self.log.log_unknown_exception()
             return None
         self.ui.mplwidgetdetect.update_edge(edge, draw=draw)
 
@@ -588,16 +586,13 @@ class AppWindow(QMainWindow):
         try:
             fit, fit_center = self.dsa.get_current_fit(params)
         except:
-            error = sys.exc_info()[0]
-            self.log.log(f'Unknown error during edge fitting: {error}', level=3)
+            self.log.log_unknown_exception()
             return None
         self.ui.mplwidgetfit.update_fit(fit, fit_center, draw=draw)
         try:
             cas = self.dsa.get_current_ca()
         except:
-            error = sys.exc_info()[0]
-            self.log.log(f'Unknown error during contact angle computation: {error}',
-                         level=3)
+            self.log.log_unknown_exception()
             return None
         self.ui.mplwidgetfit.update_ca(cas, draw=draw)
 
@@ -689,26 +684,20 @@ class AppWindow(QMainWindow):
         try:
             self.dsa.compute_edges(params)
         except:
-            error = sys.exc_info()[0]
-            self.log.log(f'Unknown error during edges detection: {error}',
-                         level=3)
+            self.log.log_unknown_exception()
             return None
         # compute fits for every frames !
         params = self.tab3_get_params()
         try:
             self.dsa.compute_fits(params)
         except:
-            error = sys.exc_info()[0]
-            self.log.log(f'Unknown error during edges fitting: {error}',
-                         level=3)
+            self.log.log_unknown_exception()
             return None
         # compute contact angles for every frames !
         try:
             self.dsa.compute_cas()
         except:
-            error = sys.exc_info()[0]
-            self.log.log(f'Unknown error during contact angle computation: {error}',
-                         level=3)
+            self.log.log_unknown_exception()
             return None
         #
         self.tab4_update_plot(0, replot=True, draw=draw)
@@ -731,17 +720,13 @@ class AppWindow(QMainWindow):
         try:
             x, unit_x = self.dsa.get_plotable_quantity(xaxis)
         except:
-            error = sys.exc_info()[0]
-            self.log.log(f"Unknown error while gathering '{xaxis}': {error}",
-                         level=3)
+            self.log.log_unknown_exception()
             x = []
             unit_x = ""
         try:
             y, unit_y = self.dsa.get_plotable_quantity(yaxis)
         except:
-            error = sys.exc_info()[0]
-            self.log.log(f"Unknown error while gathering '{yaxis}': {error}",
-                         level=3)
+            self.log.log_unknown_exception()
             y = [np.nan]*len(x)
             unit_y = ""
         if self.tab4_use_yaxis2:
@@ -749,9 +734,7 @@ class AppWindow(QMainWindow):
             try:
                 y2, unit_y2 = self.dsa.get_plotable_quantity(yaxis2)
             except:
-                error = sys.exc_info()[0]
-                self.log.log(f"Unknown error while gathering '{yaxis2}': {error}",
-                             level=3)
+                self.log.log_unknown_exception()
                 y2 = [np.nan]*len(x)
                 unit_y2 = ""
         else:
@@ -822,9 +805,7 @@ class AppWindow(QMainWindow):
                        header=", ".join(headers))
             self.log.log(f"Save data in {filepath}", level=1)
         except:
-            error = sys.exc_info()[0]
-            self.log.log(f"Unknown error while exporting to csv: {error}",
-                         level=3)
+            self.log.log_unknown_exception()
 
 
     # Menu

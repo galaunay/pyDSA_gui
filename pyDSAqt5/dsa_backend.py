@@ -199,10 +199,12 @@ class DSA(object):
                     im = self.get_current_precomp_im()
                     edge = im.edge_detection_contour(**contour_args)
                 else:
-                    raise Exception()
+                    self.log.log("No edge detection method selected",
+                                 level=2)
+                    self.current_edge = None
+                    return [[], []]
             except Exception:
-                self.log.log("Couldn't find edges for the current frame",
-                             level=2)
+                self.log.log_unknown_exception()
                 self.current_edge = None
                 return [[], []]
             # Update cache
@@ -274,10 +276,10 @@ class DSA(object):
                 pts = fit.get_fit_as_points()
                 fit_center = np.array([[-999], [-999]])
             else:
+                self.log.lof("No fitting method selected", level=2)
                 return [[0], [0]], [[-999], [-999]]
         except:
-            self.log.log("Couldn't find edges for the current frame",
-                         level=2)
+            self.log.log_unknown_exception()
             return [[0], [0]], [[-999], [-999]]
         # Update cache
         self.fit_cache[self.current_ind] = fit
@@ -301,7 +303,7 @@ class DSA(object):
         try:
             self.current_fit.compute_contact_angle()
         except:
-            self.log.log('Failed to compute contact angles', level=2)
+            self.log.log_unknown_exception()
             return [[np.nan, np.nan], [np.nan, np.nan]]
         lines = self.current_fit._get_angle_display_lines()
         lines = lines[0:2]
@@ -365,11 +367,9 @@ class DSA(object):
             elif quant == 'Volume':
                 return self.fits.get_drop_volumes(), f'{unit_x}^3'
             else:
-                raise Exception(f'Non-plotable quantity: {quant}')
+                self.log.log(f'Non-plotable quantity: {quant}', level=3)
         except:
-            error = sys.exc_info()[0]
-            self.log.log(f"Couldn't fetch '{quant}' for the current frames",
-                         level=2)
+            self.log.log_unknown_exception()
 
     def precompute_images(self, params):
         self.log.log('DSA backend: Preparing images for edge detection',
@@ -402,8 +402,7 @@ class DSA(object):
             base1, base2 = params['baseline_pts']
             ims_precomp.set_baseline(base1, base2)
         except:
-            self.log.log('Failed to set the baseline on current images',
-                         level=3)
+            self.log.log_unknown_exception()
             ims_precomp = self.ims.copy()
         hook(0, 4)
         # apply crop
@@ -415,8 +414,7 @@ class DSA(object):
                              intervt=[limst[0] - 1, limst[1]],
                              inplace=True)
         except:
-            self.log.log('Failed to crop properly the current images',
-                         level=3)
+            self.log.log_unknown_exception()
         hook(2, 4)
         # apply scaling
         try:
@@ -425,8 +423,7 @@ class DSA(object):
                               scalet=params['dt'],
                               inplace=True)
         except:
-            self.log.log('Failed to scale properly the current images',
-                         level=3)
+            self.log.log_unknown_exception()
         hook(3, 4)
         # store
         self.ims_precomp = ims_precomp
@@ -478,10 +475,9 @@ class DSA(object):
                 self.edges = tmp_ims.edge_detection_contour(iteration_hook=hook,
                                                             **contour_args)
             else:
-                raise Exception()
+                self.log.log("No edge detection method selected", level=2)
         except:
-            self.log.log('Failed to compute the edges for the current images',
-                         level=3)
+            self.log.log_unknown_exception()
 
     def compute_fits(self, params):
         self.log.log('DSA backend: fitting edges for the image set', level=1)
@@ -533,10 +529,9 @@ class DSA(object):
                 self.fits = self.edges.fit_spline(iteration_hook=hook,
                                                   **spline_args)
             else:
-                self.app.log.log('please select a fitting method', level=1)
+                self.app.log.log('No fitting method selected', level=2)
         except:
-            self.log.log("Failed to compute the edge fittings for the current"
-                         " images", level=3)
+            self.log.log_unknown_exception()
 
     def compute_cas(self):
         if self.fits is None:
@@ -547,5 +542,4 @@ class DSA(object):
             try:
                 self.fits.compute_contact_angle(iteration_hook=hook)
             except:
-                self.log.log('Failed to compute the contact angles'
-                             ' for the current images', level=3)
+                self.log.log_unknown_exception()
