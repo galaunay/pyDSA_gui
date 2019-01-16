@@ -105,10 +105,8 @@ class AppWindow(QMainWindow):
         self.tab1_filepath = ""
         self.tab2_initialized = False
         self.tab2_already_opened = False
-        self.tab2_old_index = -1
         self.tab3_initialized = False
         self.tab3_already_opened = False
-        self.tab3_old_index = -1
         self.tab4_initialized = False
         self.tab4_use_yaxis2 = False
         self.tab4_already_opened = False
@@ -159,10 +157,6 @@ class AppWindow(QMainWindow):
                 self.ui.tabWidget.setCurrentIndex(0)
                 return None
             self.tab1_leave_tab()
-        elif self.last_tab == 1:
-            self.tab2_old_index = self.dsa.current_ind
-        elif self.last_tab == 2:
-            self.tab3_old_index = self.dsa.current_ind
         # Do switch to tab
         if tab_nmb == 0:
             self.tab1_switch_to_tab()
@@ -419,9 +413,6 @@ class AppWindow(QMainWindow):
         draw = True
         if not self.tab2_already_opened:
             draw = False
-        # Minor optimization, not really needed
-        if self.tab2_old_index == self.dsa.current_ind:
-            draw = False
         # Replot
         im = self.dsa.get_current_precomp_im()
         self.ui.mplwidgetdetect.update_image(im.values, replot=True, draw=draw)
@@ -529,9 +520,6 @@ class AppWindow(QMainWindow):
             self.tab3_initialize()
         draw = True
         if not self.tab3_already_opened:
-            draw = False
-        # Minor optimization, not really needed
-        if self.tab3_old_index == self.dsa.current_ind:
             draw = False
         # Update the plot only if necessary
         im = self.dsa.get_current_precomp_im()
