@@ -131,7 +131,8 @@ class Log(object):
         errmess = "Unknown error: " + str(exc_info[1])
         self.log(errmess, level=3)
         # print traceback
-        print("".join(traceback.format_exception(*exc_info)))
+        trcmess = ' '*9 + "".join(traceback.format_exception(*exc_info))
+        print(trcmess.replace('\n', '\n' + ' '*9))
 
 
 if __name__ == "__main__":
