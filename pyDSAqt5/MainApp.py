@@ -97,8 +97,7 @@ class AppWindow(QMainWindow):
         self.ui.progressbar.setVisible(False)
         self.ui.statusbar.addPermanentWidget(self.ui.progressbar)
         # Initialize log
-        self.log = Log(self.ui.logarea, self.ui.statusbar,
-                       self.statusbar_delay)
+        self.log = Log(self.ui.logarea, self.ui.statusbar, self.statusbar_delay)
         # Always start from the first tab
         self.ui.tabWidget.setCurrentIndex(0)
         # Tab-related variables
@@ -237,21 +236,24 @@ class AppWindow(QMainWindow):
         pt2 = [9/10*w, 2/3*h]
         self.ui.mplwidgetimport.update_baseline(pt1, pt2)
 
-    def tab1_import_image(self):
+    def tab1_import_image(self, toggle=None):
         # Select image to import
-        self.filepath_type = 'image'
-        self.filepath = select_file('Open image')[0]
+        filepath = select_file('Open image')[0]
         # Import image
-        self.dsa = DSA(self)
+        dsa = DSA(self)
         try:
-            self.dsa.import_image(self.filepath)
+            dsa.import_image(filepath)
         except IOError:
-            self.log.log(f"Cannot import '{self.filepath}': not a valid image",
+            self.log.log(f"Cannot import '{filepath}': not a valid image",
                          level=3)
             return None
         except:
-            self.log.log(f"Unknown error during image import", level=3)
+            self.log.log_unknown_exception()
             return None
+        # store
+        self.dsa = dsa
+        self.filepath_type = 'image'
+        self.filepath = filepath
         # Update image display
         im = self.dsa.get_current_raw_im()
         self.ui.mplwidgetimport.update_image(im.values, replot=True)
@@ -267,24 +269,27 @@ class AppWindow(QMainWindow):
         self.tab2_initialized = False
         self.tab3_initialized = False
 
-    def tab1_import_images(self):
+    def tab1_import_images(self, toggle=None):
         # Select images to import
-        self.filepath_type = 'images'
-        self.filepath = select_files('Open images')[0]
+        filepath = select_files('Open images')[0]
         # Check
-        if len(self.filepath) == 0:
+        if len(filepath) == 0:
             return None
         # Import images
-        self.dsa = DSA(self)
+        dsa = DSA(self)
         try:
-            self.dsa.import_images(self.filepath)
+            dsa.import_images(filepath)
         except IOError:
-            self.log.log(f"Couldn't import selected files: {self.filepath}",
+            self.log.log(f"Couldn't import selected files: {filepath}",
                          level=3)
             return None
         except:
-            self.log.log(f"Unknown error during images import", level=3)
+            self.log.log_unknown_exception()
             return None
+        # store
+        self.dsa = dsa
+        self.filepath_type = 'images'
+        self.filepath = filepath
         # Update images display
         im = self.dsa.get_current_raw_im()
         self.ui.mplwidgetimport.update_image(im.values, replot=True)
@@ -300,24 +305,27 @@ class AppWindow(QMainWindow):
         self.tab2_initialized = False
         self.tab3_initialized = False
 
-    def tab1_import_video(self):
+    def tab1_import_video(self, toggle=None):
         # Select video to import
-        self.filepath_type = 'video'
-        self.filepath = select_file('Open video')[0]
+        filepath = select_file('Open video')[0]
         # Import video
-        self.dsa = DSA(self)
+        dsa = DSA(self)
         try:
-            self.dsa.import_video(self.filepath)
+            dsa.import_video(filepath)
         except IOError:
             self.log.log(f"Couldn't import '{self.filepath}':"
                          " not a valid video", level=3)
             return None
         except ImportError:
-            self.log.log(f"Couldn't import '{self.filepath}':", level=3)
+            self.log.log(f"Couldn't import '{filepath}':", level=3)
             return None
         except:
-            self.log.log(f"Unknown error during video import", level=3)
+            self.log.log_unknown_exception()
             return None
+        # store
+        self.dsa = dsa
+        self.filepath_type = 'video'
+        self.filepath = filepath
         # Update video display
         im = self.dsa.get_current_raw_im()
         self.ui.mplwidgetimport.update_image(im.values, replot=True)

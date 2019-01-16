@@ -29,11 +29,60 @@ __status__ = "Development"
 
 from datetime import timedelta
 from PyQt5 import QtGui
+import sys
+import traceback
 import time
 
 
+class catchAndLog(object):
+    """
+    Decorator that catches and log exceptions.
+    """
+
+    def __init__(self, log, filter=[], default_return=None):
+        """
+        Decorator that catches and log exceptions.
+
+        Parameters
+        ----------
+        log: Log instance
+            Log instance to communicate with
+        filter: list of Exception
+            Exception to ignore (log on a low level)
+        default_return: anything
+            Default return value for the function in case of Exception
+        """
+        self.log = log
+        self.filter = filter
+        self.default_return = default_return
+
+    def __call__(self, fun):
+        def wrapped(loc_self, *args):
+            print(f"args: {args}")
+            try:
+                res = fun(loc_self, *args)
+                return res
+            except:
+                exc_info = sys.exc_info()
+                exc = exc_info[0]
+                if exc in self.filter:
+                    self.log_low(fun, exc_info)
+                else:
+                    self.log_high(fun, exc_info)
+                return self.default_return
+        return wrapped
+
+    def log_low(self, f, exc_info):
+        pass
+
+    def log_high(self, f, exc_info):
+        errmess = "".join(traceback.format_exception(*exc_info))
+        mess = f"Unknown error while running {f.__name__}:\n{errmess}"
+        self.log.log(mess, level=3)
+
+
 class Log(object):
-    def __init__(self, display_area, status_bar, delay):
+    def __init__(self, display_area=None, status_bar=None, delay=1):
         self.logs = []
         self.delay = delay
         self.display_area = display_area
@@ -64,10 +113,53 @@ class Log(object):
         # Print in shell
         print(text)
         # Update log tab
-        self.display_area.setTextColor(self.level_colors[level - 1])
-        self.display_area.append(self.logs[-1])
+        if self.display_area is not None:
+            self.display_area.setTextColor(self.level_colors[level - 1])
+            self.display_area.append(self.logs[-1])
         # Display in statu bar
-        if level == 2:
-            self.status_bar.showMessage(f"{message}", self.delay)
-        elif level == 3:
-            self.status_bar.showMessage(f"Error: {message}", self.delay)
+        if self.status_bar is not None:
+            short_mess = message.split('\n')[-1]
+            if level == 2:
+                self.status_bar.showMessage(f"{short_mess}", self.delay)
+            elif level == 3:
+                self.status_bar.showMessage(f"Error: {short_mess}", self.delay)
+
+    def log_unknown_exception(self):
+        # Get last exception
+        exc_info = sys.exc_info()
+        # log the error
+        errmess = "Unknown error: " + str(exc_info[1])
+        self.log(errmess, level=3)
+        # print traceback
+        print("".join(traceback.format_exception(*exc_info)))
+
+
+if __name__ == "__main__":
+
+    class LowError(Exception):
+        pass
+
+    class HighError(Exception):
+        pass
+
+    @catchAndLog(Log(None, None, 1), filter=[LowError], default_return=45)
+    def foo(a, b):
+        if a < 2:
+            raise LowError('a is too small')
+        if b < 2:
+            raise HighError('b is too small')
+        return a + b
+
+    # try it
+    print("")
+    print("Alright")
+    print(foo(3, 4))
+    print("")
+    print("Alright but return 45")
+    print(foo(1, 5))
+    print("")
+    print("Not alright")
+    print(foo(3, 1))
+    print("")
+    print("Not alright")
+    print(foo("un", "deux"))

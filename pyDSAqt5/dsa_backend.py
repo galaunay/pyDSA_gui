@@ -74,20 +74,15 @@ class DSA(object):
                 self.fit_cache = [None]*self.nmb_frames
 
     def import_image(self, filepath):
-        try:
-            self.log.log(f'DSA backend: Importing image: {filepath}', level=1)
-            self.ims = dsa.TemporalImages(cache_infos=False)
-            self.ims.add_field(dsa.import_from_image(filepath, cache_infos=False),
-                               copy=False)
-            self.reset_cache()
-            self.current_ind = 0
-            self.nmb_frames = 1
-            self.sizex = self.ims.shape[0]
-            self.sizey = self.ims.shape[1]
-        except:
-            error = sys.exc_info()[0]
-            self.log.log(f"Unknown error while importing image: {error}",
-                         level=3)
+        self.log.log(f'DSA backend: Importing image: {filepath}', level=1)
+        self.ims = dsa.TemporalImages(cache_infos=False)
+        self.ims.add_field(dsa.import_from_image(filepath, cache_infos=False),
+                           copy=False)
+        self.reset_cache()
+        self.current_ind = 0
+        self.nmb_frames = 1
+        self.sizex = self.ims.shape[0]
+        self.sizey = self.ims.shape[1]
 
     def get_progressbar_hook(self, text_progress, text_finished):
         def hook(i, maxi):
@@ -111,49 +106,34 @@ class DSA(object):
         return hook
 
     def import_images(self, filepaths):
-        try:
-            if len(filepaths) == 0:
-                return None
-            self.log.log(f'DSA backend: Importing image set: {filepaths}', level=1)
-            self.ims = dsa.TemporalImages(filepath=None, cache_infos=False)
-            filepaths.sort()
-            import_hook = self.get_progressbar_hook('Importing image set',
-                                                    'Imported image set')
-            for i, filepath in enumerate(filepaths):
-                try:
-                    tmpim = dsa.import_from_image(filepath, cache_infos=False)
-                    self.ims.add_field(tmpim, time=i+1, unit_times="", copy=False)
-                    import_hook(i, len(filepaths))
-                except IOError:
-                    self.log.log(f"Cannot import '{filepath}': not a valid image",
-                                 level=3)
-                    raise IOError()
-            self.current_ind = 0
-            self.reset_cache()
-            self.nmb_frames = len(self.ims)
-            self.sizex = self.ims[0].shape[0]
-            self.sizey = self.ims[0].shape[1]
-        except:
-            error = sys.exc_info()[0]
-            self.log.log(f"Unknown error while importing images: {error}",
-                         level=3)
+        if len(filepaths) == 0:
+            raise Exception('No file specified')
+        self.log.log(f'DSA backend: Importing image set: {filepaths}', level=1)
+        self.ims = dsa.TemporalImages(filepath=None, cache_infos=False)
+        filepaths.sort()
+        import_hook = self.get_progressbar_hook('Importing image set',
+                                                'Imported image set')
+        for i, filepath in enumerate(filepaths):
+            tmpim = dsa.import_from_image(filepath, cache_infos=False)
+            self.ims.add_field(tmpim, time=i+1, unit_times="", copy=False)
+            import_hook(i, len(filepaths))
+        self.current_ind = 0
+        self.reset_cache()
+        self.nmb_frames = len(self.ims)
+        self.sizex = self.ims[0].shape[0]
+        self.sizey = self.ims[0].shape[1]
 
     def import_video(self, filepath):
-        try:
-            self.log.log(f'DSA backend: Importing video: {filepath}', level=1)
-            hook = self.get_progressbar_hook('Importing video',
-                                             'Video imported')
-            self.ims = dsa.import_from_video(filepath, cache_infos=False,
-                                             iteration_hook=hook)
-            self.current_ind = 0
-            self.reset_cache()
-            self.nmb_frames = len(self.ims)
-            self.sizex = self.ims[0].shape[0]
-            self.sizey = self.ims[0].shape[1]
-        except:
-            error = sys.exc_info()[0]
-            self.log.log(f"Unknown error while importing video: {error}",
-                         level=3)
+        self.log.log(f'DSA backend: Importing video: {filepath}', level=1)
+        hook = self.get_progressbar_hook('Importing video',
+                                         'Video imported')
+        self.ims = dsa.import_from_video(filepath, cache_infos=False,
+                                         iteration_hook=hook)
+        self.current_ind = 0
+        self.reset_cache()
+        self.nmb_frames = len(self.ims)
+        self.sizex = self.ims[0].shape[0]
+        self.sizey = self.ims[0].shape[1]
 
     def set_current(self, ind):
         if self.nmb_frames == 1:
