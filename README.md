@@ -2,9 +2,23 @@
 
 PyDSAqt5 is a graphical interface for [pyDSA](https://framagit.org/gabylaunay/pyDSA), a drop shape analyzer.
 
-## Dependencies
+## Usage
 
-pyDSAqt5 relies on pyDSA and pyQt5
+Just fire up the GUI from the terminal (or anaconda console) with:
+
+``pyDSAqt5``
+
+## Mandatory screenshots
+
+<img src="doc/screenshot1.png" alt="Import" width="300"/>
+
+<img src="doc/screenshot2.png" alt="Import" width="300"/>
+
+<img src="doc/screenshot3.png" alt="Import" width="300"/>
+
+<img src="doc/screenshot4.png" alt="Import" width="300"/>
+
+
 
 ## Installation
 
@@ -38,16 +52,28 @@ And finally install pyDSAqt5:
 
 ``pip install git+https://framagit.org/gabylaunay/pyDSAqt5.git#egg=pyDSAqt5``
 
-## Usage
+### Winpython
 
-Just fire the GUI from the terminal (or anaconda console) with:
+You will need to download the following packages:
 
-``pyDSAqt5``
+- [IMTreatment](https://framagit.org/gabylaunay/IMTreatment/-/archive/master/IMTreatment-master.zip)
+- [pyDSA](https://framagit.org/gabylaunay/pyDSA/-/archive/master/pyDSA-master.zip)
+- [pyDSAqt5](https://framagit.org/gabylaunay/pyDSAqt5/-/archive/master/pyDSAqt5-master.zip)
+
+extract them, and install them (in order) with:
+
+``python setup.py install``
+
 
 ## Issues and bugs
 
-If pyDSAqt5 crashes or behave abnormally, you can report [here](https://framagit.org/gabylaunay/pyDSAqt5/issues) or just send me an email at [gaby.launay@northumbria.ac.uk](mailto:gaby.launay@northumbria.ac.uk), with
+If pyDSAqt5 crashes or behaves abnormally, you can report [here](https://framagit.org/gabylaunay/pyDSAqt5/issues) or just send me an email at [gaby.launay@northumbria.ac.uk](mailto:gaby.launay@northumbria.ac.uk).
+Any of the followings will greatly help me fix the issue:
 
-- a description of the problem (as detailled as possible, for me to get it)
-- the logs from the terminal
-- potentially a test case to reproduce the problem
+- A description of the problem (as detailled as possible, for me to get it)
+- The logs from the terminal
+- A test case to reproduce the problem
+
+
+
+
