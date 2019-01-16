@@ -504,14 +504,16 @@ class MplWidgetAnalyze(Canvas):
                                              y2[indx - 1], y2[indx],
                                              xi)
         # Update the indicators
-        if xi is not None and yi is not None:
-            self.indicator1.set_data([xi], [yi])
-        else:
-            self.indicator1.set_data([], [])
-        if xi is not None and y2i is not None:
-            self.indicator2.set_data([xi], [y2i])
-        else:
-            self.indicator2.set_data([], [])
+        if self.indicator1 is not None:
+            if xi is not None and yi is not None:
+                self.indicator1.set_data([xi], [yi])
+            else:
+                self.indicator1.set_data([], [])
+        if self.indicator2 is not None:
+            if xi is not None and y2i is not None:
+                self.indicator2.set_data([xi], [y2i])
+            else:
+                self.indicator2.set_data([], [])
         # Update interface
         xi_t = ""
         if xi is not None:

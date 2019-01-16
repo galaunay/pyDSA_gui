@@ -28,6 +28,7 @@ __status__ = "Development"
 
 
 import pyDSA as dsa
+import sys
 import re
 import numpy as np
 from IMTreatment.utils import make_unit
@@ -73,15 +74,20 @@ class DSA(object):
                 self.fit_cache = [None]*self.nmb_frames
 
     def import_image(self, filepath):
-        self.log.log(f'DSA backend: Importing image: {filepath}', level=1)
-        self.ims = dsa.TemporalImages(cache_infos=False)
-        self.ims.add_field(dsa.import_from_image(filepath, cache_infos=False),
-                           copy=False)
-        self.reset_cache()
-        self.current_ind = 0
-        self.nmb_frames = 1
-        self.sizex = self.ims.shape[0]
-        self.sizey = self.ims.shape[1]
+        try:
+            self.log.log(f'DSA backend: Importing image: {filepath}', level=1)
+            self.ims = dsa.TemporalImages(cache_infos=False)
+            self.ims.add_field(dsa.import_from_image(filepath, cache_infos=False),
+                               copy=False)
+            self.reset_cache()
+            self.current_ind = 0
+            self.nmb_frames = 1
+            self.sizex = self.ims.shape[0]
+            self.sizey = self.ims.shape[1]
+        except:
+            error = sys.exc_info()[0]
+            self.log.log(f"Unknown error while importing image: {error}",
+                         level=3)
 
     def get_progressbar_hook(self, text_progress, text_finished):
         def hook(i, maxi):
@@ -105,39 +111,49 @@ class DSA(object):
         return hook
 
     def import_images(self, filepaths):
-        if len(filepaths) == 0:
-            return None
-        self.log.log(f'DSA backend: Importing image set: {filepaths}', level=1)
-        self.ims = dsa.TemporalImages(filepath=None, cache_infos=False)
-        filepaths.sort()
-        import_hook = self.get_progressbar_hook('Importing image set',
-                                                'Imported image set')
-        for i, filepath in enumerate(filepaths):
-            try:
-                tmpim = dsa.import_from_image(filepath, cache_infos=False)
-                self.ims.add_field(tmpim, time=i+1, unit_times="", copy=False)
-                import_hook(i, len(filepaths))
-            except IOError:
-                self.log.log(f"Cannot import '{filepath}': not a valid image",
-                             level=3)
-                raise IOError()
-        self.current_ind = 0
-        self.reset_cache()
-        self.nmb_frames = len(self.ims)
-        self.sizex = self.ims[0].shape[0]
-        self.sizey = self.ims[0].shape[1]
+        try:
+            if len(filepaths) == 0:
+                return None
+            self.log.log(f'DSA backend: Importing image set: {filepaths}', level=1)
+            self.ims = dsa.TemporalImages(filepath=None, cache_infos=False)
+            filepaths.sort()
+            import_hook = self.get_progressbar_hook('Importing image set',
+                                                    'Imported image set')
+            for i, filepath in enumerate(filepaths):
+                try:
+                    tmpim = dsa.import_from_image(filepath, cache_infos=False)
+                    self.ims.add_field(tmpim, time=i+1, unit_times="", copy=False)
+                    import_hook(i, len(filepaths))
+                except IOError:
+                    self.log.log(f"Cannot import '{filepath}': not a valid image",
+                                 level=3)
+                    raise IOError()
+            self.current_ind = 0
+            self.reset_cache()
+            self.nmb_frames = len(self.ims)
+            self.sizex = self.ims[0].shape[0]
+            self.sizey = self.ims[0].shape[1]
+        except:
+            error = sys.exc_info()[0]
+            self.log.log(f"Unknown error while importing images: {error}",
+                         level=3)
 
     def import_video(self, filepath):
-        self.log.log(f'DSA backend: Importing video: {filepath}', level=1)
-        hook = self.get_progressbar_hook('Importing video',
-                                         'Video imported')
-        self.ims = dsa.import_from_video(filepath, cache_infos=False,
-                                         iteration_hook=hook)
-        self.current_ind = 0
-        self.reset_cache()
-        self.nmb_frames = len(self.ims)
-        self.sizex = self.ims[0].shape[0]
-        self.sizey = self.ims[0].shape[1]
+        try:
+            self.log.log(f'DSA backend: Importing video: {filepath}', level=1)
+            hook = self.get_progressbar_hook('Importing video',
+                                             'Video imported')
+            self.ims = dsa.import_from_video(filepath, cache_infos=False,
+                                             iteration_hook=hook)
+            self.current_ind = 0
+            self.reset_cache()
+            self.nmb_frames = len(self.ims)
+            self.sizex = self.ims[0].shape[0]
+            self.sizey = self.ims[0].shape[1]
+        except:
+            error = sys.exc_info()[0]
+            self.log.log(f"Unknown error while importing video: {error}",
+                         level=3)
 
     def set_current(self, ind):
         if self.nmb_frames == 1:
@@ -229,6 +245,8 @@ class DSA(object):
 
     def get_current_fit(self, params):
         # Reset cache if not valid anymre
+        if self.fit_method is None:
+            return [[0], [0]], [[-999], [-999]]
         if self.fit_cache_method != self.fit_method:
             self.reset_cache()
         for p1, p2 in zip(params, self.fit_cache_params):
@@ -254,27 +272,32 @@ class DSA(object):
         else:
             self.log.log('DSA backend: Using cached fits for current image',
                          level=1)
-        if self.fit_method == 'circle':
-            if fit is None:
-                fit = self.current_edge.fit_circle(**circle_args)
-            pts = fit.get_fit_as_points()
-            fit_center = fit.fits[0].copy()
-        elif self.fit_method == 'ellipse':
-            if fit is None:
-                fit = self.current_edge.fit_ellipse(**ellipse_args)
-            pts = fit.get_fit_as_points()
-            fit_center = fit.fits[0].copy()
-        elif self.fit_method == 'polyline':
-            if fit is None:
-                fit = self.current_edge.fit_polyline(**polyline_args)
-            pts = fit.get_fit_as_points()
-            fit_center = np.array([[-999], [-999]])
-        elif self.fit_method == 'spline':
-            if fit is None:
-                fit = self.current_edge.fit_spline(**spline_args)
-            pts = fit.get_fit_as_points()
-            fit_center = np.array([[-999], [-999]])
-        else:
+        try:
+            if self.fit_method == 'circle':
+                if fit is None:
+                    fit = self.current_edge.fit_circle(**circle_args)
+                pts = fit.get_fit_as_points()
+                fit_center = fit.fits[0].copy()
+            elif self.fit_method == 'ellipse':
+                if fit is None:
+                    fit = self.current_edge.fit_ellipse(**ellipse_args)
+                pts = fit.get_fit_as_points()
+                fit_center = fit.fits[0].copy()
+            elif self.fit_method == 'polyline':
+                if fit is None:
+                    fit = self.current_edge.fit_polyline(**polyline_args)
+                pts = fit.get_fit_as_points()
+                fit_center = np.array([[-999], [-999]])
+            elif self.fit_method == 'spline':
+                if fit is None:
+                    fit = self.current_edge.fit_spline(**spline_args)
+                pts = fit.get_fit_as_points()
+                fit_center = np.array([[-999], [-999]])
+            else:
+                return [[0], [0]], [[-999], [-999]]
+        except:
+            self.log.log("Couldn't find edges for the current frame",
+                         level=2)
             return [[0], [0]], [[-999], [-999]]
         # Update cache
         self.fit_cache[self.current_ind] = fit
@@ -321,37 +344,42 @@ class DSA(object):
         ff, lf = self.precomp_old_params['cropt']
         unit_x = dx.strUnit()[1:-1]
         unit_t = dt.strUnit()[1:-1]
-        if quant == 'Frame number':
-            return np.arange(ff, ff + len(self.ims_precomp), 1), ""
-        elif quant == 'Time':
-            return self.ims_precomp.times, unit_t
-        elif quant == 'Position (x, right)':
-            _, pt2s = self.fits.get_drop_positions()
-            return pt2s[:, 0], unit_x
-        elif quant == 'Position (x, left)':
-            pt1s, _ = self.fits.get_drop_positions()
-            return pt1s[:, 0], unit_x
-        elif quant == 'Position (x, center)':
-            xys = self.fits.get_drop_centers()
-            return xys[:, 0], unit_x
-        elif quant == 'CA (right)':
-            return self.fits.get_contact_angles()[:, 1], "°"
-        elif quant == 'CA (left)':
-            return 180 - self.fits.get_contact_angles()[:, 0], "°"
-        elif quant == 'CA (mean)':
-            thetas = self.fits.get_contact_angles()
-            thetas[:, 1] = 180 - thetas[:, 1]
-            return np.mean(thetas, axis=1), "°"
-        elif quant == 'Base radius':
-            return self.fits.get_base_diameters()/2, unit_x
-        elif quant == 'Height':
-            return self.fits.get_drop_heights(), unit_x
-        elif quant == 'Area':
-            return self.fits.get_drop_areas(), f'{unit_x}^2'
-        elif quant == 'Volume':
-            return self.fits.get_drop_volumes(), f'{unit_x}^3'
-        else:
-            raise Exception(f'Non-plotable quantity: {quant}')
+        try:
+            if quant == 'Frame number':
+                return np.arange(ff, ff + len(self.ims_precomp), 1), ""
+            elif quant == 'Time':
+                return self.ims_precomp.times, unit_t
+            elif quant == 'Position (x, right)':
+                _, pt2s = self.fits.get_drop_positions()
+                return pt2s[:, 0], unit_x
+            elif quant == 'Position (x, left)':
+                pt1s, _ = self.fits.get_drop_positions()
+                return pt1s[:, 0], unit_x
+            elif quant == 'Position (x, center)':
+                xys = self.fits.get_drop_centers()
+                return xys[:, 0], unit_x
+            elif quant == 'CA (right)':
+                return self.fits.get_contact_angles()[:, 1], "°"
+            elif quant == 'CA (left)':
+                return 180 - self.fits.get_contact_angles()[:, 0], "°"
+            elif quant == 'CA (mean)':
+                thetas = self.fits.get_contact_angles()
+                thetas[:, 1] = 180 - thetas[:, 1]
+                return np.mean(thetas, axis=1), "°"
+            elif quant == 'Base radius':
+                return self.fits.get_base_diameters()/2, unit_x
+            elif quant == 'Height':
+                return self.fits.get_drop_heights(), unit_x
+            elif quant == 'Area':
+                return self.fits.get_drop_areas(), f'{unit_x}^2'
+            elif quant == 'Volume':
+                return self.fits.get_drop_volumes(), f'{unit_x}^3'
+            else:
+                raise Exception(f'Non-plotable quantity: {quant}')
+        except:
+            error = sys.exc_info()[0]
+            self.log.log(f"Couldn't fetch '{quant}' for the current frames",
+                         level=2)
 
     def precompute_images(self, params):
         self.log.log('DSA backend: Preparing images for edge detection',
@@ -379,23 +407,36 @@ class DSA(object):
         hook = self.get_progressbar_hook('Preparing images for edge detection',
                                          'Images ready for edge detection')
         # set baseline
-        ims_precomp = self.ims.copy()
-        base1, base2 = params['baseline_pts']
-        ims_precomp.set_baseline(base1, base2)
+        try:
+            ims_precomp = self.ims.copy()
+            base1, base2 = params['baseline_pts']
+            ims_precomp.set_baseline(base1, base2)
+        except:
+            self.log.log('Failed to set the baseline on current images',
+                         level=3)
+            ims_precomp = self.ims.copy()
         hook(0, 4)
         # apply crop
-        lims = params['lims']
-        limst = params['cropt']
-        ims_precomp.crop(intervx=lims[0],
-                         intervy=lims[1],
-                         intervt=[limst[0] - 1, limst[1]],
-                         inplace=True)
+        try:
+            lims = params['lims']
+            limst = params['cropt']
+            ims_precomp.crop(intervx=lims[0],
+                             intervy=lims[1],
+                             intervt=[limst[0] - 1, limst[1]],
+                             inplace=True)
+        except:
+            self.log.log('Failed to crop properly the current images',
+                         level=3)
         hook(2, 4)
         # apply scaling
-        ims_precomp.scale(scalex=params['dx'],
-                          scaley=params['dx'],
-                          scalet=params['dt'],
-                          inplace=True)
+        try:
+            ims_precomp.scale(scalex=params['dx'],
+                              scaley=params['dx'],
+                              scalet=params['dt'],
+                              inplace=True)
+        except:
+            self.log.log('Failed to scale properly the current images',
+                         level=3)
         hook(3, 4)
         # store
         self.ims_precomp = ims_precomp
@@ -406,6 +447,10 @@ class DSA(object):
 
     def compute_edges(self, params):
         self.log.log('DSA backend: Computing edges for the image set', level=1)
+        if self.edge_detection_method is None:
+            self.edges = None
+            self.fits = None
+            return None
         # Get params
         canny_args = params[0].copy()
         canny_args.update(params[-1])
@@ -435,17 +480,25 @@ class DSA(object):
         tmp_ims = self.ims_precomp
         hook = self.get_progressbar_hook('Detecting edges',
                                          'Detected edges')
-        if self.edge_detection_method == 'canny':
-            self.edges = tmp_ims.edge_detection(iteration_hook=hook,
-                                                **canny_args)
-        elif self.edge_detection_method == 'contour':
-            self.edges = tmp_ims.edge_detection_contour(iteration_hook=hook,
-                                                        **contour_args)
-        else:
-            raise Exception()
+        try:
+            if self.edge_detection_method == 'canny':
+                self.edges = tmp_ims.edge_detection(iteration_hook=hook,
+                                                    **canny_args)
+            elif self.edge_detection_method == 'contour':
+                self.edges = tmp_ims.edge_detection_contour(iteration_hook=hook,
+                                                            **contour_args)
+            else:
+                raise Exception()
+        except:
+            self.log.log('Failed to compute the edges for the current images',
+                         level=3)
 
     def compute_fits(self, params):
         self.log.log('DSA backend: fitting edges for the image set', level=1)
+        # Check
+        if self.fit_method is None or self.edges is None:
+            self.fits = None
+            return None
         # Get params
         circle_args = params[0]
         ellipse_args = params[1]
@@ -476,24 +529,33 @@ class DSA(object):
         # Fit
         hook = self.get_progressbar_hook('Fitting edges',
                                          'Fitted edges')
-        if self.fit_method == 'circle':
-            self.fits = self.edges.fit_circle(iteration_hook=hook,
-                                              **circle_args)
-        elif self.fit_method == 'ellipse':
-            self.fits = self.edges.fit_ellipse(iteration_hook=hook,
-                                               **ellipse_args)
-        elif self.fit_method == 'polyline':
-            self.fits = self.edges.fit_polyline(iteration_hook=hook,
-                                                **polyline_args)
-        elif self.fit_method == 'spline':
-            self.fits = self.edges.fit_spline(iteration_hook=hook,
-                                              **spline_args)
-        else:
-            self.app.log.log('please select a fitting method', level=1)
-            return [[0], [0]], [[-999], [-999]]
+        try:
+            if self.fit_method == 'circle':
+                self.fits = self.edges.fit_circle(iteration_hook=hook,
+                                                  **circle_args)
+            elif self.fit_method == 'ellipse':
+                self.fits = self.edges.fit_ellipse(iteration_hook=hook,
+                                                   **ellipse_args)
+            elif self.fit_method == 'polyline':
+                self.fits = self.edges.fit_polyline(iteration_hook=hook,
+                                                    **polyline_args)
+            elif self.fit_method == 'spline':
+                self.fits = self.edges.fit_spline(iteration_hook=hook,
+                                                  **spline_args)
+            else:
+                self.app.log.log('please select a fitting method', level=1)
+        except:
+            self.log.log("Failed to compute the edge fittings for the current"
+                         " images", level=3)
 
     def compute_cas(self):
+        if self.fits is None:
+            return None
         if self.fits.fits[0].thetas is None:
             hook = self.get_progressbar_hook('Computing contact angles',
                                              'Computed contact angles')
-            self.fits.compute_contact_angle(iteration_hook=hook)
+            try:
+                self.fits.compute_contact_angle(iteration_hook=hook)
+            except:
+                self.log.log('Failed to compute the contact angles'
+                             ' for the current images', level=3)

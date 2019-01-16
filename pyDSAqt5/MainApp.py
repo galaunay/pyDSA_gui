@@ -803,24 +803,23 @@ class AppWindow(QMainWindow):
         self.tab4_update_plot(index=0)
 
     def tab4_export_as_csv(self, toggle):
-        # get fiel to save to
-        filepath = select_new_file("Save as")
-        if len(filepath) == 0:
-            return None
-        filepath = filepath[0]
-        if filepath[0] == "":
-            return None
-        # get data
-        data = []
-        headers = []
-        for quant in self.plottable_quant:
-            tmpd = self.dsa.get_plotable_quantity(quant)
-            data.append(tmpd[0])
-            unit = tmpd[1]
-            headers.append(f'{quant} [{unit}]')
-        data = np.array(data).transpose()
-        # Save as csv
         try:
+            # get fiel to save to
+            filepath = select_new_file("Save as")
+            if len(filepath) == 0:
+                return None
+            filepath = filepath[0]
+            if filepath[0] == "":
+                return None
+            # get data
+            data = []
+            headers = []
+            for quant in self.plottable_quant:
+                tmpd = self.dsa.get_plotable_quantity(quant)
+                data.append(tmpd[0])
+                unit = tmpd[1]
+                headers.append(f'{quant} [{unit}]')
+            data = np.array(data).transpose()
             np.savetxt(filepath, data, delimiter=', ',
                        header=", ".join(headers))
             self.log.log(f"Save data in {filepath}", level=1)
