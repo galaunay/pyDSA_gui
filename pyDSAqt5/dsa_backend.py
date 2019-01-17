@@ -609,7 +609,7 @@ class DSALive(DSA):
         self.sizex = 150
         self.sizey = 100
         self.thread = SendToDSAThread(self.camera, self.set_new_image)
-        self.app.exit_connect(self.thread.stop())
+        self.app.exit_connect(self.thread.stop)
         self.thread.start()
 
     def set_new_image(self, imdata):

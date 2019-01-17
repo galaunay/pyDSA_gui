@@ -74,8 +74,9 @@ def select_files(message="Open files", filetypes=None):
 # TODO: Add keybindings
 # TODO: Make everything asynchroneous
 class AppWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, app):
         super().__init__()
+        self.app = app
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         # Variables
@@ -114,6 +115,9 @@ class AppWindow(QMainWindow):
         self.last_tab = 0
         # Show it !
         self.show()
+
+    def exit_connect(self, method):
+        self.app.aboutToQuit.connect(method)
 
     def enable_options(self):
         """ To run after importing at least an image"""
@@ -878,7 +882,7 @@ class AppWindow(QMainWindow):
 def run():
     app = QApplication(sys.argv)
     app.setStyle('fusion')
-    w = AppWindow()
+    w = AppWindow(app)
     w.show()
     # exit()
     sys.exit(app.exec_())
