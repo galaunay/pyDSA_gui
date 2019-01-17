@@ -30,8 +30,18 @@ __status__ = "Development"
 import pyDSA as dsa
 import sys
 import re
+import time
 import numpy as np
+from threading import Thread
 from IMTreatment.utils import make_unit
+try:
+    from pypyueye import Camera
+    from pypyueye.utils import ImageBuffer, ImageData, uEyeException
+    from pyueye import ueye
+    SUPPORT_CAMERA = True
+except ImportError:
+    SUPPORT_CAMERA = False
+    uEyeException = Exception
 
 
 class DSA(object):
@@ -46,6 +56,10 @@ class DSA(object):
         self.sizex = None
         self.sizey = None
         self.ims = None
+        self.default_image = dsa.Image()
+        self.default_image.import_from_arrays(range(300), range(200),
+                                              np.random.rand(300, 200)*255,
+                                              dtype=np.uint8)
         # Precompute
         self.precomp_old_params = None
         self.ims_precomp = None
@@ -161,13 +175,15 @@ class DSA(object):
         return pt1, pt2
 
     def get_current_raw_im(self):
+        if self.ims is None or len(self.ims) == 0:
+            return self.default_image
         return self.ims[self.current_ind]
 
     def get_current_precomp_im(self):
         if self.ims_precomp is None:
             raise Exception()
         cropt = self.precomp_old_params['cropt']
-        return self.ims_precomp[self.current_ind - cropt[0] + 1]
+        return self.ims_precomp[self.current_ind - cropt[0]]
 
     def get_current_edge(self, params):
         if self.edge_detection_method is None:
@@ -543,3 +559,83 @@ class DSA(object):
                 self.fits.compute_contact_angle(iteration_hook=hook)
             except:
                 self.log.log_unknown_exception()
+
+
+class SendToDSAThread(Thread):
+
+    def __init__(self, cam, update_function, copy=True):
+        super().__init__()
+        self.update_function = update_function
+        self.timeout = 1000
+        self.cam = cam
+        self.cam.capture_video()
+        self.running = True
+        self.copy = copy
+
+    def run(self):
+        while self.running:
+            img_buffer = ImageBuffer()
+            ret = ueye.is_WaitForNextImage(self.cam.handle(),
+                                           self.timeout,
+                                           img_buffer.mem_ptr,
+                                           img_buffer.mem_id)
+            if ret == ueye.IS_SUCCESS:
+                imdata = ImageData(self.cam.handle(), img_buffer)
+                self.process(imdata)
+                imdata.unlock()
+            else:
+                imdata = ImageData(self.cam.handle(), img_buffer)
+                imdata.unlock()
+                print('Failed to deliver the image')
+            time.sleep(0.2)  # Limit to 1 fps
+
+    def process(self, im):
+        print('processing')
+        self.update_function(im)
+
+    def stop(self):
+        self.cam.stop_video()
+        self.running = False
+
+
+class DSALive(DSA):
+    def __init__(self, app):
+        super().__init__(app)
+        self.camera = Camera(device_id=0, buffer_count=10)
+        self.camera.init()
+        self.camera.set_colormode(ueye.IS_CM_MONO8)
+        self.current_ind = 0
+        self.nmb_frames = 1
+        self.sizex = 150
+        self.sizey = 100
+        self.thread = SendToDSAThread(self.camera, self.set_new_image)
+        self.app.exit_connect(self.thread.stop())
+        self.thread.start()
+
+    def set_new_image(self, imdata):
+        self.log.log(f'DSA backend: Getting a new image from camera', level=1)
+        self.ims = dsa.TemporalImages(cache_infos=False)
+        data = imdata.as_1d_image()
+        imdata.unlock()
+        im = dsa.Image()
+        im.import_from_arrays(range(data.shape[0]),
+                              range(data.shape[1]),
+                              data, dtype=np.uint8,
+                              dontchecknans=True,
+                              dontcheckunits=True)
+        self.ims.add_field(im, copy=False)
+        self.reset_cache()
+        self.current_ind = 0
+        self.nmb_frames = 1
+        self.sizex = self.ims.shape[0]
+        self.sizey = self.ims.shape[1]
+        self.app.set_current_frame(1)
+
+    def stop(self):
+        self.thread.running = False
+        self.thread.join()
+        self.camera.exit()
+
+    def get_current_precomp_im(self):
+        self.precompute_images(self.app.tab1_get_params())
+        return super().get_current_precomp_im()

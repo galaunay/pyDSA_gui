@@ -37,11 +37,11 @@ from IMTreatment.utils import make_unit
 import re
 try:
     from .design import Ui_MainWindow
-    from .dsa_backend import DSA
+    from .dsa_backend import DSA, DSALive, SUPPORT_CAMERA, uEyeException
     from .log import Log
 except ModuleNotFoundError:
     from design import Ui_MainWindow
-    from dsa_backend import DSA
+    from dsa_backend import DSA, DSALive, SUPPORT_CAMERA, uEyeException
     from log import Log
 
 
@@ -82,6 +82,8 @@ class AppWindow(QMainWindow):
         self.statusbar_delay = 2000
         self._disable_frame_updater = False
         self.dsa = None
+        self.filepath = None
+        self.filepath_type = None
         self.plottable_quant = [
             'Frame number', 'Time', 'Position (x, right)',
             'CL velocity (x, left)', 'CL velocity (x, right)',
@@ -168,6 +170,14 @@ class AppWindow(QMainWindow):
         # Update the last tab
         self.last_tab = tab_nmb
 
+    def set_current_frame(self, ind):
+        if self.last_tab == 0:
+            self.tab1_set_current_frame(ind)
+        elif self.last_tab == 1:
+            self.tab2_set_current_frame(ind)
+        elif self.last_tab == 2:
+            self.tab3_set_current_frame(ind)
+
     # TAB 1
     def tab1_switch_to_tab(self):
         # Update the frame number
@@ -236,7 +246,52 @@ class AppWindow(QMainWindow):
         pt2 = [9/10*w, 2/3*h]
         self.ui.mplwidgetimport.update_baseline(pt1, pt2)
 
+    def tab1_enable_live_preview(self, toggle=None):
+        if self.filepath_type is not None:
+            if self.filepath_type == "live":
+                return None
+        if not SUPPORT_CAMERA:
+            self.log.log('Camera not supported, you need to install pypyueye',
+                         level=2)
+            return None
+        self.log.log('Enabling live preview', level=1)
+        try:
+            dsa = DSALive(self)
+        # except uEyeException as e:
+        #     self.log.log(f"Couldn't connect to the camera: {str(e)}", level=3)
+        #     return None
+        except:
+            self.log.log_unknown_exception()
+            return None
+        # store
+        self.dsa = dsa
+        self.filepath_type = 'live'
+        self.filepath = None
+        # Update image display
+        im = self.dsa.get_current_raw_im()
+        self.ui.mplwidgetimport.update_image(im.values, replot=True)
+        # Disable frame sliders
+        self.tab1_disable_frame_sliders()
+        # Enable cropping sliders
+        self.tab1_enable_cropping()
+        # Enable baseline
+        self.tab1_enable_baseline()
+        # Enable options
+        self.enable_options()
+        # De-init next tabs
+        self.tab2_initialized = False
+        self.tab3_initialized = False
+
+    def tab1_disable_live_preview(self, toggle=None):
+        # Stop the live preview
+        if self.filepath_type == 'live':
+            self.dsa.stop()
+            self.dsa = None
+            self.filepath_type = None
+
     def tab1_import_image(self, toggle=None):
+        # Disable live
+        self.tab1_disable_live_preview()
         # Select image to import
         filepath = select_file('Open image')[0]
         # Import image
@@ -270,6 +325,8 @@ class AppWindow(QMainWindow):
         self.tab3_initialized = False
 
     def tab1_import_images(self, toggle=None):
+        # Disable live
+        self.tab1_disable_live_preview()
         # Select images to import
         filepath = select_files('Open images')[0]
         # Check
@@ -306,6 +363,8 @@ class AppWindow(QMainWindow):
         self.tab3_initialized = False
 
     def tab1_import_video(self, toggle=None):
+        # Disable live
+        self.tab1_disable_live_preview()
         # Select video to import
         filepath = select_file('Open video')[0]
         # Import video
