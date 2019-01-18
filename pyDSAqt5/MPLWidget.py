@@ -92,6 +92,7 @@ class MplWidgetImport(Canvas):
         # Image
         self.data = np.random.rand(200, 300)
         self.im = self.ax.imshow(self.data,
+                                 interpolation='None',
                                  cmap=plt.cm.binary_r)
         # Cropped area
         self.rect_hand = RectangleHandler(self, self.figure, self.ax)
@@ -117,6 +118,7 @@ class MplWidgetImport(Canvas):
         self.data = im.transpose()[::-1]
         if replot:
             self.im = self.ax.imshow(self.data,
+                                     interpolation="None",
                                      cmap=plt.cm.binary_r)
             # clean stuff !
             self.ax.set_xticks([])
@@ -190,9 +192,13 @@ class MplWidgetDetect(Canvas):
         self.figure = Figure(dpi=100, figsize=(200, 200))
         self.canvas = Canvas(self.figure)
         self.ax = self.figure.add_axes([0, 0, 1, 1])
+        self.axbackground = None
+        self.need_replot = True
+        self.tab_opened = False
         # Image
         self.data = np.random.rand(200, 300)
         self.im = self.ax.imshow(self.data,
+                                 interpolation="None",
                                  cmap=plt.cm.binary_r)
         # baseline
         self.baseline = self.ax.plot([0, 0], [0, 0],
@@ -205,41 +211,64 @@ class MplWidgetDetect(Canvas):
                                  marker='o',
                                  ms=3,
                                  alpha=0.5,
-                                 ls='none')[0]
+                                 ls='none',
+                                 animated=True)[0]
         # Clean stuff !
         self.ax.set_xticks([])
         self.ax.set_xticklabels([])
         self.ax.set_yticks([])
         self.ax.set_yticklabels([])
 
-    def update_image(self, im, replot=False, draw=True):
-        self.data = im.transpose()[::-1]
-        if replot:
+    def update_image(self, im):
+        new_data = im.transpose()[::-1]
+        if not np.all(new_data.shape == self.data.shape):
+            self.need_replot = True
+        self.data = new_data
+        self.im.set_data(self.data)
+
+    def update_baseline(self, pt1, pt2):
+        sizex = abs(self.ax.viewLim.width)
+        pt1, pt2 = Baseline.get_baseline_from_points([pt1, pt2],
+                                                     xmin=-100*sizex,
+                                                     xmax=100*sizex)
+        self.baseline.set_data([[pt1[0], pt2[0]],
+                                [pt1[1], pt2[1]]])
+        self.blit_it()
+
+    def update_edge(self, edge):
+        self.edge.set_data(*edge)
+        self.blit_it()
+
+    def blit_it(self):
+        if not self.tab_opened:
+            print('display on not open')
+            # If tab is not open, just redispay the data
             self.im = self.ax.imshow(self.data,
+                                     interpolation='None',
+                                     cmap=plt.cm.binary_r)
+            return None
+        if self.need_replot or self.axbackground is None:
+            print('replot')
+            self.im = self.ax.imshow(self.data,
+                                     interpolation='None',
                                      cmap=plt.cm.binary_r)
             # clean stuff !
             self.ax.set_xticks([])
             self.ax.set_xticklabels([])
             self.ax.set_yticks([])
             self.ax.set_yticklabels([])
+            self.draw()
+            self.axbackground = self.copy_from_bbox(self.ax.bbox)
+            self.ax.draw_artist(self.edge)
+            self.ax.draw_artist(self.baseline)
+            self.need_replot = False
         else:
-            self.im.set_data(self.data)
-        if draw:
-            self.draw()
-
-    def update_baseline(self, pt1, pt2, draw=True):
-        sizex = abs(self.ax.viewLim.width)
-        pt1, pt2 = Baseline.get_baseline_from_points([pt1, pt2],
-                                                     xmin=0, xmax=sizex)
-        self.baseline.set_data([[pt1[0], pt2[0]],
-                                [pt1[1], pt2[1]]])
-        if draw:
-            self.draw()
-
-    def update_edge(self, edge, draw=True):
-        self.edge.set_data(*edge)
-        if draw:
-            self.draw()
+            print('blit')
+            self.restore_region(self.axbackground)
+            self.ax.draw_artist(self.im)
+            self.ax.draw_artist(self.edge)
+            self.ax.draw_artist(self.baseline)
+            self.blit(self.ax.bbox)
 
 
 class MplWidgetFit(Canvas):
@@ -250,9 +279,13 @@ class MplWidgetFit(Canvas):
         self.figure = Figure(dpi=100, figsize=(200, 200))
         self.canvas = Canvas(self.figure)
         self.ax = self.figure.add_axes([0, 0, 1, 1])
+        self.axbackground = None
+        self.need_replot = True
+        self.tab_opened = False
         # Image
         self.data = np.random.rand(200, 300)
         self.im = self.ax.imshow(self.data,
+                                 interpolation="None",
                                  cmap=plt.cm.binary_r)
         # baseline
         self.baseline = self.ax.plot([0, 0], [0, 0],
@@ -284,44 +317,68 @@ class MplWidgetFit(Canvas):
         self.ax.set_yticks([])
         self.ax.set_yticklabels([])
 
-    def update_image(self, im, replot=False, draw=True):
-        self.data = im.transpose()[::-1]
-        if replot:
+    def update_image(self, im):
+        new_data = im.transpose()[::-1]
+        if not np.all(new_data.shape == self.data.shape):
+            self.need_replot = True
+        self.data = new_data
+        self.im.set_data(self.data)
+
+    def update_baseline(self, pt1, pt2):
+        sizex = abs(self.ax.viewLim.width)
+        pt1, pt2 = Baseline.get_baseline_from_points([pt1, pt2],
+                                                     xmin=-100*sizex,
+                                                     xmax=100*sizex)
+        self.baseline.set_data([[pt1[0], pt2[0]],
+                                [pt1[1], pt2[1]]])
+        self.blit_it()
+
+    def update_fit(self, fit, fit_center):
+        if fit_center is None:
+            fit_center = [[0], [0]]
+        self.fit.set_data(*fit)
+        self.fit_center.set_data(fit_center)
+        self.blit_it()
+
+    def update_ca(self, cas):
+        ca1, ca2 = cas
+        self.ca_r.set_data(*ca1)
+        self.ca_l.set_data(*ca2)
+        self.blit_it()
+
+    def blit_it(self):
+        if not self.tab_opened:
+            # If tab is not open, just redispay the data
             self.im = self.ax.imshow(self.data,
+                                     interpolation='None',
+                                     cmap=plt.cm.binary_r)
+            return None
+        if self.need_replot or self.axbackground is None:
+            self.im = self.ax.imshow(self.data,
+                                     interpolation="None",
                                      cmap=plt.cm.binary_r)
             # clean stuff !
             self.ax.set_xticks([])
             self.ax.set_xticklabels([])
             self.ax.set_yticks([])
             self.ax.set_yticklabels([])
+            self.draw()
+            self.axbackground = self.copy_from_bbox(self.ax.bbox)
+            self.ax.draw_artist(self.baseline)
+            self.ax.draw_artist(self.fit)
+            self.ax.draw_artist(self.fit_center)
+            self.ax.draw_artist(self.ca_r)
+            self.ax.draw_artist(self.ca_l)
+            self.need_replot = False
         else:
-            self.im.set_data(self.data)
-        if draw:
-            self.draw()
-
-    def update_baseline(self, pt1, pt2, draw=True):
-        sizex = abs(self.ax.viewLim.width)
-        pt1, pt2 = Baseline.get_baseline_from_points([pt1, pt2],
-                                                     xmin=0, xmax=sizex)
-        self.baseline.set_data([[pt1[0], pt2[0]],
-                                [pt1[1], pt2[1]]])
-        if draw:
-            self.draw()
-
-    def update_fit(self, fit, fit_center, draw=True):
-        if fit_center is None:
-            fit_center = [[0], [0]]
-        self.fit.set_data(*fit)
-        self.fit_center.set_data(fit_center)
-        if draw:
-            self.draw()
-
-    def update_ca(self, cas, draw=True):
-        ca1, ca2 = cas
-        self.ca_r.set_data(*ca1)
-        self.ca_l.set_data(*ca2)
-        if draw:
-            self.draw()
+            self.restore_region(self.axbackground)
+            self.ax.draw_artist(self.im)
+            self.ax.draw_artist(self.baseline)
+            self.ax.draw_artist(self.fit)
+            self.ax.draw_artist(self.fit_center)
+            self.ax.draw_artist(self.ca_r)
+            self.ax.draw_artist(self.ca_l)
+            self.blit(self.ax.bbox)
 
 
 class MplWidgetAnalyze(Canvas):

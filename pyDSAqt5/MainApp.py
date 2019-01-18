@@ -418,14 +418,11 @@ class AppWindow(QMainWindow):
     def tab2_switch_to_tab(self):
         if not self.tab2_initialized:
             self.tab2_initialize()
-        draw = True
-        if not self.tab2_already_opened:
-            draw = False
         # Replot
         im = self.dsa.get_current_precomp_im()
-        self.ui.mplwidgetdetect.update_image(im.values, replot=True, draw=draw)
+        self.ui.mplwidgetdetect.update_image(im.values)
         pt1, pt2 = self.dsa.get_baseline_display_points()
-        self.ui.mplwidgetdetect.update_baseline(pt1, pt2, draw=draw)
+        self.ui.mplwidgetdetect.update_baseline(pt1, pt2)
         # Update the curent frame
         self._disable_frame_updater = True
         self.ui.tab2_frameslider.setValue(self.dsa.current_ind + 1)
@@ -437,10 +434,11 @@ class AppWindow(QMainWindow):
         self.ui.tab2_spinbox.setMinimum(cropt[0])
         self.ui.tab2_spinbox.setMaximum(cropt[1])
         # update the detected edge
-        self.tab2_update_edge(draw=draw)
+        self.tab2_update_edge()
         #
         self.tab2_initialized = True
         self.tab2_already_opened = True
+        self.ui.mplwidgetdetect.tab_opened = True
 
     def tab2_set_current_frame(self, ind):
         if self._disable_frame_updater:
@@ -448,7 +446,7 @@ class AppWindow(QMainWindow):
         self.dsa.set_current(ind - 1)
         # update image
         im = self.dsa.get_current_precomp_im()
-        self.ui.mplwidgetdetect.update_image(im.values, replot=False)
+        self.ui.mplwidgetdetect.update_image(im.values)
         # update edge
         # TODO: replotting the edge markers for each frame take time,
         #       It may be a better idea to use imshow to display edges
@@ -493,7 +491,7 @@ class AppWindow(QMainWindow):
         except:
             self.log.log_unknown_exception()
             return None
-        self.ui.mplwidgetdetect.update_edge(edge, draw=draw)
+        self.ui.mplwidgetdetect.update_edge(edge)
 
     def tab2_toggle_canny(self, toggle):
         if toggle:
@@ -524,20 +522,17 @@ class AppWindow(QMainWindow):
     def tab3_switch_to_tab(self):
         if not self.tab3_initialized:
             self.tab3_initialize()
-        draw = True
-        if not self.tab3_already_opened:
-            draw = False
         # Update the plot only if necessary
         im = self.dsa.get_current_precomp_im()
-        self.ui.mplwidgetfit.update_image(im.values, replot=True, draw=draw)
+        self.ui.mplwidgetfit.update_image(im.values)
         pt1, pt2 = self.dsa.get_baseline_display_points()
-        self.ui.mplwidgetfit.update_baseline(pt1, pt2, draw=draw)
+        self.ui.mplwidgetfit.update_baseline(pt1, pt2)
         # Update the curent frame
         self._disable_frame_updater = True
         self.ui.tab3_frameslider.setValue(self.dsa.current_ind + 1)
         self._disable_frame_updater = False
         # update the edge fit and baseline
-        self.tab3_update_fit(draw=draw)
+        self.tab3_update_fit()
         # update the 'ignore lower part' slider upper bound
         sizey = abs(self.ui.mplwidgetimport.ax.viewLim.height)
         self.ui.tab3_circle_ymin.setMaximum(sizey)
@@ -545,6 +540,7 @@ class AppWindow(QMainWindow):
         #
         self.tab3_initialized = True
         self.tab3_already_opened = True
+        self.ui.mplwidgetfit.tab_opened = True
 
     def tab3_set_current_frame(self, ind):
         if self._disable_frame_updater:
@@ -552,7 +548,7 @@ class AppWindow(QMainWindow):
         self.dsa.set_current(ind - 1)
         # update image
         im = self.dsa.get_current_precomp_im()
-        self.ui.mplwidgetfit.update_image(im.values, replot=False)
+        self.ui.mplwidgetfit.update_image(im.values)
         # update fit
         self.tab3_update_fit()
 
@@ -581,20 +577,20 @@ class AppWindow(QMainWindow):
                   's': self.ui.tab3_spline_smooth.value()/100}
         return circle, ellipse, polyline, spline
 
-    def tab3_update_fit(self, draw=True):
+    def tab3_update_fit(self):
         params = self.tab3_get_params()
         try:
             fit, fit_center = self.dsa.get_current_fit(params)
         except:
             self.log.log_unknown_exception()
             return None
-        self.ui.mplwidgetfit.update_fit(fit, fit_center, draw=draw)
+        self.ui.mplwidgetfit.update_fit(fit, fit_center)
         try:
             cas = self.dsa.get_current_ca()
         except:
             self.log.log_unknown_exception()
             return None
-        self.ui.mplwidgetfit.update_ca(cas, draw=draw)
+        self.ui.mplwidgetfit.update_ca(cas)
 
     def _tab3_uncheck_others(self, box):
         checks = [b.setChecked(False)
