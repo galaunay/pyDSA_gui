@@ -112,9 +112,9 @@ class Log(object):
         # Print in shell
         print(text)
         # Update log tab
-        if self.ui.display_area is not None:
-            self.ui.display_area.setTextColor(self.level_colors[level - 1])
-            self.ui.display_area.append(self.logs[-1])
+        if self.ui.logarea is not None:
+            self.ui.logarea.setTextColor(self.level_colors[level - 1])
+            self.ui.logarea.append(self.logs[-1])
         # Display in statu bar
         if self.ui.status_bar is not None:
             short_mess = message.split('\n')[-1]

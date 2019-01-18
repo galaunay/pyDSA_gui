@@ -59,6 +59,7 @@ class DSA(object):
         self.edge_cache_method = None
         self.edges = None
         self.edges_old_params = None
+        self.edges_old_method = self.edge_detection_method
         # Fit
         self.fit_method = 'ellipse'
         self.fit_cache = []
@@ -66,6 +67,7 @@ class DSA(object):
         self.fit_cache_method = None
         self.fits = None
         self.fits_old_params = None
+        self.fits_old_method = self.fit_method
 
     def is_initialized(self):
         return self.ims is not None
@@ -180,10 +182,10 @@ class DSA(object):
             return False
         return True
 
-    def get_baseline_display_points(self):
+    def get_baseline_display_points(self, params, ind):
         lims = self.precomp_old_params['lims']
         dx = self.precomp_old_params['dx'].asNumber()
-        baseline = self.get_current_precomp_im().baseline
+        baseline = self.get_current_precomp_im(params, ind).baseline
         pt1 = baseline.pt1.copy()
         pt2 = baseline.pt2.copy()
         # x
@@ -202,6 +204,9 @@ class DSA(object):
         return self.ims[ind]
 
     def precompute_images(self, params):
+        if self.ims_precomp is not None:
+            if not self.is_precomp_params_changed(params):
+                return None
         self.log.log('DSA backend: Preparing images for edge detection',
                      level=1)
         # store new parameters
@@ -244,6 +249,8 @@ class DSA(object):
         self.fits = None
 
     def is_precomp_params_changed(self, params):
+        if self.precomp_old_params is None:
+            return True
         for d in ['dx', 'dt']:
             if params[d].strUnit() != self.precomp_old_params[d].strUnit():
                 return True
@@ -251,14 +258,14 @@ class DSA(object):
                 return True
         for crop in ['lims', 'baseline_pts', 'cropt']:
             if np.any(params[crop] != self.precomp_old_params[crop]):
-                break
+                return True
         return False
 
     def get_current_precomp_im(self, params, ind):
-        if self.is_precomp_params_changed(params) or self.ims_precomp is None:
+        if self.ims_precomp is None or self.is_precomp_params_changed(params):
             self.precompute_images(params)
         cropt = params['cropt']
-        return self.ims_precomp[ind - cropt[0]]
+        return self.ims_precomp[ind - cropt[0] + 1]
 
     def is_edge_param_changed(self, params):
         if self.edge_cache_method != self.edge_detection_method:
@@ -269,10 +276,12 @@ class DSA(object):
         return False
 
     def get_current_edge(self, params, ind):
+        params_precomp = self.app.tab1.get_params()
+        im = self.get_current_precomp_im(params_precomp, ind)
         if self.edge_detection_method is None:
-            return [[], []]
+            return dsa.DropEdges([], im, None)
         # Reset cache if not valid anymore
-        if self.is_edge_param_changed():
+        if self.is_edge_param_changed(params):
             self.reset_cache()
         # Use cache if possible
         edge = self.edge_cache[ind]
@@ -286,7 +295,7 @@ class DSA(object):
             contour_args.update(params[-1])
             # Edge detection
             try:
-                im = self.get_current_precomp_im(ind)
+                params_precomp = self.app.tab1.get_params()
                 if self.edge_detection_method == 'canny':
                     edge = im.edge_detection(**canny_args)
                 elif self.edge_detection_method == 'contour':
@@ -294,14 +303,13 @@ class DSA(object):
                 else:
                     self.log.log("No edge detection method selected",
                                  level=2)
-                    return [[], []]
+                    return dsa.DropEdges([], im, None)
             except Exception:
                 self.log.log("Couldn't find a drop here", level=2)
-                self.current_edge = None
-                return [[], []]
+                return dsa.DropEdges([], im, None)
             except:
                 self.log.log_unknown_exception()
-                return [[], []]
+                return dsa.DropEdges([], im, None)
             # Update cache
             self.edge_cache[ind] = edge
             self.edge_cache_params = params
@@ -309,6 +317,12 @@ class DSA(object):
         else:
             self.log.log('DSA backend: Using cached edges for current image',
                          level=1)
+        return edge
+
+    def get_current_edge_pts(self, params, ind):
+        edge = self.get_current_edge(params, ind)
+        if len(edge.xy) == 0:
+            return [[], []]
         # Return edge pts
         pts = edge.xy.transpose().copy()
         lims = self.precomp_old_params['lims']
@@ -330,7 +344,7 @@ class DSA(object):
     def get_current_fit(self, params, ind):
         # Reset cache if not valid anymre
         if self.fit_method is None:
-            return [[0], [0]], [[-999], [-999]]
+            return dsa.DropFit(None, None, None)
         # Reset cache if not valid anymore
         if self.is_fit_params_changed(params):
             self.reset_cache()
@@ -338,10 +352,10 @@ class DSA(object):
         fit = self.fit_cache[ind]
         if fit is None:
             # Ensure the edge is computed
-            edge_params = self.app.tab2_get_params()
+            edge_params = self.app.tab2.get_params()
             edge = self.get_current_edge(edge_params, ind)
             if edge is None:
-                return [[0], [0]], [[0], [0]]
+                return dsa.DropFit(None, None, None)
             # log
             self.log.log('DSA backend: Computing fits for current image',
                          level=1)
@@ -361,10 +375,13 @@ class DSA(object):
                     fit = edge.fit_spline(**spline_args)
                 else:
                     self.log.lof("No fitting method selected", level=2)
-                    return [[0], [0]], [[-999], [-999]]
+                    return dsa.DropFit(None, None, None)
+            except Exception:
+                self.log.log("Couldn't find a fit here...", level=2)
+                return dsa.DropEdges([], im, None)
             except:
                 self.log.log_unknown_exception()
-                return [[0], [0]], [[-999], [-999]]
+                return dsa.DropFit(None, None, None)
             # Update cache
             self.fit_cache[ind] = fit
             self.fit_cache_params = params
@@ -372,6 +389,12 @@ class DSA(object):
         else:
             self.log.log('DSA backend: Using cached fits for current image',
                          level=1)
+        return fit
+
+    def get_current_fit_pts(self, params, ind):
+        fit = self.get_current_fit(params, ind)
+        if fit.baseline is None:
+            return [[0], [0]], [[-999], [-999]]
         # Get fit pts and center
         pts = fit.get_fit_as_points()
         if self.fit_method in ['circle', 'ellipse']:
@@ -481,6 +504,8 @@ class DSA(object):
                     'contour': contour_args}
         new_params = {'detection_method': self.edge_detection_method,
                       'args': new_args[self.edge_detection_method]}
+        if self.edge_detection_method != self.edges_old_method:
+            return True
         if self.edges_old_params is None or self.edges is None:
             return True
         elif (self.edges_old_params['detection_method']
@@ -489,16 +514,23 @@ class DSA(object):
         else:
             for key in new_params['args'].keys():
                 if (new_params['args'][key]
-                        != self.edges_old_params['args'][key]):
+                    != self.edges_old_params['args'][key]):
                     return True
         return False
 
     def compute_edges(self, params):
         self.log.log('DSA backend: Computing edges for the image set', level=1)
+        #
         if self.edge_detection_method is None:
             self.edges = None
             self.fits = None
             return None
+        # precompute
+        precomp_params = self.app.tab1.get_params()
+        if self.ims_precomp is None:
+            self.precompute_images(precomp_params)
+        if self.is_precomp_params_changed(precomp_params):
+            self.precompute_images(precomp_params)
         # Get params
         canny_args = params[0].copy()
         canny_args.update(params[-1])
@@ -509,9 +541,10 @@ class DSA(object):
         new_params = {'detection_method': self.edge_detection_method,
                       'args': new_args[self.edge_detection_method]}
         # Check if need to recompute
-        if not self.is_edge_param_changed():
+        if not self.is_edges_param_changed(params):
             return None
         # Edge detection
+        self.precompute_images(self.app.tab1.get_params())
         tmp_ims = self.ims_precomp
         hook = self.get_progressbar_hook('Detecting edges', 'Detected edges')
         try:
@@ -523,11 +556,18 @@ class DSA(object):
                                                        **contour_args)
             else:
                 self.log.log("No edge detection method selected", level=2)
+                self.edges = None
+                self.fits = None
+                return None
         except:
             self.log.log_unknown_exception()
+            self.edges = None
+            self.fits = None
+            return None
         # Store
         self.edges = edges
         self.edges_old_params = new_params
+        self.edges_old_method = self.edge_detection_method
         self.fits = None
 
     def is_fits_param_changed(self, params):
@@ -543,6 +583,8 @@ class DSA(object):
                     'spline': spline_args}[self.fit_method]
         new_params = {'method': self.fit_method,
                       'args': new_args}
+        if self.fit_method != self.fits_old_method:
+            return True
         if self.fits_old_params is None or self.fits is None:
             return True
         elif new_params['method'] != self.fits_old_params['method']:
@@ -557,7 +599,9 @@ class DSA(object):
     def compute_fits(self, params):
         self.log.log('DSA backend: fitting edges for the image set', level=1)
         # Check
-        if self.fit_method is None or self.edges is None:
+        if self.edges is None:
+            self.compute_edges(self.app.tab2.get_params())
+        if self.fit_method is None:
             self.fits = None
             return None
         # Get params
@@ -592,11 +636,16 @@ class DSA(object):
                                              **spline_args)
             else:
                 self.app.log.log('No fitting method selected', level=2)
+                self.fits = None
+                return None
         except:
             self.log.log_unknown_exception()
+            self.fits = None
+            return None
         # Store
         self.fits = fits
         self.fits_old_params = new_params
+        self.fits_old_method = self.fit_method
 
     def compute_cas(self):
         if self.fits is None:

@@ -67,10 +67,11 @@ def select_files(message="Open files", filetypes=None):
 
 class Tab(object):
 
-    def __init__(self, ui, app, dsa):
+    def __init__(self, ui, app, dsa, log):
         self.app = app
         self.ui = ui
         self.dsa = dsa
+        self.log = log
         self.initialized = False
         self.already_opened = False
 
@@ -80,11 +81,14 @@ class Tab(object):
     def leave_tab(self):
         return True
 
+    def enable_options(self):
+        pass
+
 
 class TabImport(Tab):
 
-    def __init__(self, ui, app, dsa):
-        super().__init__(ui, app, dsa)
+    def __init__(self, ui, app, dsa, log):
+        super().__init__(ui, app, dsa, log)
 
     def enter_tab(self):
         # Update the frame number
@@ -308,10 +312,12 @@ class TabEdges(Tab):
         if not self.initialized:
             self.initialize()
         # Replot
-        params = self.get_params()
-        im = self.dsa.get_current_precomp_im(params, self.app.current_ind)
+        precomp_params = self.app.tab1.get_params()
+        im = self.dsa.get_current_precomp_im(precomp_params,
+                                             self.app.current_ind)
         self.ui.mplwidgetdetect.update_image(im.values)
-        pt1, pt2 = self.dsa.get_baseline_display_points()
+        pt1, pt2 = self.dsa.get_baseline_display_points(precomp_params,
+                                                        self.app.current_ind)
         self.ui.mplwidgetdetect.update_baseline(pt1, pt2)
         # Update the curent frame
         self._disable_frame_updater = True
@@ -337,9 +343,11 @@ class TabEdges(Tab):
     def set_current_frame(self, frame_number):
         if self._disable_frame_updater:
             return None
-        self.dsa.set_current(frame_number - 1)
+        self.app.set_current_ind(frame_number - 1)
         # update image
-        im = self.dsa.get_current_precomp_im(self.app.current_ind)
+        params_precomp = self.app.tab1.get_params()
+        im = self.dsa.get_current_precomp_im(params_precomp,
+                                             self.app.current_ind)
         self.ui.mplwidgetdetect.update_image(im.values)
         # update edge
         # TODO: replotting the edge markers for each frame take time,
@@ -378,9 +386,9 @@ class TabEdges(Tab):
         return canny, contour, options
 
     def update_edge(self, draw=True):
-        params = self.app.tab1.get_params()
+        params = self.get_params()
         try:
-            edge = self.dsa.get_current_edge(params, self.app.current_ind)
+            edge = self.dsa.get_current_edge_pts(params, self.app.current_ind)
         except:
             self.log.log_unknown_exception()
             return None
@@ -419,9 +427,12 @@ class TabFits(Tab):
         if not self.initialized:
             self.initialize()
         # Update the plot only if necessary
-        im = self.dsa.get_current_precomp_im(self.app.current_ind)
+        params_precomp = self.app.tab1.get_params()
+        im = self.dsa.get_current_precomp_im(params_precomp,
+                                             self.app.current_ind)
         self.ui.mplwidgetfit.update_image(im.values)
-        pt1, pt2 = self.dsa.get_baseline_display_points()
+        pt1, pt2 = self.dsa.get_baseline_display_points(params_precomp,
+                                                        self.app.current_ind)
         self.ui.mplwidgetfit.update_baseline(pt1, pt2)
         # Update the curent frame
         self._disable_frame_updater = True
@@ -448,7 +459,9 @@ class TabFits(Tab):
             return None
         self.app.current_ind = frame_number - 1
         # update image
-        im = self.dsa.get_current_precomp_im(self.app.current_ind)
+        precomp_params = self.app.tab1.get_params()
+        im = self.dsa.get_current_precomp_im(precomp_params,
+                                             self.app.current_ind)
         self.ui.mplwidgetfit.update_image(im.values)
         # update fit
         self.update_fit()
@@ -478,16 +491,16 @@ class TabFits(Tab):
                   's': self.ui.tab3_spline_smooth.value()/100}
         return circle, ellipse, polyline, spline
 
-    def update_fit(self)
-        params = self.app.tab1.get_params()
+    def update_fit(self):
+        params = self.get_params()
         try:
-            fit, fit_center = self.dsa.get_current_fit(params,
-                                                       self.app.current_ind)
+            fit, fit_center = self.dsa.get_current_fit_pts(params,
+                                                           self.app.current_ind)
         except:
             self.log.log_unknown_exception()
             return None
         try:
-            cas = self.dsa.get_current_ca()
+            cas = self.dsa.get_current_ca(self.app.current_ind)
         except:
             self.log.log_unknown_exception()
             return None
@@ -550,8 +563,8 @@ class TabFits(Tab):
 
 class TabAnalyze(Tab):
 
-    def __init__(self, ui, app, dsa):
-        super().__init__(ui, app, dsa)
+    def __init__(self, ui, app, dsa, log):
+        super().__init__(ui, app, dsa, log)
         self.use_yaxis2 = False
 
     def initialize(self):
@@ -664,7 +677,7 @@ class TabAnalyze(Tab):
         # Update local values labels
         self.ui.tab4_local_x_label.setText(f"{xaxis} [{unit_x}]")
         self.ui.tab4_local_y_label.setText(f"{yaxis} [{unit_y}]")
-        if self.tab4_use_yaxis2:
+        if self.use_yaxis2:
             self.ui.tab4_local_y2_label.setEnabled(True)
             self.ui.tab4_local_y2_value.setEnabled(True)
             self.ui.tab4_local_y2_label.setText(f"{yaxis2} [{unit_y2}]")
@@ -749,17 +762,18 @@ class AppWindow(QMainWindow):
             'CA (right)', 'CA (left)', 'CA (mean)', 'Base radius',
             'Height', 'Area', 'Volume']
         # Initialize log
-        self.ui.display_area = None  # needed to be initialized for log
+        self.ui.logarea = None  # needed to be initialized for log
         self.ui.status_bar = None
         self.log = Log(self.ui, self.statusbar_delay)
         # Initialize dsa backend
         self.dsa = DSA(self)
         # Initialize tabs (need to be done before initializing design.py)
-        self.tab1 = TabImport(self.ui, self, self.dsa)
-        self.tab2 = TabEdges(self.ui, self, self.dsa)
-        self.tab3 = TabFits(self.ui, self, self.dsa)
-        self.tab4 = TabAnalyze(self.ui, self, self.dsa)
-        self.tabs = [self.tab1, self.tab2, self.tab3, self.tab4]
+        self.tab1 = TabImport(self.ui, self, self.dsa, self.log)
+        self.tab2 = TabEdges(self.ui, self, self.dsa, self.log)
+        self.tab3 = TabFits(self.ui, self, self.dsa, self.log)
+        self.tab4 = TabAnalyze(self.ui, self, self.dsa, self.log)
+        self.tab5 = Tab(self.ui, self, self.dsa, self.log)
+        self.tabs = [self.tab1, self.tab2, self.tab3, self.tab4, self.tab5]
         self.last_tab = 0
         # Including design.ui
         self.ui.setupUi(self)
