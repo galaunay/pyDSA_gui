@@ -311,7 +311,8 @@ class DSA(object):
             return [[np.nan, np.nan], [np.nan, np.nan]]
         lines = self.current_fit._get_angle_display_lines()
         lines = lines[0:2]
-        lines = np.array(lines)
+        dx = self.precomp_old_params['dx'].asNumber()
+        lines = np.array(lines)/dx
         lims = self.precomp_old_params['lims']
         deltax = lims[0][0]
         deltay = lims[1][1]
@@ -323,7 +324,7 @@ class DSA(object):
         # fits should be computed already...
         if self.fits is None:
             self.log.log('Fit need to be computed first', level=3)
-            return []
+            return [], ""
         #
         dx = self.precomp_old_params['dx']
         dt = self.precomp_old_params['dt']
@@ -372,8 +373,10 @@ class DSA(object):
                 return self.fits.get_drop_volumes(), f'{unit_x}^3'
             else:
                 self.log.log(f'Non-plotable quantity: {quant}', level=3)
+                return [], ""
         except:
             self.log.log_unknown_exception()
+            return [], ""
 
     def precompute_images(self, params):
         self.log.log('DSA backend: Preparing images for edge detection',
