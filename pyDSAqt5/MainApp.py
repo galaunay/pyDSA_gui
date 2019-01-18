@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #!/usr/env python3
 
 # Copyright (C) 2018-2019 Gaby Launay
@@ -66,140 +65,65 @@ def select_files(message="Open files", filetypes=None):
     return filepath
 
 
-# TODO: Add export_as_script
-# TODO: Add tests (QT5 tests ?)
-#       - http://johnnado.com/pyqt-qtest-example/
-#       - https://pypi.org/project/pytest-qt/
-# TODO: Add circles fitting for ridge detection
-# TODO: Add keybindings
-# TODO: Make everything asynchroneous
-class AppWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.ui = Ui_MainWindow()
-        self.ui.setupUi(self)
-        # Variables
-        self.statusbar_delay = 2000
-        self._disable_frame_updater = False
-        self.dsa = None
-        self.plottable_quant = [
-            'Frame number', 'Time', 'Position (x, right)',
-            'CL velocity (x, left)', 'CL velocity (x, right)',
-            'Position (x, left)', 'Position (x, center)',
-            'CA (right)', 'CA (left)', 'CA (mean)', 'Base radius',
-            'Height', 'Area', 'Volume']
-        # Add Progress bar to status bar
-        self.ui.progressbar = QtWidgets.QProgressBar()
-        self.ui.progressbar.setMaximumSize(QtCore.QSize(250, 16777215))
-        self.ui.progressbar.setTextVisible(True)
-        self.ui.progressbar.setFormat("%p%")
-        self.ui.progressbar.setValue(0)
-        self.ui.progressbar.setVisible(False)
-        self.ui.statusbar.addPermanentWidget(self.ui.progressbar)
-        # Initialize log
-        self.log = Log(self.ui.logarea, self.ui.statusbar, self.statusbar_delay)
-        # Always start from the first tab
-        self.ui.tabWidget.setCurrentIndex(0)
-        # Tab-related variables
-        self.tab1_filepath = ""
-        self.tab2_initialized = False
-        self.tab2_already_opened = False
-        self.tab3_initialized = False
-        self.tab3_already_opened = False
-        self.tab4_initialized = False
-        self.tab4_use_yaxis2 = False
-        self.tab4_already_opened = False
-        self.last_tab = 0
-        # Show it !
-        self.show()
+class Tab(object):
+
+    def __init__(self, ui, app, dsa):
+        self.app = app
+        self.ui = ui
+        self.dsa = dsa
+        self.initialized = False
+        self.already_opened = False
+
+    def enter_tab(self):
+        pass
+
+    def leave_tab(self):
+        return True
+
+
+class TabImport(Tab):
+
+    def __init__(self, ui, app, dsa):
+        super().__init__(ui, app, dsa)
+
+    def enter_tab(self):
+        # Update the frame number
+        self.ui.tab1_frameslider.setValue(self.app.current_ind + 1)
+
+    def leave_tab(self):
+        # Checks entries
+        if not self.is_inputs_valid():
+            return False
+        # Ensure current image is in the selected range
+        cropt = self.get_params('cropt')
+        if self.app.current_ind > cropt[1] - 1:
+            self.app.set_current(cropt[1] - 1)
+        elif self.app.current_ind < cropt[0] - 1:
+            self.app.set_current(cropt[0] - 1)
+        return True
 
     def enable_options(self):
-        """ To run after importing at least an image"""
-        # tab1
         self.ui.tab1_crop_box.setEnabled(True)
         self.ui.tab1_scaling_box.setEnabled(True)
         if self.dsa.nmb_frames > 1:
             self.ui.tab1_time_box.setEnabled(True)
         else:
             self.ui.tab1_time_box.setEnabled(False)
-        # tab2
-        self.ui.tab2_canny_box.setEnabled(True)
-        self.ui.tab2_contour_box.setEnabled(True)
-        self.ui.tab2_options_box.setEnabled(True)
-        # tab3
-        self.ui.tab3_circle_box.setEnabled(True)
-        self.ui.tab3_ellipse_box.setEnabled(True)
-        self.ui.tab3_polyline_box.setEnabled(True)
-        self.ui.tab3_spline_box.setEnabled(True)
-        # tab4
-        if self.dsa.nmb_frames > 1:
-            self.ui.tab4_xaxis_box.setEnabled(True)
-            self.ui.tab4_yaxis_box.setEnabled(True)
-            self.ui.tab4_yaxis2_box.setEnabled(True)
-            self.ui.tab4_local_values_box.setEnabled(True)
-            self.ui.tab4_export_box.setEnabled(True)
-        else:
-            self.ui.tab4_xaxis_box.setEnabled(False)
-            self.ui.tab4_yaxis_box.setEnabled(False)
-            self.ui.tab4_yaxis2_box.setEnabled(False)
-            self.ui.tab4_local_values_box.setEnabled(False)
-            self.ui.tab4_export_box.setEnabled(False)
-        self.ui.mplwidgetanalyze.ui = self.ui
 
-    def tab_changed(self, tab_nmb):
-        # Do nothing if no imported image yet
-        if self.dsa is None:
-            return None
-        # Update precomputed images if the last tab is the import tab
-        if self.last_tab == 0:
-            if not self.tab1_check_inputs():
-                self.ui.tabWidget.setCurrentIndex(0)
-                return None
-            self.tab1_leave_tab()
-        # Do switch to tab
-        if tab_nmb == 0:
-            self.tab1_switch_to_tab()
-        elif tab_nmb == 1:
-            self.tab2_switch_to_tab()
-        elif tab_nmb == 2:
-            self.tab3_switch_to_tab()
-        elif tab_nmb == 3:
-            self.tab4_switch_to_tab()
-        # Update the last tab
-        self.last_tab = tab_nmb
-
-    # TAB 1
-    def tab1_switch_to_tab(self):
-        # Update the frame number
-        self.ui.tab1_frameslider.setValue(self.dsa.current_ind + 1)
-        self.ui.tab1_spinbox_frame.setValue(self.dsa.current_ind + 1)
-
-    def tab1_leave_tab(self):
-        # Precompute images
-        self.dsa.precompute_images(self.tab1_get_params())
-        # Ensure current image is in the selected range
-        cropt = self.dsa.precomp_old_params['cropt']
-        if self.dsa.current_ind > cropt[1] - 1:
-            self.dsa.set_current(cropt[1] - 1)
-        elif self.dsa.current_ind < cropt[0] - 1:
-            self.dsa.set_current(cropt[0] - 1)
-
-    def tab1_check_inputs(self):
+    def is_inputs_valid(self):
         try:
-            dt = self.tab1_get_params('dt')
+            self.get_params('dt')
         except:
-            self.log.log("Bad format for 'dt'",
-                         level=2)
+            self.log.log("Bad format for 'dt'", level=2)
             return False
         try:
-            dx = self.tab1_get_params('dx')
+            self.get_params('dx')
         except:
-            self.log.log("Bad format for 'dx'",
-                         level=2)
+            self.log.log("Bad format for 'dx'", level=2)
             return False
         return True
 
-    def tab1_enable_frame_sliders(self):
+    def enable_frame_sliders(self):
         for slide in [self.ui.tab1_frameslider,
                       self.ui.tab1_frameslider_first,
                       self.ui.tab1_frameslider_last]:
@@ -215,7 +139,7 @@ class AppWindow(QMainWindow):
         self.ui.tab1_frameslider_last.setValue(self.dsa.nmb_frames)
         self.ui.tab1_spinbox_frame.setValue(0)
 
-    def tab1_disable_frame_sliders(self):
+    def disable_frame_sliders(self):
         for slide in [self.ui.tab1_frameslider,
                       self.ui.tab1_frameslider_first,
                       self.ui.tab1_frameslider_last]:
@@ -225,147 +149,108 @@ class AppWindow(QMainWindow):
                      self.ui.tab1_spinbox_last]:
             spin.setEnabled(False)
 
-    def tab1_enable_cropping(self):
-        im = self.dsa.get_current_raw_im()
+    def enable_cropping(self):
+        im = self.dsa.get_current_raw_im(self.app.current_ind)
         crop_lims = [0, im.shape[0], 0, im.shape[1]]
         self.ui.mplwidgetimport.update_crop_area(*crop_lims)
 
-    def tab1_enable_baseline(self):
-        w, h = self.dsa.get_current_raw_im().shape
+    def enable_baseline(self):
+        w, h = self.dsa.get_current_raw_im(self.app.current_ind).shape
         pt1 = [1/10*w, 2/3*h]
         pt2 = [9/10*w, 2/3*h]
         self.ui.mplwidgetimport.update_baseline(pt1, pt2)
 
-    def tab1_import_image(self, toggle=None):
+    def import_image(self, toggle=None):
         # Select image to import
         filepath = select_file('Open image')[0]
         # Import image
-        dsa = DSA(self)
-        try:
-            dsa.import_image(filepath)
-        except IOError:
-            self.log.log(f"Cannot import '{filepath}': not a valid image",
-                         level=3)
-            return None
-        except:
-            self.log.log_unknown_exception()
-            return None
-        # store
-        self.dsa = dsa
-        self.filepath_type = 'image'
-        self.filepath = filepath
-        # Update image display
-        im = self.dsa.get_current_raw_im()
-        self.ui.mplwidgetimport.update_image(im.values, replot=True)
-        # Disable frame sliders
-        self.tab1_disable_frame_sliders()
-        # Enable cropping sliders
-        self.tab1_enable_cropping()
-        # Enable baseline
-        self.tab1_enable_baseline()
-        # Enable options
-        self.enable_options()
-        # De-init next tabs
-        self.tab2_initialized = False
-        self.tab3_initialized = False
+        success = self.dsa.import_image(filepath)
+        if success:
+            # Update image display
+            im = self.dsa.get_current_raw_im(self.app.current_ind)
+            self.ui.mplwidgetimport.update_image(im.values, replot=True)
+            # Disable frame sliders
+            self.disable_frame_sliders()
+            # Enable cropping sliders
+            self.enable_cropping()
+            # Enable baseline
+            self.enable_baseline()
+            # Enable options
+            self.app.enable_options()
+            # De-init next tabs
+            self.tab2_initialized = False
+            self.tab3_initialized = False
 
-    def tab1_import_images(self, toggle=None):
+    def import_images(self, toggle=None):
         # Select images to import
         filepath = select_files('Open images')[0]
         # Check
         if len(filepath) == 0:
             return None
         # Import images
-        dsa = DSA(self)
-        try:
-            dsa.import_images(filepath)
-        except IOError:
-            self.log.log(f"Couldn't import selected files: {filepath}",
-                         level=3)
-            return None
-        except:
-            self.log.log_unknown_exception()
-            return None
-        # store
-        self.dsa = dsa
-        self.filepath_type = 'images'
-        self.filepath = filepath
-        # Update images display
-        im = self.dsa.get_current_raw_im()
-        self.ui.mplwidgetimport.update_image(im.values, replot=True)
-        # Enable frame sliders
-        self.tab1_enable_frame_sliders()
-        # Enable cropping sliders
-        self.tab1_enable_cropping()
-        # Enable baseline
-        self.tab1_enable_baseline()
-        # Enable options
-        self.enable_options()
-        # De-init other tabs
-        self.tab2_initialized = False
-        self.tab3_initialized = False
+        success = self.dsa.import_images(filepath)
+        if success:
+            # Update images display
+            im = self.dsa.get_current_raw_im(self.app.current_ind)
+            self.ui.mplwidgetimport.update_image(im.values, replot=True)
+            # Enable frame sliders
+            self.enable_frame_sliders()
+            # Enable cropping sliders
+            self.enable_cropping()
+            # Enable baseline
+            self.enable_baseline()
+            # Enable options
+            self.app.enable_options()
+            # De-init other tabs
+            self.tab2_initialized = False
+            self.tab3_initialized = False
 
-    def tab1_import_video(self, toggle=None, filepath=None):
+    def import_video(self, toggle=None):
         # Select video to import
         if filepath is None:
             filepath = select_file('Open video')[0]
         # Import video
-        dsa = DSA(self)
-        try:
-            dsa.import_video(filepath)
-        except IOError:
-            self.log.log(f"Couldn't import '{self.filepath}':"
-                         " not a valid video", level=3)
-            return None
-        except ImportError:
-            self.log.log(f"Couldn't import '{filepath}':", level=3)
-            return None
-        except:
-            self.log.log_unknown_exception()
-            return None
-        # store
-        self.dsa = dsa
-        self.filepath_type = 'video'
-        self.filepath = filepath
-        # Update video display
-        im = self.dsa.get_current_raw_im()
-        self.ui.mplwidgetimport.update_image(im.values, replot=True)
-        # Enable frame sliders
-        self.tab1_enable_frame_sliders()
-        # Enable cropping sliders
-        self.tab1_enable_cropping()
-        # Enable baseline
-        self.tab1_enable_baseline()
-        # Enable options
-        self.enable_options()
-        # De-init other tabs
-        self.tab2_initialized = False
-        self.tab3_initialized = False
+        success = self.dsa.import_video(filepath)
+        if success:
+            # Update video display
+            im = self.dsa.get_current_raw_im(self.app.current_ind)
+            self.ui.mplwidgetimport.update_image(im.values, replot=True)
+            # Enable frame sliders
+            self.enable_frame_sliders()
+            # Enable cropping sliders
+            self.enable_cropping()
+            # Enable baseline
+            self.enable_baseline()
+            # Enable options
+            self.app.enable_options()
+            # De-init other tabs
+            self.tab2_initialized = False
+            self.tab3_initialized = False
 
-    def tab1_set_current_frame(self, ind):
-        self.dsa.set_current(ind - 1)
-        im = self.dsa.get_current_raw_im()
+    def set_current_frame(self, frame_number):
+        self.app.current_ind = frame_number - 1
+        im = self.dsa.get_current_raw_im(self.app.current_ind)
         self.ui.mplwidgetimport.update_image(im.values)
 
-    def tab1_set_first_frame(self, ind):
-        self.ui.tab1_spinbox_frame.setValue(ind)
+    def set_first_frame(self, frame_number):
+        self.ui.tab1_spinbox_frame.setValue(frame_number)
 
-    def tab1_set_last_frame(self, ind):
-        self.ui.tab1_spinbox_frame.setValue(ind)
+    def set_last_frame(self, frame_number):
+        self.ui.tab1_spinbox_frame.setValue(frame_number)
 
-    def tab1_reset_crop(self):
-        im = self.dsa.get_current_raw_im()
+    def reset_crop(self):
+        im = self.dsa.get_current_raw_im(self.app.current_ind)
         crop_lims = [0, im.shape[0], 0, im.shape[1]]
         self.ui.mplwidgetimport.update_crop_area(*crop_lims)
 
-    def tab1_set_scaling(self):
+    def set_scaling(self):
         self.ui.mplwidgetimport.is_scaling = True
 
-    def tab1_remove_scaling(self):
+    def remove_scaling(self):
         self.ui.mplwidgetimport.is_scaling = False
         self.ui.mplwidgetimport.scaling_hand.reset()
 
-    def tab1_get_params(self, arg=None):
+    def get_params(self, arg=None):
         dic = {}
         # dt and dt
         if arg is None or arg == 'dt':
@@ -408,54 +293,62 @@ class AppWindow(QMainWindow):
         else:
             return dic[arg]
 
-    # TAB 2
-    def tab2_initialize(self):
+
+class TabEdges(Tab):
+
+    def initialize(self):
         # enable slider if necessary
         if self.dsa.nmb_frames > 1:
-            self.tab2_enable_frame_sliders()
+            self.enable_frame_sliders()
         else:
-            self.tab2_disable_frame_sliders()
+            self.disable_frame_sliders()
+        self.initialized = True
 
-    def tab2_switch_to_tab(self):
-        if not self.tab2_initialized:
-            self.tab2_initialize()
+    def enter_tab(self):
+        if not self.initialized:
+            self.initialize()
         # Replot
-        im = self.dsa.get_current_precomp_im()
+        params = self.get_params()
+        im = self.dsa.get_current_precomp_im(params, self.app.current_ind)
         self.ui.mplwidgetdetect.update_image(im.values)
         pt1, pt2 = self.dsa.get_baseline_display_points()
         self.ui.mplwidgetdetect.update_baseline(pt1, pt2)
         # Update the curent frame
         self._disable_frame_updater = True
-        self.ui.tab2_frameslider.setValue(self.dsa.current_ind + 1)
+        self.ui.tab2_frameslider.setValue(self.app.current_ind + 1)
         self._disable_frame_updater = False
         # Update the first and last frames
-        cropt = self.dsa.precomp_old_params['cropt']
+        cropt = self.app.tab1.get_params('cropt')
         self.ui.tab2_frameslider.setMinimum(cropt[0])
         self.ui.tab2_frameslider.setMaximum(cropt[1])
         self.ui.tab2_spinbox.setMinimum(cropt[0])
         self.ui.tab2_spinbox.setMaximum(cropt[1])
         # update the detected edge
-        self.tab2_update_edge()
+        self.update_edge()
         #
-        self.tab2_initialized = True
-        self.tab2_already_opened = True
+        self.already_opened = True
         self.ui.mplwidgetdetect.tab_opened = True
 
-    def tab2_set_current_frame(self, ind):
+    def enable_options(self):
+        self.ui.tab2_canny_box.setEnabled(True)
+        self.ui.tab2_contour_box.setEnabled(True)
+        self.ui.tab2_options_box.setEnabled(True)
+
+    def set_current_frame(self, frame_number):
         if self._disable_frame_updater:
             return None
-        self.dsa.set_current(ind - 1)
+        self.dsa.set_current(frame_number - 1)
         # update image
-        im = self.dsa.get_current_precomp_im()
+        im = self.dsa.get_current_precomp_im(self.app.current_ind)
         self.ui.mplwidgetdetect.update_image(im.values)
         # update edge
         # TODO: replotting the edge markers for each frame take time,
         #       It may be a better idea to use imshow to display edges
-        self.tab2_update_edge()
+        self.update_edge()
 
-    def tab2_enable_frame_sliders(self):
+    def enable_frame_sliders(self):
         self._disable_frame_updater = True
-        cropt = self.dsa.precomp_old_params['cropt']
+        cropt = self.app.tab1.get_params('cropt')
         self.ui.tab2_frameslider.setMinimum(cropt[0])
         self.ui.tab2_frameslider.setMaximum(cropt[1])
         self.ui.tab2_spinbox.setMinimum(cropt[0])
@@ -464,98 +357,105 @@ class AppWindow(QMainWindow):
         self.ui.tab2_spinbox.setEnabled(True)
         self._disable_frame_updater = False
 
-    def tab2_disable_frame_sliders(self):
+    def disable_frame_sliders(self):
         self._disable_frame_updater = True
         self.ui.tab2_frameslider.setEnabled(False)
         self.ui.tab2_spinbox.setEnabled(False)
         self._disable_frame_updater = False
 
-    def tab2_get_params(self):
+    def get_params(self):
         canny = {'threshold1': self.ui.tab2_canny_threshold1.value(),
                  'threshold2': self.ui.tab2_canny_threshold2.value(),
                  'dilatation_steps': self.ui.tab2_canny_dilatation_steps.value(),
                  'smooth_size': self.ui.tab2_canny_smooth_size.value()}
-        contour = {'level': self.ui.tab2_contour_level.value()/255,
+        contour = {'level': self.ui.tab2_contour_level.value()/255}
+        edges = 1
+        if self.ui.tab2_nmb_edges_2.isChecked():
+            edges = 2
+        options = {'nmb_edges': edges,
                    'ignored_pixels': self.ui.tab2_ign_pixels.value(),
                    'size_ratio': self.ui.tab2_size_ratio.value()/100}
-        if self.ui.tab2_nmb_edges_1.isChecked():
-            edges = 1
-        else:
-            edges = 2
-        options = {'nmb_edges': edges}
         return canny, contour, options
 
-    def tab2_update_edge(self, draw=True):
-        params = self.tab2_get_params()
+    def update_edge(self, draw=True):
+        params = self.app.tab1.get_params()
         try:
-            edge = self.dsa.get_current_edge(params)
+            edge = self.dsa.get_current_edge(params, self.app.current_ind)
         except:
             self.log.log_unknown_exception()
             return None
         self.ui.mplwidgetdetect.update_edge(edge)
 
-    def tab2_toggle_canny(self, toggle):
+    def toggle_canny(self, toggle):
         if toggle:
             self.dsa.edge_detection_method = 'canny'
             self.ui.tab2_contour_box.setChecked(False)
         else:
             if not self.ui.tab2_contour_box.isChecked():
                 self.dsa.edge_detection_method = None
-        self.tab2_update_edge()
+        self.update_edge()
 
-    def tab2_toggle_contour(self, toggle):
+    def toggle_contour(self, toggle):
         if toggle:
             self.dsa.edge_detection_method = 'contour'
             self.ui.tab2_canny_box.setChecked(False)
         else:
             if not self.ui.tab2_canny_box.isChecked():
                 self.dsa.edge_detection_method = None
-        self.tab2_update_edge()
+        self.update_edge()
 
-    # TAB 3
-    def tab3_initialize(self):
+
+class TabFits(Tab):
+
+    def initialize(self):
         # enable slider if necessary
         if self.dsa.nmb_frames > 1:
-            self.tab3_enable_frame_sliders()
+            self.enable_frame_sliders()
         else:
-            self.tab3_disable_frame_sliders()
+            self.disable_frame_sliders()
+        self.initialized = True
 
-    def tab3_switch_to_tab(self):
-        if not self.tab3_initialized:
-            self.tab3_initialize()
+    def enter_tab(self):
+        if not self.initialized:
+            self.initialize()
         # Update the plot only if necessary
-        im = self.dsa.get_current_precomp_im()
+        im = self.dsa.get_current_precomp_im(self.app.current_ind)
         self.ui.mplwidgetfit.update_image(im.values)
         pt1, pt2 = self.dsa.get_baseline_display_points()
         self.ui.mplwidgetfit.update_baseline(pt1, pt2)
         # Update the curent frame
         self._disable_frame_updater = True
-        self.ui.tab3_frameslider.setValue(self.dsa.current_ind + 1)
+        self.ui.tab3_frameslider.setValue(self.app.current_ind + 1)
         self._disable_frame_updater = False
         # update the edge fit and baseline
-        self.tab3_update_fit()
+        self.update_fit()
         # update the 'ignore lower part' slider upper bound
         sizey = abs(self.ui.mplwidgetimport.ax.viewLim.height)
         self.ui.tab3_circle_ymin.setMaximum(sizey)
         self.ui.tab3_ellipse_ymin.setMaximum(sizey)
         #
-        self.tab3_initialized = True
-        self.tab3_already_opened = True
+        self.already_opened = True
         self.ui.mplwidgetfit.tab_opened = True
 
-    def tab3_set_current_frame(self, ind):
+    def enable_options(self):
+        self.ui.tab3_circle_box.setEnabled(True)
+        self.ui.tab3_ellipse_box.setEnabled(True)
+        self.ui.tab3_polyline_box.setEnabled(True)
+        self.ui.tab3_spline_box.setEnabled(True)
+
+    def set_current_frame(self, frame_number):
         if self._disable_frame_updater:
             return None
-        self.dsa.set_current(ind - 1)
+        self.app.current_ind = frame_number - 1
         # update image
-        im = self.dsa.get_current_precomp_im()
+        im = self.dsa.get_current_precomp_im(self.app.current_ind)
         self.ui.mplwidgetfit.update_image(im.values)
         # update fit
-        self.tab3_update_fit()
+        self.update_fit()
 
-    def tab3_enable_frame_sliders(self):
+    def enable_frame_sliders(self):
         self._disable_frame_updater = True
-        cropt = self.dsa.precomp_old_params['cropt']
+        cropt = self.app.tab1.get_params('cropt')
         self.ui.tab3_frameslider.setMinimum(cropt[0])
         self.ui.tab3_frameslider.setMaximum(cropt[1])
         self.ui.tab3_spinbox.setMinimum(cropt[0])
@@ -564,13 +464,13 @@ class AppWindow(QMainWindow):
         self.ui.tab3_spinbox.setEnabled(True)
         self._disable_frame_updater = False
 
-    def tab3_disable_frame_sliders(self):
+    def disable_frame_sliders(self):
         self._disable_frame_updater = True
         self.ui.tab3_frameslider.setEnabled(False)
         self.ui.tab3_spinbox.setEnabled(False)
         self._disable_frame_updater = False
 
-    def tab3_get_params(self):
+    def get_params(self):
         circle = {'triple_pts': [[0, self.ui.tab3_circle_ymin.value()]]*2}
         ellipse = {'triple_pts': [[0, self.ui.tab3_ellipse_ymin.value()]]*2}
         polyline = {'deg': self.ui.tab3_polyline_deg.value()}
@@ -578,10 +478,11 @@ class AppWindow(QMainWindow):
                   's': self.ui.tab3_spline_smooth.value()/100}
         return circle, ellipse, polyline, spline
 
-    def tab3_update_fit(self):
-        params = self.tab3_get_params()
+    def update_fit(self)
+        params = self.app.tab1.get_params()
         try:
-            fit, fit_center = self.dsa.get_current_fit(params)
+            fit, fit_center = self.dsa.get_current_fit(params,
+                                                       self.app.current_ind)
         except:
             self.log.log_unknown_exception()
             return None
@@ -592,7 +493,7 @@ class AppWindow(QMainWindow):
             return None
         self.ui.mplwidgetfit.update_fit_and_cas(fit, fit_center, cas)
 
-    def _tab3_uncheck_others(self, box):
+    def _uncheck_others(self, box):
         checks = [b.setChecked(False)
                   for b in [self.ui.tab3_circle_box,
                             self.ui.tab3_ellipse_box,
@@ -601,7 +502,7 @@ class AppWindow(QMainWindow):
                   if b != box and b.isChecked()]
         return checks
 
-    def _tab3_update_fit_method(self):
+    def _update_fit_method(self):
         checks = np.array([box.isChecked()
                            for box in [self.ui.tab3_circle_box,
                                        self.ui.tab3_ellipse_box,
@@ -610,43 +511,55 @@ class AppWindow(QMainWindow):
         if not np.any(checks):
             self.dsa.fit_method = None
 
-    def tab3_toggle_circle(self, toggle):
+    def toggle_circle(self, toggle):
+        # TODO: send the fit methd as argument like the other parameters
+        # TODO: DO the same for edge
+        # TODO: Globally, be sure that the backend is just accessed trhough
+        #       function call
         if toggle:
             self.dsa.fit_method = 'circle'
-            self._tab3_uncheck_others(self.ui.tab3_circle_box)
+            self._uncheck_others(self.ui.tab3_circle_box)
         else:
-            self._tab3_update_fit_method()
-        self.tab3_update_fit()
+            self._update_fit_method()
+        self.update_fit()
 
-    def tab3_toggle_ellipse(self, toggle):
+    def toggle_ellipse(self, toggle):
         if toggle:
             self.dsa.fit_method = 'ellipse'
-            self._tab3_uncheck_others(self.ui.tab3_ellipse_box)
+            self._uncheck_others(self.ui.tab3_ellipse_box)
         else:
-            self._tab3_update_fit_method()
-        self.tab3_update_fit()
+            self._update_fit_method()
+        self.update_fit()
 
-    def tab3_toggle_polyline(self, toggle):
+    def toggle_polyline(self, toggle):
         if toggle:
             self.dsa.fit_method = 'polyline'
-            self._tab3_uncheck_others(self.ui.tab3_polyline_box)
+            self._uncheck_others(self.ui.tab3_polyline_box)
         else:
-            self._tab3_update_fit_method()
-        self.tab3_update_fit()
+            self._update_fit_method()
+        self.update_fit()
 
-    def tab3_toggle_spline(self, toggle):
+    def toggle_spline(self, toggle):
         if toggle:
             self.dsa.fit_method = 'spline'
-            self._tab3_uncheck_others(self.ui.tab3_spline_box)
+            self._uncheck_others(self.ui.tab3_spline_box)
         else:
-            self._tab3_update_fit_method()
-        self.tab3_update_fit()
+            self._update_fit_method()
+        self.update_fit()
 
-    # TAB4
-    def tab4_initialize(self):
+
+class TabAnalyze(Tab):
+
+    def __init__(self, ui, app, dsa):
+        super().__init__(ui, app, dsa)
+        self.use_yaxis2 = False
+
+    def initialize(self):
         if self.dsa.nmb_frames == 1:
             return None
         # Add option to combo boxes
+        # TODO: Centralize the accessible things to make it more
+        #       convenient to add some
         for opts in ['Frame number', 'Time']:
             self.ui.tab4_combo_xaxis.insertItem(100, opts)
         for opts in ['CA (mean)', 'CA (left)', 'CA (right)', 'Base radius',
@@ -660,30 +573,30 @@ class AppWindow(QMainWindow):
         self.ui.tab4_combo_xaxis.setCurrentIndex(0)
         self.ui.tab4_combo_yaxis.setCurrentIndex(0)
         self.ui.tab4_combo_yaxis2.setCurrentIndex(3)
-        self.tab4_initialized = True
+        self.initialized = True
 
-    def tab4_switch_to_tab(self):
+    def enter_tab(self):
         # initialize if needed
-        if not self.tab4_initialized:
-            self.tab4_initialize()
+        if not self.initialized:
+            self.initialize()
         draw = True
-        # if not self.tab4_already_opened:
+        # if not self.already_opened:
         #     draw = False
         # Do nothing if there is only one point...
         if self.dsa.nmb_frames <= 1:
             return None
         # Clean
-        if self.tab4_already_opened:
-            self.tab4_clean_plot()
+        if self.already_opened:
+            self.clean_plot()
         # compute edges for every frames !
-        params = self.tab2_get_params()
+        params = self.app.tab2.get_params()
         try:
             self.dsa.compute_edges(params)
         except:
             self.log.log_unknown_exception()
             return None
         # compute fits for every frames !
-        params = self.tab3_get_params()
+        params = self.app.tab3.get_params()
         try:
             self.dsa.compute_fits(params)
         except:
@@ -696,19 +609,30 @@ class AppWindow(QMainWindow):
             self.log.log_unknown_exception()
             return None
         #
-        self.tab4_update_plot(0, replot=True, draw=draw)
-        self.tab4_already_opened = True
+        self.update_plot(0, replot=True, draw=draw)
+        self.already_opened = True
 
-    def tab4_clean_plot(self):
-        self.ui.mplwidgetanalyze.update_plots([], [], [],
-                                              xname="",
-                                              yname="",
-                                              y2name="",
-                                              replot=False,
-                                              draw=True)
+    def enable_options(self):
+        if self.dsa.nmb_frames > 1:
+            self.ui.tab4_xaxis_box.setEnabled(True)
+            self.ui.tab4_yaxis_box.setEnabled(True)
+            self.ui.tab4_yaxis2_box.setEnabled(True)
+            self.ui.tab4_local_values_box.setEnabled(True)
+            self.ui.tab4_export_box.setEnabled(True)
+        else:
+            self.ui.tab4_xaxis_box.setEnabled(False)
+            self.ui.tab4_yaxis_box.setEnabled(False)
+            self.ui.tab4_yaxis2_box.setEnabled(False)
+            self.ui.tab4_local_values_box.setEnabled(False)
+            self.ui.tab4_export_box.setEnabled(False)
 
-    def tab4_update_plot(self, index, replot=False, draw=True):
-        if not self.tab4_initialized:
+    def clean_plot(self):
+        self.ui.mplwidgetanalyze.update_plots(
+            [], [], [], xname="", yname="", y2name="",
+            replot=False, draw=True)
+
+    def update_plot(self, index, replot=False, draw=True):
+        if not self.initialized:
             return None
         # get things to plot
         xaxis = self.ui.tab4_combo_xaxis.currentText()
@@ -725,7 +649,7 @@ class AppWindow(QMainWindow):
             self.log.log_unknown_exception()
             y = [np.nan]*len(x)
             unit_y = ""
-        if self.tab4_use_yaxis2:
+        if self.use_yaxis2:
             yaxis2 = self.ui.tab4_combo_yaxis2.currentText()
             try:
                 y2, unit_y2 = self.dsa.get_plotable_quantity(yaxis2)
@@ -753,8 +677,7 @@ class AppWindow(QMainWindow):
         if len(x) == 0:
             y = []
             y2 = []
-        #
-        # check length
+        # check length, just in case
         if len(x) != len(y):
             self.log.log('Incoherence in plottable quantities length:'
                          f'\n{xaxis} is {len(x)} and {yaxis} is {len(y)}',
@@ -769,17 +692,17 @@ class AppWindow(QMainWindow):
         yname2 = f'{yaxis2} [{unit_y2}]'
         #
         self.ui.mplwidgetanalyze.update_plots(x, y, y2,
-                                              xname=xname,
-                                              yname=yname,
-                                              y2name=yname2,
-                                              replot=replot,
-                                              draw=draw)
+                                           xname=xname,
+                                           yname=yname,
+                                           y2name=yname2,
+                                           replot=replot,
+                                           draw=draw)
 
-    def tab4_toggle_axis2(self, toggle):
-        self.tab4_use_yaxis2 = toggle
-        self.tab4_update_plot(index=0)
+    def toggle_axis2(self, toggle):
+        self.use_yaxis2 = toggle
+        self.update_plot(index=0)
 
-    def tab4_export_as_csv(self, toggle):
+    def export_as_csv(self, toggle):
         try:
             # get fiel to save to
             filepath = select_new_file("Save as")
@@ -803,6 +726,84 @@ class AppWindow(QMainWindow):
         except:
             self.log.log_unknown_exception()
 
+
+# TODO: Add export_as_script
+# TODO: Add tests (QT5 tests ?)
+#       - http://johnnado.com/pyqt-qtest-example/
+#       - https://pypi.org/project/pytest-qt/
+# TODO: Add circles fitting for ridge detection
+# TODO: Add keybindings
+# TODO: Make everything asynchroneous
+class AppWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.ui = Ui_MainWindow()
+        # Variables
+        self.current_ind = 0
+        self.statusbar_delay = 2000
+        self._disable_frame_updater = False
+        self.plottable_quant = [
+            'Frame number', 'Time', 'Position (x, right)',
+            'CL velocity (x, left)', 'CL velocity (x, right)',
+            'Position (x, left)', 'Position (x, center)',
+            'CA (right)', 'CA (left)', 'CA (mean)', 'Base radius',
+            'Height', 'Area', 'Volume']
+        # Initialize log
+        self.ui.display_area = None  # needed to be initialized for log
+        self.ui.status_bar = None
+        self.log = Log(self.ui, self.statusbar_delay)
+        # Initialize dsa backend
+        self.dsa = DSA(self)
+        # Initialize tabs (need to be done before initializing design.py)
+        self.tab1 = TabImport(self.ui, self, self.dsa)
+        self.tab2 = TabEdges(self.ui, self, self.dsa)
+        self.tab3 = TabFits(self.ui, self, self.dsa)
+        self.tab4 = TabAnalyze(self.ui, self, self.dsa)
+        self.tabs = [self.tab1, self.tab2, self.tab3, self.tab4]
+        self.last_tab = 0
+        # Including design.ui
+        self.ui.setupUi(self)
+        # Add missing links
+        self.ui.mplwidgetanalyze.ui = self.ui
+        # Initialize progressbar
+        self.init_progressbar()
+        # Always start from the first tab
+        self.ui.tabWidget.setCurrentIndex(0)
+        # Show it !
+        self.show()
+
+    def init_progressbar(self):
+        # Add Progress bar to status bar
+        self.ui.progressbar = QtWidgets.QProgressBar()
+        self.ui.progressbar.setMaximumSize(QtCore.QSize(250, 16777215))
+        self.ui.progressbar.setTextVisible(True)
+        self.ui.progressbar.setFormat("%p%")
+        self.ui.progressbar.setValue(0)
+        self.ui.progressbar.setVisible(False)
+        self.ui.statusbar.addPermanentWidget(self.ui.progressbar)
+
+    def enable_options(self):
+        """ To run after importing at least an image"""
+        for tab in self.tabs:
+            tab.enable_options()
+
+    def change_tab(self, tab_nmb):
+        # Do nothing if no imported image yet
+        if not self.dsa.is_initialized():
+            return None
+        # Leave the current tab
+        success = self.tabs[self.last_tab].leave_tab()
+        if not success:
+            self.ui.tabWidget.setCurrentIndex(self.last_tab)
+            return None
+        # enter the new tab
+        self.tabs[tab_nmb].enter_tab()
+        # Update last tab number
+        self.last_tab = tab_nmb
+
+    def set_current_ind(self, ind):
+        if self.dsa.is_valid_ind(ind):
+            self.current_ind = ind
 
     # Menu
     def export_as_script(self):

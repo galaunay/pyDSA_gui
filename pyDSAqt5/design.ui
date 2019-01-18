@@ -1548,7 +1548,7 @@
    <sender>tab1_import_image_button</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab1_import_image()</slot>
+   <slot>tab1.import_image()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>106</x>
@@ -1564,7 +1564,7 @@
    <sender>tab1_import_video_button</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab1_import_video()</slot>
+   <slot>tab1.import_video()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>119</x>
@@ -1580,7 +1580,7 @@
    <sender>tab1_reset_crop</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab1_reset_crop()</slot>
+   <slot>tab1.reset_crop()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>138</x>
@@ -1596,7 +1596,7 @@
    <sender>tabWidget</sender>
    <signal>currentChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab_changed(int)</slot>
+   <slot>change_tab(int)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>110</x>
@@ -1612,7 +1612,7 @@
    <sender>tab2_spinbox</sender>
    <signal>valueChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab2_set_current_frame(int)</slot>
+   <slot>tab2.set_current_frame(int)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>272</x>
@@ -1660,7 +1660,7 @@
    <sender>tab1_set_scaling_btn</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab1_set_scaling()</slot>
+   <slot>tab1.set_scaling()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>109</x>
@@ -1676,7 +1676,7 @@
    <sender>tab1_remove_scaling_btn</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab1_remove_scaling()</slot>
+   <slot>tab1.remove_scaling()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>138</x>
@@ -1692,7 +1692,7 @@
    <sender>tab2_canny_smooth_size</sender>
    <signal>valueChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab2_update_edge()</slot>
+   <slot>tab2.update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>108</x>
@@ -1708,7 +1708,7 @@
    <sender>tab2_canny_dilatation_steps</sender>
    <signal>valueChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab2_update_edge()</slot>
+   <slot>tab2.update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>108</x>
@@ -1724,7 +1724,7 @@
    <sender>tab2_contour_level</sender>
    <signal>sliderMoved(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab2_update_edge()</slot>
+   <slot>tab2.update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>108</x>
@@ -1740,7 +1740,7 @@
    <sender>tab2_ign_pixels</sender>
    <signal>valueChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab2_update_edge()</slot>
+   <slot>tab2.update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>108</x>
@@ -1756,7 +1756,7 @@
    <sender>tab2_size_ratio</sender>
    <signal>valueChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab2_update_edge()</slot>
+   <slot>tab2.update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>108</x>
@@ -1772,7 +1772,7 @@
    <sender>tab2_nmb_edges_2</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab2_update_edge()</slot>
+   <slot>tab2.update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>145</x>
@@ -1788,7 +1788,7 @@
    <sender>tab2_nmb_edges_1</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab2_update_edge()</slot>
+   <slot>tab2.update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>89</x>
@@ -1804,7 +1804,7 @@
    <sender>tab2_contour_box</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab2_toggle_contour(bool)</slot>
+   <slot>tab2.toggle_contour(bool)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>73</x>
@@ -1820,7 +1820,7 @@
    <sender>tab2_canny_box</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab2_toggle_canny(bool)</slot>
+   <slot>tab2.toggle_canny(bool)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>46</x>
@@ -1836,7 +1836,7 @@
    <sender>tab1_import_images_button</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab1_import_images()</slot>
+   <slot>tab1.import_images()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>79</x>
@@ -1868,7 +1868,7 @@
    <sender>tab3_spinbox</sender>
    <signal>valueChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab3_set_current_frame(int)</slot>
+   <slot>tab3.set_current_frame(int)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>272</x>
@@ -1900,7 +1900,7 @@
    <sender>tab3_spline_smooth</sender>
    <signal>valueChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab3_update_fit()</slot>
+   <slot>tab3.update_fit()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>146</x>
@@ -1916,7 +1916,7 @@
    <sender>tab3_spline_box</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab3_toggle_spline(bool)</slot>
+   <slot>tab3.toggle_spline(bool)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>108</x>
@@ -1932,7 +1932,7 @@
    <sender>tab3_spline_deg</sender>
    <signal>valueChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab3_update_fit()</slot>
+   <slot>tab3.update_fit()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>146</x>
@@ -1948,7 +1948,7 @@
    <sender>tab3_polyline_box</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab3_toggle_polyline(bool)</slot>
+   <slot>tab3.toggle_polyline(bool)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>108</x>
@@ -1964,7 +1964,7 @@
    <sender>tab3_polyline_deg</sender>
    <signal>valueChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab3_update_fit()</slot>
+   <slot>tab3.update_fit()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>146</x>
@@ -1980,7 +1980,7 @@
    <sender>tab3_ellipse_box</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab3_toggle_ellipse(bool)</slot>
+   <slot>tab3.toggle_ellipse(bool)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>117</x>
@@ -1996,7 +1996,7 @@
    <sender>tab3_ellipse_ymin</sender>
    <signal>valueChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab3_update_fit()</slot>
+   <slot>tab3.update_fit()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>146</x>
@@ -2012,7 +2012,7 @@
    <sender>tab3_circle_ymin</sender>
    <signal>valueChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab3_update_fit()</slot>
+   <slot>tab3.update_fit()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>142</x>
@@ -2028,7 +2028,7 @@
    <sender>tab3_circle_box</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab3_toggle_circle(bool)</slot>
+   <slot>tab3.toggle_circle(bool)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>37</x>
@@ -2044,7 +2044,7 @@
    <sender>tab4_combo_xaxis</sender>
    <signal>currentIndexChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab4_update_plot()</slot>
+   <slot>tab4.update_plot()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>147</x>
@@ -2060,7 +2060,7 @@
    <sender>tab4_combo_yaxis</sender>
    <signal>currentIndexChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab4_update_plot()</slot>
+   <slot>tab4.update_plot()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>131</x>
@@ -2076,7 +2076,7 @@
    <sender>tab4_yaxis2_box</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab4_toggle_axis2(bool)</slot>
+   <slot>tab4.toggle_axis2(bool)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>85</x>
@@ -2092,7 +2092,7 @@
    <sender>tab4_combo_yaxis2</sender>
    <signal>currentIndexChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab4_update_plot()</slot>
+   <slot>tab4.update_plot()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>142</x>
@@ -2108,7 +2108,7 @@
    <sender>tab1_spinbox_frame</sender>
    <signal>valueChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab1_set_current_frame(int)</slot>
+   <slot>tab1.set_current_frame(int)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>269</x>
@@ -2220,7 +2220,7 @@
    <sender>tab1_spinbox_first</sender>
    <signal>valueChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab1_set_first_frame(int)</slot>
+   <slot>tab1.set_first_frame(int)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>259</x>
@@ -2236,7 +2236,7 @@
    <sender>tab1_spinbox_last</sender>
    <signal>valueChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab1_set_last_frame(int)</slot>
+   <slot>tab1.set_last_frame(int)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>255</x>
@@ -2268,7 +2268,7 @@
    <sender>tab4_export_csv_button</sender>
    <signal>clicked(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab4_export_as_csv()</slot>
+   <slot>tab4.export_as_csv()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>144</x>
@@ -2284,7 +2284,7 @@
    <sender>tab2_canny_threshold1</sender>
    <signal>valueChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab2_update_edge()</slot>
+   <slot>tab2.update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>100</x>
@@ -2300,7 +2300,7 @@
    <sender>tab2_canny_threshold2</sender>
    <signal>valueChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab2_update_edge()</slot>
+   <slot>tab2.update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>141</x>
@@ -2314,29 +2314,29 @@
   </connection>
  </connections>
  <slots>
-  <slot>tab1_import_image()</slot>
-  <slot>tab1_import_video()</slot>
-  <slot>tab1_set_current_frame(int)</slot>
-  <slot>tab1_reset_crop()</slot>
-  <slot>tab_changed(int)</slot>
-  <slot>tab2_set_current_frame(int)</slot>
-  <slot>tab1_set_scaling()</slot>
-  <slot>tab1_set_scale(QString)</slot>
-  <slot>tab1_remove_scaling()</slot>
-  <slot>tab2_update_edge()</slot>
-  <slot>tab2_toggle_contour(bool)</slot>
-  <slot>tab2_toggle_canny(bool)</slot>
-  <slot>tab3_set_current_frame(int)</slot>
-  <slot>tab3_toggle_circle(bool)</slot>
-  <slot>tab3_toggle_ellipse(bool)</slot>
-  <slot>tab3_toggle_polyline(bool)</slot>
-  <slot>tab3_toggle_spline(bool)</slot>
-  <slot>tab3_update_fit()</slot>
-  <slot>tab1_import_images()</slot>
-  <slot>tab4_update_plot()</slot>
-  <slot>tab4_toggle_axis2(bool)</slot>
-  <slot>tab1_set_first_frame(int)</slot>
-  <slot>tab1_set_last_frame(int)</slot>
-  <slot>tab4_export_as_csv()</slot>
+  <slot>tab1.import_image()</slot>
+  <slot>tab1.import_video()</slot>
+  <slot>tab1.set_current_frame(int)</slot>
+  <slot>tab1.reset_crop()</slot>
+  <slot>change.tab(int)</slot>
+  <slot>tab2.set_current_frame(int)</slot>
+  <slot>tab1.set_scaling()</slot>
+  <slot>tab1.set_scale(QString)</slot>
+  <slot>tab1.remove_scaling()</slot>
+  <slot>tab2.update_edge()</slot>
+  <slot>tab2.toggle_contour(bool)</slot>
+  <slot>tab2.toggle_canny(bool)</slot>
+  <slot>tab3.set_current_frame(int)</slot>
+  <slot>tab3.toggle_circle(bool)</slot>
+  <slot>tab3.toggle_ellipse(bool)</slot>
+  <slot>tab3.toggle_polyline(bool)</slot>
+  <slot>tab3.toggle_spline(bool)</slot>
+  <slot>tab3.update_fit()</slot>
+  <slot>tab1.import_images()</slot>
+  <slot>tab4.update_plot()</slot>
+  <slot>tab4.toggle_axis2(bool)</slot>
+  <slot>tab1.set_first_frame(int)</slot>
+  <slot>tab1.set_last_frame(int)</slot>
+  <slot>tab4.export_as_csv()</slot>
  </slots>
 </ui>
