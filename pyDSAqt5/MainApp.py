@@ -584,13 +584,12 @@ class AppWindow(QMainWindow):
         except:
             self.log.log_unknown_exception()
             return None
-        self.ui.mplwidgetfit.update_fit(fit, fit_center)
         try:
             cas = self.dsa.get_current_ca()
         except:
             self.log.log_unknown_exception()
             return None
-        self.ui.mplwidgetfit.update_ca(cas)
+        self.ui.mplwidgetfit.update_fit_and_cas(fit, fit_center, cas)
 
     def _tab3_uncheck_others(self, box):
         checks = [b.setChecked(False)

@@ -241,14 +241,12 @@ class MplWidgetDetect(Canvas):
 
     def blit_it(self):
         if not self.tab_opened:
-            print('display on not open')
             # If tab is not open, just redispay the data
             self.im = self.ax.imshow(self.data,
                                      interpolation='None',
                                      cmap=plt.cm.binary_r)
             return None
         if self.need_replot or self.axbackground is None:
-            print('replot')
             self.im = self.ax.imshow(self.data,
                                      interpolation='None',
                                      cmap=plt.cm.binary_r)
@@ -263,7 +261,6 @@ class MplWidgetDetect(Canvas):
             self.ax.draw_artist(self.baseline)
             self.need_replot = False
         else:
-            print('blit')
             self.restore_region(self.axbackground)
             self.ax.draw_artist(self.im)
             self.ax.draw_artist(self.edge)
@@ -333,14 +330,13 @@ class MplWidgetFit(Canvas):
                                 [pt1[1], pt2[1]]])
         self.blit_it()
 
-    def update_fit(self, fit, fit_center):
+    def update_fit_and_cas(self, fit, fit_center, cas):
+        # fit
         if fit_center is None:
             fit_center = [[0], [0]]
         self.fit.set_data(*fit)
         self.fit_center.set_data(fit_center)
-        self.blit_it()
-
-    def update_ca(self, cas):
+        # cas
         ca1, ca2 = cas
         self.ca_r.set_data(*ca1)
         self.ca_l.set_data(*ca2)
