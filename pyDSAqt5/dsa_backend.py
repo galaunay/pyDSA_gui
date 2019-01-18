@@ -204,6 +204,10 @@ class DSA(object):
                     self.current_edge = None
                     return [[], []]
             except Exception:
+                self.log.log("Couldn't find a drop here")
+                self.current_edge = None
+                return [[], []]
+            except:
                 self.log.log_unknown_exception()
                 self.current_edge = None
                 return [[], []]
