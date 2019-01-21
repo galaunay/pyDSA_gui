@@ -27,71 +27,119 @@ import pytest
 import time
 
 
+class MockEvent(object):
+    def __init__(self, x, y):
+        self.xdata = x
+        self.ydata = y
+
+
 class TestGui(object):
 
     def setup(self):
         self.app = QApplication([])
         self.w = AppWindow()
         self.ui = self.w.ui
-        self.delay = 500
+        self.delay = 10
 
     def test_whole_process(self):
         QTest.qWait(self.delay)
+
+        #======================================================================
+        # TAB 1
+        #======================================================================
         # Import video
         self.w.tab1_import_video(None, '../tests/test.avi')
         QTest.qWait(self.delay)
+        # Crop in time
+        self.ui.tab1_spinbox_first.setValue(50+92)
+        QTest.qWait(self.delay)
+        self.ui.tab1_spinbox_last.setValue(400)
+        QTest.qWait(self.delay)
+        self.ui.tab1_spinbox_frame.setValue(200)
+        QTest.qWait(self.delay)
+        # Crop in space
+        self.ui.mplwidgetimport.update_crop_area(100, 1500, 50, 250)
+        QTest.qWait(self.delay)
+        # Set baseline
+        self.ui.mplwidgetimport.update_baseline([100, 200], [1500, 200])
+        QTest.qWait(self.delay)
+        # Set scaling
+        self.ui.mplwidgetimport.scaling_hand.add_point(MockEvent(500, 100))
+        self.ui.mplwidgetimport.scaling_hand.add_point(MockEvent(643, 110))
+        self.ui.mplwidgetimport.scaling_hand.add_point(MockEvent(674, 83))
+        self.ui.tab1_set_scaling_text.setText('0.44mm')
+        QTest.qWait(self.delay)
+        # Set time sclaing
+        self.ui.tab1_set_dt_text.setText('0.34')
+        QTest.qWait(self.delay)
+
+        #======================================================================
+        # TAB 2
+        #======================================================================
         # Goto edge tab
         self.ui.tabWidget.setCurrentIndex(1)
         QTest.qWait(self.delay)
+        # COntour detection
+        self.ui.tab2_contour_box.setChecked(True)
+        QTest.qWait(self.delay)
+        self.ui.tab2_contour_level.setValue(50)
+        QTest.qWait(self.delay)
+        # Canny detection
+        self.ui.tab2_contour_box.setChecked(False)
+        self.ui.tab2_canny_box.setChecked(True)
+        self.ui.tab2_canny_dilatation_steps.setValue(0)
+        self.ui.tab2_canny_threshold1.setValue(50)
+        self.ui.tab2_canny_threshold2.setValue(200)
+        self.ui.tab2_canny_smooth_size.setValue(1)
+        QTest.qWait(self.delay)
+
+        #======================================================================
+        # TAB 3
+        #======================================================================
         # Goto fit tab
         self.ui.tabWidget.setCurrentIndex(2)
         QTest.qWait(self.delay)
+        # Test circle fit
+        self.ui.tab3_circle_box.setChecked(True)
+        QTest.qWait(self.delay)
+        # Test ellipse fit
+        self.ui.tab3_ellipse_box.setChecked(True)
+        QTest.qWait(self.delay)
+        # Test polyline fit
+        self.ui.tab3_polyline_box.setChecked(True)
+        self.ui.tab3_polyline_deg.setValue(7)
+        QTest.qWait(self.delay)
+        # Test spline fit
+        self.ui.tab3_spline_box.setChecked(True)
+        self.ui.tab3_spline_deg.setValue(3)
+        QTest.qWait(self.delay)
+        # Back to ellipse
+        self.ui.tab3_ellipse_box.setChecked(True)
+        QTest.qWait(self.delay)
+
+        #======================================================================
+        # TAB 4
+        #======================================================================
         # Goto analyze tab
         self.ui.tabWidget.setCurrentIndex(3)
-        QTest.qWait(self.delay*4)
+        QTest.qWait(self.delay)
+        self.ui.tab4_yaxis2_box.setChecked(True)
+        QTest.qWait(self.delay)
+        self.ui.tab4_combo_xaxis.setCurrentIndex(1)
+        QTest.qWait(self.delay)
+        self.ui.tab4_combo_yaxis.setCurrentIndex(0)
+        QTest.qWait(self.delay)
+        self.ui.tab4_combo_yaxis2.setCurrentIndex(3)
+        QTest.qWait(self.delay)
 
+        # #==============================================================================
+        # # Wait at the end
+        # #==============================================================================
+        # QTest.qWait(50000000)
 
-# # TEMP
-# pytest.main(['test_gui.py'])
-# # TEMP - End
+if __name__ == "__main__":
+    test = TestGui()
+    test.setup()
+    test.test_whole_process()
 
-
-
-# class WholeProcessTest(QTest):
-#     def test(self):
-#         # Push OK with the left mouse button
-#        okWidget = self.form.ui.buttonBox.button(self.form.ui.buttonBox.Ok)
-#        QTest.mouseClick(okWidget, Qt.LeftButton)
-#        self.assertEqual(self.form.jiggers, 36.0)
-#        self.assertEqual(self.form.speedName, "&Karate Chop")
-
-
-
-# class Test(unittest.TestCase):
-
-#     #----------------------------------------------------------------------
-
-#     #----------------------------------------------------------------------
-#     def test_update_label_from_menu(self):
-#         self.assertEqual(self.ui.label.text(), 'Empty')
-#         self.menu.actions()[0].menu().actions()[0].trigger()
-#         self.assertEqual(self.ui.label.text(), 'Updated label')
-
-#     #----------------------------------------------------------------------
-#     def test_update_label_from_shortcut(self):
-#         self.assertEqual(self.ui.label.text(), 'Empty')
-#         QTest.keyClicks(self.ui, 'U', Qt.ControlModifier)
-#         print(self.ui.label.text())
-
-#         QTest.keyPress(self.ui, 'U', Qt.ControlModifier)
-#         print(self.ui.label.text())
-
-#         QTest.keyPress(self.ui, Qt.Key_U, Qt.ControlModifier)
-#         print(self.ui.label.text())
-
-#         self.assertEqual(self.ui.label.text(), 'Updated label')
-#         return
-
-#     #----------------------------------------------------------------------
-#     def tearDown(self):
-#         pass
+    # pytest.main(['test_gui.py'])
