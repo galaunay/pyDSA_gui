@@ -305,9 +305,10 @@ class AppWindow(QMainWindow):
         self.tab2_initialized = False
         self.tab3_initialized = False
 
-    def tab1_import_video(self, toggle=None):
+    def tab1_import_video(self, toggle=None, filepath=None):
         # Select video to import
-        filepath = select_file('Open video')[0]
+        if filepath is None:
+            filepath = select_file('Open video')[0]
         # Import video
         dsa = DSA(self)
         try:

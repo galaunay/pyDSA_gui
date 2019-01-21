@@ -21,7 +21,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -83,7 +83,7 @@
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_3">
               <item>
-               <widget class="QPushButton" name="pushButton">
+               <widget class="QPushButton" name="tab1_import_image_button">
                 <property name="toolTip">
                  <string>Import a single image (png, jpg, bmp, ...)</string>
                 </property>
@@ -93,7 +93,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="pushButton_2">
+               <widget class="QPushButton" name="tab1_import_images_button">
                 <property name="toolTip">
                  <string>Import a set of images (need to be sorted in alphabetical order)</string>
                 </property>
@@ -103,7 +103,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="pushButton_3">
+               <widget class="QPushButton" name="tab1_import_video_button">
                 <property name="toolTip">
                  <string>Import a video (avi,mp4,mkv,...)</string>
                 </property>
@@ -1545,7 +1545,7 @@
  <resources/>
  <connections>
   <connection>
-   <sender>pushButton</sender>
+   <sender>tab1_import_image_button</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
    <slot>tab1_import_image()</slot>
@@ -1561,7 +1561,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>pushButton_3</sender>
+   <sender>tab1_import_video_button</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
    <slot>tab1_import_video()</slot>
@@ -1833,7 +1833,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>pushButton_2</sender>
+   <sender>tab1_import_images_button</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
    <slot>tab1_import_images()</slot>
