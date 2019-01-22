@@ -347,7 +347,6 @@ class VerticalLineHandler(Handler):
     def update_hands(self):
         self.hands[0].set_center(self.pt)
         xlims = self.ax.get_xlim()
-        ylims = self.ax.get_ylim()
         self.hands[0].set_radius((xlims[1] - xlims[0])*self.hand_size/100)
 
     def update_from_event(self, event):

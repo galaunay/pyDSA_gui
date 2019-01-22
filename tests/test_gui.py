@@ -39,7 +39,7 @@ class TestGui(object):
         self.app = QApplication([])
         self.w = AppWindow()
         self.ui = self.w.ui
-        self.delay = 10
+        self.delay = 100
 
     def test_whole_process(self):
         QTest.qWait(self.delay)
@@ -48,7 +48,7 @@ class TestGui(object):
         # TAB 1
         #======================================================================
         # Import video
-        self.w.tab1_import_video(None, '../tests/test.avi')
+        self.w.tab1.import_video(None, '../tests/test.avi')
         QTest.qWait(self.delay)
         # Crop in time
         self.ui.tab1_spinbox_first.setValue(50+92)
@@ -130,6 +130,29 @@ class TestGui(object):
         self.ui.tab4_combo_yaxis.setCurrentIndex(0)
         QTest.qWait(self.delay)
         self.ui.tab4_combo_yaxis2.setCurrentIndex(3)
+        QTest.qWait(self.delay)
+
+        #==============================================================================
+        # Back to TAB 1 to import images
+        #==============================================================================
+        # Goto import tab
+        self.ui.tabWidget.setCurrentIndex(0)
+        QTest.qWait(self.delay)
+        self.w.tab1.import_images(None, [f'../tests/{i+1}.png'
+                                         for i in range(5)])
+        #==============================================================================
+        # Just chec if other tab are alright
+        #==============================================================================
+        self.ui.tabWidget.setCurrentIndex(1)
+        self.ui.tab2_contour_box.setChecked(True)
+        QTest.qWait(self.delay)
+        self.ui.tabWidget.setCurrentIndex(2)
+        QTest.qWait(self.delay)
+        self.ui.tabWidget.setCurrentIndex(3)
+        QTest.qWait(self.delay)
+        self.ui.tab4_combo_yaxis.setCurrentIndex(6)
+        QTest.qWait(self.delay)
+        self.ui.tab4_yaxis2_box.setChecked(False)
         QTest.qWait(self.delay)
 
         # #==============================================================================

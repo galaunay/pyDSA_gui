@@ -344,7 +344,7 @@ class DSA(object):
     def get_current_fit(self, params, ind):
         # Reset cache if not valid anymre
         if self.fit_method is None:
-            return dsa.DropFit(None, None, None)
+            return dsa.DropFit(None, [None, None], [None, None])
         # Reset cache if not valid anymore
         if self.is_fit_params_changed(params):
             self.reset_cache()
@@ -355,7 +355,7 @@ class DSA(object):
             edge_params = self.app.tab2.get_params()
             edge = self.get_current_edge(edge_params, ind)
             if edge is None:
-                return dsa.DropFit(None, None, None)
+                return dsa.DropFit(edge.baseline, edge.x_bounds, edge.y_bounds)
             # log
             self.log.log('DSA backend: Computing fits for current image',
                          level=1)
@@ -375,13 +375,15 @@ class DSA(object):
                     fit = edge.fit_spline(**spline_args)
                 else:
                     self.log.lof("No fitting method selected", level=2)
-                    return dsa.DropFit(None, None, None)
+                    return dsa.DropFit(edge.baseline, edge.x_bounds,
+                                       edge.y_bounds)
             except Exception:
                 self.log.log("Couldn't find a fit here...", level=2)
-                return dsa.DropEdges([], im, None)
+                return dsa.DropFit(edge.baseline, edge.x_bounds,
+                                   edge.y_bounds)
             except:
                 self.log.log_unknown_exception()
-                return dsa.DropFit(None, None, None)
+                return dsa.DropFit(edge.baseline, edge.x_bounds, edge.y_bounds)
             # Update cache
             self.fit_cache[ind] = fit
             self.fit_cache_params = params
@@ -425,6 +427,11 @@ class DSA(object):
             except:
                 self.log.log_unknown_exception()
                 return [[np.nan, np.nan], [np.nan, np.nan]]
+        if fit.thetas is None:
+            self.log.log("Couldn't compute contact angles "
+                         "for the current image",
+                         level=2)
+            return [[np.nan, np.nan], [np.nan, np.nan]]
         # return angles
         lines = fit._get_angle_display_lines()
         lines = lines[0:2]
@@ -559,6 +566,11 @@ class DSA(object):
                 self.edges = None
                 self.fits = None
                 return None
+        except Exception:
+                self.log.log("No edges at all could be detected here", level=2)
+                self.edges = None
+                self.fits = None
+                return None
         except:
             self.log.log_unknown_exception()
             self.edges = None
@@ -601,6 +613,9 @@ class DSA(object):
         # Check
         if self.edges is None:
             self.compute_edges(self.app.tab2.get_params())
+            if self.edges is None:
+                self.fits = None
+                return None
         if self.fit_method is None:
             self.fits = None
             return None

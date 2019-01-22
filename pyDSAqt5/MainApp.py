@@ -101,9 +101,9 @@ class TabImport(Tab):
         # Ensure current image is in the selected range
         cropt = self.get_params('cropt')
         if self.app.current_ind > cropt[1] - 1:
-            self.app.set_current(cropt[1] - 1)
+            self.app.set_current_ind(cropt[1] - 1)
         elif self.app.current_ind < cropt[0] - 1:
-            self.app.set_current(cropt[0] - 1)
+            self.app.set_current_ind(cropt[0] - 1)
         return True
 
     def enable_options(self):
@@ -141,6 +141,7 @@ class TabImport(Tab):
             spin.setMinimum(1)
             spin.setMaximum(self.dsa.nmb_frames)
         self.ui.tab1_frameslider_last.setValue(self.dsa.nmb_frames)
+        self.ui.tab1_frameslider_first.setValue(0)
         self.ui.tab1_spinbox_frame.setValue(0)
 
     def disable_frame_sliders(self):
@@ -170,11 +171,11 @@ class TabImport(Tab):
         # Import image
         success = self.dsa.import_image(filepath)
         if success:
+            # Disable frame sliders
+            self.disable_frame_sliders()
             # Update image display
             im = self.dsa.get_current_raw_im(self.app.current_ind)
             self.ui.mplwidgetimport.update_image(im.values, replot=True)
-            # Disable frame sliders
-            self.disable_frame_sliders()
             # Enable cropping sliders
             self.enable_cropping()
             # Enable baseline
@@ -182,23 +183,24 @@ class TabImport(Tab):
             # Enable options
             self.app.enable_options()
             # De-init next tabs
-            self.tab2_initialized = False
-            self.tab3_initialized = False
+            self.app.tab2.initialized = False
+            self.app.tab3.initialized = False
 
-    def import_images(self, toggle=None):
+    def import_images(self, toggle=None, filepath=None):
         # Select images to import
-        filepath = select_files('Open images')[0]
+        if filepath is None:
+            filepath = select_files('Open images')[0]
         # Check
         if len(filepath) == 0:
             return None
         # Import images
         success = self.dsa.import_images(filepath)
         if success:
+            # Enable frame sliders
+            self.enable_frame_sliders()
             # Update images display
             im = self.dsa.get_current_raw_im(self.app.current_ind)
             self.ui.mplwidgetimport.update_image(im.values, replot=True)
-            # Enable frame sliders
-            self.enable_frame_sliders()
             # Enable cropping sliders
             self.enable_cropping()
             # Enable baseline
@@ -206,21 +208,21 @@ class TabImport(Tab):
             # Enable options
             self.app.enable_options()
             # De-init other tabs
-            self.tab2_initialized = False
-            self.tab3_initialized = False
+            self.app.tab2.initialized = False
+            self.app.tab3.initialized = False
 
-    def import_video(self, toggle=None):
+    def import_video(self, toggle=None, filepath=None):
         # Select video to import
         if filepath is None:
             filepath = select_file('Open video')[0]
         # Import video
         success = self.dsa.import_video(filepath)
         if success:
+            # Enable frame sliders
+            self.enable_frame_sliders()
             # Update video display
             im = self.dsa.get_current_raw_im(self.app.current_ind)
             self.ui.mplwidgetimport.update_image(im.values, replot=True)
-            # Enable frame sliders
-            self.enable_frame_sliders()
             # Enable cropping sliders
             self.enable_cropping()
             # Enable baseline
@@ -228,8 +230,8 @@ class TabImport(Tab):
             # Enable options
             self.app.enable_options()
             # De-init other tabs
-            self.tab2_initialized = False
-            self.tab3_initialized = False
+            self.app.tab2.initialized = False
+            self.app.tab3.initialized = False
 
     def set_current_frame(self, frame_number):
         self.app.current_ind = frame_number - 1
@@ -363,6 +365,8 @@ class TabEdges(Tab):
         self.ui.tab2_spinbox.setMaximum(cropt[1])
         self.ui.tab2_frameslider.setEnabled(True)
         self.ui.tab2_spinbox.setEnabled(True)
+        self.ui.tab2_frameslider.setValue(self.app.current_ind)
+        self.ui.tab2_spinbox.setValue(self.app.current_ind)
         self._disable_frame_updater = False
 
     def disable_frame_sliders(self):
@@ -475,6 +479,8 @@ class TabFits(Tab):
         self.ui.tab3_spinbox.setMaximum(cropt[1])
         self.ui.tab3_frameslider.setEnabled(True)
         self.ui.tab3_spinbox.setEnabled(True)
+        self.ui.tab3_frameslider.setValue(self.app.current_ind)
+        self.ui.tab3_spinbox.setValue(self.app.current_ind)
         self._disable_frame_updater = False
 
     def disable_frame_sliders(self):
@@ -494,8 +500,9 @@ class TabFits(Tab):
     def update_fit(self):
         params = self.get_params()
         try:
-            fit, fit_center = self.dsa.get_current_fit_pts(params,
-                                                           self.app.current_ind)
+            fit, fit_center = self.dsa.get_current_fit_pts(
+                params,
+                self.app.current_ind)
         except:
             self.log.log_unknown_exception()
             return None
@@ -705,11 +712,11 @@ class TabAnalyze(Tab):
         yname2 = f'{yaxis2} [{unit_y2}]'
         #
         self.ui.mplwidgetanalyze.update_plots(x, y, y2,
-                                           xname=xname,
-                                           yname=yname,
-                                           y2name=yname2,
-                                           replot=replot,
-                                           draw=draw)
+                                              xname=xname,
+                                              yname=yname,
+                                              y2name=yname2,
+                                              replot=replot,
+                                              draw=draw)
 
     def toggle_axis2(self, toggle):
         self.use_yaxis2 = toggle
@@ -727,7 +734,7 @@ class TabAnalyze(Tab):
             # get data
             data = []
             headers = []
-            for quant in self.plottable_quant:
+            for quant in self.app.plottable_quant:
                 tmpd = self.dsa.get_plotable_quantity(quant)
                 data.append(tmpd[0])
                 unit = tmpd[1]

@@ -47,7 +47,6 @@ colors = {'baseline': 'tab:blue',
           'vertical line': 'tab:green'}
 
 
-
 # class MplPlotWidget(Canvas):
 #     def __init__(self, parent=None):
 #         super(MplPlotWidget, self).__init__(Figure())
