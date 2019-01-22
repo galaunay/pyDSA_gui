@@ -24,7 +24,7 @@ from PyQt5.QtCore import QPoint
 from PyQt5.QtWidgets import QApplication, QDialog
 from pyDSAqt5.MainApp import AppWindow
 import pytest
-import time
+import os
 
 
 class MockEvent(object):
@@ -48,7 +48,8 @@ class TestGui(object):
         # TAB 1
         #======================================================================
         # Import video
-        self.w.tab1.import_video(None, '../tests/test.avi')
+        pwd = os.path.dirname(os.path.realpath(__file__))
+        self.w.tab1.import_video(None, os.path.join(pwd, './test.avi'))
         QTest.qWait(self.delay)
         # Crop in time
         self.ui.tab1_spinbox_first.setValue(50+92)

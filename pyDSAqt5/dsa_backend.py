@@ -39,7 +39,7 @@ class DSA(object):
         self.log.log('DSA backend: initializing backend', level=1)
         # Input
         self.input_type = None
-        self.input_path = None
+        self.filepath = None
         # Images
         self.default_image = dsa.Image()
         self.default_image.import_from_arrays(range(300), range(200),
@@ -115,7 +115,7 @@ class DSA(object):
             return False
         self.ims = ims
         self.input_type = 'image'
-        self.input_path = filepath
+        self.filepath = filepath
         self.reset_cache()
         self.nmb_frames = 1
         self.sizex = self.ims.shape[0]
@@ -157,7 +157,7 @@ class DSA(object):
             ims = dsa.import_from_video(filepath, cache_infos=False,
                                         iteration_hook=hook)
         except IOError:
-            self.log.log(f"Couldn't import '{self.filepath}':"
+            self.log.log(f"Couldn't import '{filepath}':"
                          " not a valid video", level=3)
             return False
         except ImportError:
