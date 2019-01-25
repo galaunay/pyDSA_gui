@@ -30,6 +30,7 @@ __status__ = "Development"
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as Canvas
 from matplotlib.backends.backend_qt4 import (
     NavigationToolbar2QT as MplNavigationBar)
+from PyQt5.QtWidgets import QWidget, QVBoxLayout
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import numpy as np
@@ -81,15 +82,36 @@ colors = {'baseline': 'tab:blue',
 #         self.draw()
 
 
-from PyQt5.QtWidgets import QWidget, QVBoxLayout
+class MplToolBar(MplNavigationBar):
+    toolitems = (
+        ('Home', 'Reset original view', 'home', 'home'),
+        ('Back', 'Back to previous view', 'back', 'back'),
+        ('Forward', 'Forward to next view', 'forward', 'forward'),
+        (None, None, None, None),
+        ('Pan', 'Pan axes with left mouse, zoom with right', 'move', 'pan'),
+        ('Zoom', 'Zoom to rectangle', 'zoom_to_rect', 'zoom'),
+        # ('Subplots', 'Configure subplots', 'subplots', 'configure_subplots'),
+        # (None, None, None, None),
+        # ('Save', 'Save the figure', 'filesave', 'save_figure'),
+    )
+
+
+class MplCanvas(Canvas):
+    def __init__(self, parent=None):
+        # Plot
+        self.figure = Figure(dpi=100, figsize=(200, 200))
+        super(MplCanvas, self).__init__(self.figure)
+        self.setParent(parent)
+        self.parent = parent
+        self.ax = self.figure.add_axes([0, 0, 1, 1])
 
 
 class MplWidgetImport(QWidget):
     def __init__(self, *args, **kwargs):
         QWidget.__init__(self, *args, **kwargs)
         self.setLayout(QVBoxLayout())
-        self.canvas = MplCanvasImport(self)
-        self.toolbar = MplNavigationBar(self.canvas, self)
+        self.canvas = MplCanvas(self)
+        self.toolbar = MplToolBar(self.canvas, self)
         self.layout().addWidget(self.toolbar)
         self.layout().addWidget(self.canvas)
         self.figure = self.canvas.figure
@@ -190,24 +212,17 @@ class MplWidgetImport(QWidget):
             self.baseline_hand.unselect_hand()
 
 
-class MplCanvasImport(Canvas):
-    def __init__(self, parent=None):
+class MplWidgetDetect(QWidget):
+    def __init__(self, *args, **kwargs):
         # Plot
-        self.figure = Figure(dpi=100, figsize=(200, 200))
-        super(MplCanvasImport, self).__init__(self.figure)
-        self.setParent(parent)
-        self.parent = parent
-        self.ax = self.figure.add_axes([0, 0, 1, 1])
-
-
-class MplWidgetDetect(Canvas):
-    def __init__(self, parent=None):
-        # Plot
-        super(MplWidgetDetect, self).__init__(Figure())
-        self.setParent(parent)
-        self.figure = Figure(dpi=100, figsize=(200, 200))
-        self.canvas = Canvas(self.figure)
-        self.ax = self.figure.add_axes([0, 0, 1, 1])
+        QWidget.__init__(self, *args, **kwargs)
+        self.setLayout(QVBoxLayout())
+        self.canvas = MplCanvas(self)
+        self.toolbar = MplToolBar(self.canvas, self)
+        self.layout().addWidget(self.toolbar)
+        self.layout().addWidget(self.canvas)
+        self.figure = self.canvas.figure
+        self.ax = self.canvas.ax
         self.axbackground = None
         self.need_replot = True
         self.tab_opened = False
@@ -271,27 +286,30 @@ class MplWidgetDetect(Canvas):
             self.ax.set_xticklabels([])
             self.ax.set_yticks([])
             self.ax.set_yticklabels([])
-            self.draw()
-            self.axbackground = self.copy_from_bbox(self.ax.bbox)
+            self.canvas.draw()
+            self.axbackground = self.canvas.copy_from_bbox(self.ax.bbox)
             self.ax.draw_artist(self.edge)
             self.ax.draw_artist(self.baseline)
             self.need_replot = False
         else:
-            self.restore_region(self.axbackground)
+            self.canvas.restore_region(self.axbackground)
             self.ax.draw_artist(self.im)
             self.ax.draw_artist(self.edge)
             self.ax.draw_artist(self.baseline)
-            self.blit(self.ax.bbox)
+            self.canvas.blit(self.ax.bbox)
 
 
-class MplWidgetFit(Canvas):
-    def __init__(self, parent=None):
+class MplWidgetFit(QWidget):
+    def __init__(self, *args, **kwargs):
         # Plot
-        super(MplWidgetFit, self).__init__(Figure())
-        self.setParent(parent)
-        self.figure = Figure(dpi=100, figsize=(200, 200))
-        self.canvas = Canvas(self.figure)
-        self.ax = self.figure.add_axes([0, 0, 1, 1])
+        QWidget.__init__(self, *args, **kwargs)
+        self.setLayout(QVBoxLayout())
+        self.canvas = MplCanvas(self)
+        self.toolbar = MplToolBar(self.canvas, self)
+        self.layout().addWidget(self.toolbar)
+        self.layout().addWidget(self.canvas)
+        self.figure = self.canvas.figure
+        self.ax = self.canvas.ax
         self.axbackground = None
         self.need_replot = True
         self.tab_opened = False
@@ -374,8 +392,8 @@ class MplWidgetFit(Canvas):
             self.ax.set_xticklabels([])
             self.ax.set_yticks([])
             self.ax.set_yticklabels([])
-            self.draw()
-            self.axbackground = self.copy_from_bbox(self.ax.bbox)
+            self.canvas.draw()
+            self.axbackground = self.canvas.copy_from_bbox(self.ax.bbox)
             self.ax.draw_artist(self.baseline)
             self.ax.draw_artist(self.fit)
             self.ax.draw_artist(self.fit_center)
@@ -383,24 +401,27 @@ class MplWidgetFit(Canvas):
             self.ax.draw_artist(self.ca_l)
             self.need_replot = False
         else:
-            self.restore_region(self.axbackground)
+            self.canvas.restore_region(self.axbackground)
             self.ax.draw_artist(self.im)
             self.ax.draw_artist(self.baseline)
             self.ax.draw_artist(self.fit)
             self.ax.draw_artist(self.fit_center)
             self.ax.draw_artist(self.ca_r)
             self.ax.draw_artist(self.ca_l)
-            self.blit(self.ax.bbox)
+            self.canvas.blit(self.ax.bbox)
 
 
-class MplWidgetAnalyze(Canvas):
-    def __init__(self, parent=None):
+class MplWidgetAnalyze(QWidget):
+    def __init__(self, *args, **kwargs):
         # Figure and axis
-        super(MplWidgetAnalyze, self).__init__(Figure())
-        self.setParent(parent)
-        self.figure = Figure(dpi=100, figsize=(200, 200))
-        self.canvas = Canvas(self.figure)
-        self.ax = self.figure.subplots(1, 1)
+        QWidget.__init__(self, *args, **kwargs)
+        self.setLayout(QVBoxLayout())
+        self.canvas = MplCanvas(self)
+        self.toolbar = MplToolBar(self.canvas, self)
+        self.layout().addWidget(self.toolbar)
+        self.layout().addWidget(self.canvas)
+        self.figure = self.canvas.figure
+        self.ax = self.canvas.ax
         self.ax.yaxis.label.set_color(colors['plot1'])
         self.ax.tick_params(axis='y', colors=colors['plot1'])
         self.ax2 = self.ax.twinx()
@@ -420,16 +441,16 @@ class MplWidgetAnalyze(Canvas):
         self.indicator2 = None
         # Vertical line
         self.vertical_line = VerticalLineHandler(
-            self,
+            self.canvas,
             self.figure,
             self.ax3,
             color=colors['vertical line'])
         # Connect event handler
-        self.connect_press = self.mpl_connect('button_press_event',
+        self.connect_press = self.canvas.mpl_connect('button_press_event',
                                               self.on_press)
-        self.connect_release = self.mpl_connect('button_release_event',
+        self.connect_release = self.canvas.mpl_connect('button_release_event',
                                                 self.on_release)
-        self.connect_motion = self.mpl_connect('motion_notify_event',
+        self.connect_motion = self.canvas.mpl_connect('motion_notify_event',
                                                self.on_motion)
         # grid
         self.ax.grid()
@@ -459,7 +480,7 @@ class MplWidgetAnalyze(Canvas):
                      draw=True, replot=False):
         # Because of issues with the vertical line hand...
         if draw:
-            self.draw()
+            self.canvas.draw()
         # store
         self.current_x = x
         self.current_y = y
@@ -506,7 +527,7 @@ class MplWidgetAnalyze(Canvas):
             self.ax2.set_ylabel("")
         # Draw if asked
         if draw:
-            self.draw()
+            self.canvas.draw()
 
     def update_lims(self, x, y, y2):
         # margin

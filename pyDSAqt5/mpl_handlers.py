@@ -372,23 +372,23 @@ class VerticalLineHandler(Handler):
     def update_upstream(self):
         """ Update the interface to reflect line modification"""
         # Get values at position
-        self.canvas.update_upstream()
+        self.canvas.parent.update_upstream()
 
     def prepare_for_drag(self):
-        self.canvas.indicator1.set_animated(True)
-        self.canvas.indicator2.set_animated(True)
+        self.canvas.parent.indicator1.set_animated(True)
+        self.canvas.parent.indicator2.set_animated(True)
         super(VerticalLineHandler, self).prepare_for_drag()
-        self.canvas.ax.draw_artist(self.canvas.indicator1)
-        self.canvas.ax2.draw_artist(self.canvas.indicator2)
+        self.canvas.parent.ax.draw_artist(self.canvas.parent.indicator1)
+        self.canvas.parent.ax2.draw_artist(self.canvas.parent.indicator2)
 
     def drag_to(self, event):
         super(VerticalLineHandler, self).drag_to(event, blit=False)
-        self.canvas.ax.draw_artist(self.canvas.indicator1)
-        self.canvas.ax2.draw_artist(self.canvas.indicator2)
+        self.canvas.parent.ax.draw_artist(self.canvas.parent.indicator1)
+        self.canvas.parent.ax2.draw_artist(self.canvas.parent.indicator2)
         # blit just the redrawn area
         self.canvas.blit(self.ax.bbox)
 
     def finish_drag(self):
         super(VerticalLineHandler, self).finish_drag()
-        self.canvas.indicator1.set_animated(False)
-        self.canvas.indicator2.set_animated(False)
+        self.canvas.parent.indicator1.set_animated(False)
+        self.canvas.parent.indicator2.set_animated(False)
