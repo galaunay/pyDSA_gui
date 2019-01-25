@@ -106,7 +106,7 @@ class MplCanvas(Canvas):
         self.ax = self.figure.add_axes([0, 0, 1, 1])
 
 
-class MplWidgetImport(QWidget):
+class MplWidget(QWidget):
     def __init__(self, *args, **kwargs):
         QWidget.__init__(self, *args, **kwargs)
         self.setLayout(QVBoxLayout())
@@ -116,6 +116,14 @@ class MplWidgetImport(QWidget):
         self.layout().addWidget(self.canvas)
         self.figure = self.canvas.figure
         self.ax = self.canvas.ax
+
+    def reset_zoom(self):
+        self.toolbar.home()
+
+
+class MplWidgetImport(MplWidget):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         # Image
         self.data = np.random.rand(200, 300)
         self.im = self.ax.imshow(self.data,
@@ -174,7 +182,10 @@ class MplWidgetImport(QWidget):
         # Check
         if event.inaxes != self.ax:
             return None
-        #
+        # toolbar want the focus !
+        if self.toolbar._active is not None:
+            return None
+        # On a scaling handle
         if self.scaling_hand.select_hand_at_point(event):
             self.scaling_hand.prepare_for_drag()
         # Add a new scaling point
@@ -212,17 +223,10 @@ class MplWidgetImport(QWidget):
             self.baseline_hand.unselect_hand()
 
 
-class MplWidgetDetect(QWidget):
+class MplWidgetDetect(MplWidget):
     def __init__(self, *args, **kwargs):
-        # Plot
-        QWidget.__init__(self, *args, **kwargs)
-        self.setLayout(QVBoxLayout())
-        self.canvas = MplCanvas(self)
-        self.toolbar = MplToolBar(self.canvas, self)
-        self.layout().addWidget(self.toolbar)
-        self.layout().addWidget(self.canvas)
-        self.figure = self.canvas.figure
-        self.ax = self.canvas.ax
+        super().__init__(*args, **kwargs)
+        #
         self.axbackground = None
         self.need_replot = True
         self.tab_opened = False
@@ -242,8 +246,7 @@ class MplWidgetDetect(QWidget):
                                  marker='o',
                                  ms=3,
                                  alpha=0.5,
-                                 ls='none',
-                                 animated=True)[0]
+                                 ls='none')[0]
         # Clean stuff !
         self.ax.set_xticks([])
         self.ax.set_xticklabels([])
@@ -299,17 +302,10 @@ class MplWidgetDetect(QWidget):
             self.canvas.blit(self.ax.bbox)
 
 
-class MplWidgetFit(QWidget):
+class MplWidgetFit(MplWidget):
     def __init__(self, *args, **kwargs):
-        # Plot
-        QWidget.__init__(self, *args, **kwargs)
-        self.setLayout(QVBoxLayout())
-        self.canvas = MplCanvas(self)
-        self.toolbar = MplToolBar(self.canvas, self)
-        self.layout().addWidget(self.toolbar)
-        self.layout().addWidget(self.canvas)
-        self.figure = self.canvas.figure
-        self.ax = self.canvas.ax
+        super().__init__(*args, **kwargs)
+        #
         self.axbackground = None
         self.need_replot = True
         self.tab_opened = False
@@ -411,17 +407,10 @@ class MplWidgetFit(QWidget):
             self.canvas.blit(self.ax.bbox)
 
 
-class MplWidgetAnalyze(QWidget):
+class MplWidgetAnalyze(MplWidget):
     def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         # Figure and axis
-        QWidget.__init__(self, *args, **kwargs)
-        self.setLayout(QVBoxLayout())
-        self.canvas = MplCanvas(self)
-        self.toolbar = MplToolBar(self.canvas, self)
-        self.layout().addWidget(self.toolbar)
-        self.layout().addWidget(self.canvas)
-        self.figure = self.canvas.figure
-        self.ax = self.canvas.ax
         self.ax.yaxis.label.set_color(colors['plot1'])
         self.ax.tick_params(axis='y', colors=colors['plot1'])
         self.ax2 = self.ax.twinx()
@@ -447,17 +436,20 @@ class MplWidgetAnalyze(QWidget):
             color=colors['vertical line'])
         # Connect event handler
         self.connect_press = self.canvas.mpl_connect('button_press_event',
-                                              self.on_press)
+                                                     self.on_press)
         self.connect_release = self.canvas.mpl_connect('button_release_event',
-                                                self.on_release)
+                                                       self.on_release)
         self.connect_motion = self.canvas.mpl_connect('motion_notify_event',
-                                               self.on_motion)
+                                                      self.on_motion)
         # grid
         self.ax.grid()
 
     def on_press(self, event):
         # Check
         if event.inaxes != self.ax3:
+            return None
+        # toolbar want the focus !
+        if self.toolbar._active is not None:
             return None
         #
         if self.vertical_line.select_hand_at_point(event):

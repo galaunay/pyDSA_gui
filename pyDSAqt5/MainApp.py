@@ -95,6 +95,8 @@ class TabImport(Tab):
         self.ui.tab1_frameslider.setValue(self.app.current_ind + 1)
 
     def leave_tab(self):
+        # reset zoom
+        self.ui.mplwidgetimport.reset_zoom()
         # Checks entries
         if not self.is_inputs_valid():
             return False
@@ -337,6 +339,12 @@ class TabEdges(Tab):
         self.already_opened = True
         self.ui.mplwidgetdetect.tab_opened = True
 
+    def leave_tab(self):
+        # reset zoom
+        self.ui.mplwidgetdetect.reset_zoom()
+        #
+        return True
+
     def enable_options(self):
         self.ui.tab2_canny_box.setEnabled(True)
         self.ui.tab2_contour_box.setEnabled(True)
@@ -451,6 +459,12 @@ class TabFits(Tab):
         #
         self.already_opened = True
         self.ui.mplwidgetfit.tab_opened = True
+
+    def leave_tab(self):
+        # reset zoom
+        self.ui.mplwidgetfit.reset_zoom()
+        #
+        return True
 
     def enable_options(self):
         self.ui.tab3_circle_box.setEnabled(True)
@@ -816,6 +830,8 @@ class AppWindow(QMainWindow):
         success = self.tabs[self.last_tab].leave_tab()
         if not success:
             self.ui.tabWidget.setCurrentIndex(self.last_tab)
+            self.log.log('Something wrong happened during tab switching',
+                         level=3)
             return None
         # enter the new tab
         self.tabs[tab_nmb].enter_tab()

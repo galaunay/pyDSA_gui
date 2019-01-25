@@ -199,8 +199,8 @@ class RectangleHandler(Handler):
         self.update_hands()
 
     def ensure_lims_in_image(self):
-        sizex = abs(self.ax.viewLim.width)
-        sizey = abs(self.ax.viewLim.height)
+        sizex = abs(self.ax.dataLim.width)
+        sizey = abs(self.ax.dataLim.height)
         (xlim1, xlim2), (ylim1, ylim2) = self.lims
         # checks
         #    x
@@ -235,7 +235,7 @@ class BaselineHandler(Handler):
                       for i in range(2)]
 
     def update_line(self):
-        sizex = abs(self.ax.viewLim.width)
+        sizex = abs(self.ax.dataLim.width)
         pt1, pt2 = Baseline.get_baseline_from_points([self.pt1, self.pt2],
                                                      xmin=0,
                                                      xmax=sizex)
