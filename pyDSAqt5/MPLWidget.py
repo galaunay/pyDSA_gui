@@ -28,6 +28,8 @@ __status__ = "Development"
 
 
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as Canvas
+from matplotlib.backends.backend_qt4 import (
+    NavigationToolbar2QT as MplNavigationBar)
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import numpy as np
@@ -79,39 +81,44 @@ colors = {'baseline': 'tab:blue',
 #         self.draw()
 
 
-class MplWidgetImport(Canvas):
-    def __init__(self, parent=None):
-        # Plot
-        super(MplWidgetImport, self).__init__(Figure())
-        self.setParent(parent)
-        self.parent = parent
-        self.figure = Figure(dpi=100, figsize=(200, 200))
-        self.canvas = Canvas(self.figure)
-        self.ax = self.figure.add_axes([0, 0, 1, 1])
+from PyQt5.QtWidgets import QWidget, QVBoxLayout
+
+
+class MplWidgetImport(QWidget):
+    def __init__(self, *args, **kwargs):
+        QWidget.__init__(self, *args, **kwargs)
+        self.setLayout(QVBoxLayout())
+        self.canvas = MplCanvasImport(self)
+        self.toolbar = MplNavigationBar(self.canvas, self)
+        self.layout().addWidget(self.toolbar)
+        self.layout().addWidget(self.canvas)
+        self.figure = self.canvas.figure
+        self.ax = self.canvas.ax
         # Image
         self.data = np.random.rand(200, 300)
         self.im = self.ax.imshow(self.data,
                                  interpolation='None',
                                  cmap=plt.cm.binary_r)
+        # add handlers
         # Cropped area
-        self.rect_hand = RectangleHandler(self, self.figure, self.ax)
+        self.rect_hand = RectangleHandler(self.canvas, self.figure, self.ax)
         # Baseline
-        self.baseline_hand = BaselineHandler(self, self.figure, self.ax)
+        self.baseline_hand = BaselineHandler(self.canvas, self.figure, self.ax)
         # Scaling
         self.is_scaling = False
-        self.scaling_hand = ScalingHandler(self, self.figure, self.ax)
+        self.scaling_hand = ScalingHandler(self.canvas, self.figure, self.ax)
         # Clean stuff !
         self.ax.set_xticks([])
         self.ax.set_xticklabels([])
         self.ax.set_yticks([])
         self.ax.set_yticklabels([])
         # Connect event handlerd
-        self.connect_press = self.mpl_connect('button_press_event',
-                                              self.on_press)
-        self.connect_release = self.mpl_connect('button_release_event',
-                                                self.on_release)
-        self.connect_motion = self.mpl_connect('motion_notify_event',
-                                               self.on_motion)
+        self.connect_press = self.canvas.mpl_connect('button_press_event',
+                                                     self.on_press)
+        self.connect_release = self.canvas.mpl_connect('button_release_event',
+                                                       self.on_release)
+        self.connect_motion = self.canvas.mpl_connect('motion_notify_event',
+                                                      self.on_motion)
 
     def update_image(self, im, replot=False):
         self.data = im.transpose()[::-1]
@@ -126,16 +133,19 @@ class MplWidgetImport(Canvas):
             self.ax.set_yticklabels([])
         else:
             self.im.set_data(self.data)
-        self.draw()
+        self.canvas.draw()
 
     def update_crop_area(self, xlim1, xlim2, ylim1, ylim2):
         self.rect_hand.update_lims(xlim1, xlim2,
                                    ylim1, ylim2)
-        self.draw()
+        self.canvas.draw()
 
     def update_baseline(self, pt1, pt2):
         self.baseline_hand.update_pts(pt1, pt2)
-        self.draw()
+        self.canvas.draw()
+
+    def get_scale(self):
+        return self.scaling_hand.get_scale()
 
     def on_press(self, event):
         # see: https://stackoverflow.com/questions/28001655/draggable-line-with-draggable-points
@@ -148,7 +158,7 @@ class MplWidgetImport(Canvas):
         # Add a new scaling point
         elif self.is_scaling and len(self.scaling_hand.pts) < 2:
             self.scaling_hand.add_point(event)
-            self.draw()
+            self.canvas.draw()
         # On a crop handle
         elif self.rect_hand.select_hand_at_point(event):
             self.rect_hand.prepare_for_drag()
@@ -179,8 +189,15 @@ class MplWidgetImport(Canvas):
             self.baseline_hand.finish_drag()
             self.baseline_hand.unselect_hand()
 
-    def get_scale(self):
-        return self.scaling_hand.get_scale()
+
+class MplCanvasImport(Canvas):
+    def __init__(self, parent=None):
+        # Plot
+        self.figure = Figure(dpi=100, figsize=(200, 200))
+        super(MplCanvasImport, self).__init__(self.figure)
+        self.setParent(parent)
+        self.parent = parent
+        self.ax = self.figure.add_axes([0, 0, 1, 1])
 
 
 class MplWidgetDetect(Canvas):
