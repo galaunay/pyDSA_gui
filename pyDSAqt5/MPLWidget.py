@@ -103,7 +103,7 @@ class MplCanvas(Canvas):
         super(MplCanvas, self).__init__(self.figure)
         self.setParent(parent)
         self.parent = parent
-        self.ax = self.figure.add_axes([0, 0, 1, 1])
+        self.ax = self.figure.subplots(1, 1)
 
 
 class MplWidget(QWidget):
