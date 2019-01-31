@@ -480,9 +480,9 @@ class DSA(object):
                 xys = self.fits.get_drop_centers()
                 return xys[:, 0], unit_x
             elif quant == 'CA (right)':
-                return self.fits.get_contact_angles()[:, 1], "°"
+                return 180 - self.fits.get_contact_angles()[:, 1], "°"
             elif quant == 'CA (left)':
-                return 180 - self.fits.get_contact_angles()[:, 0], "°"
+                return self.fits.get_contact_angles()[:, 0], "°"
             elif quant == 'CA (mean)':
                 thetas = self.fits.get_contact_angles()
                 thetas[:, 1] = 180 - thetas[:, 1]
