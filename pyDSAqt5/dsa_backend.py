@@ -212,14 +212,8 @@ class DSA(object):
         # store new parameters
         hook = self.get_progressbar_hook('Preparing images for edge detection',
                                          'Images ready for edge detection')
-        # Only use a certain amount of frames
-        ims_precomp = self.ims.copy()
-        try:
-            ims_precomp.reduce_temporal_resolution(params['N'], mean=False,
-                                                   inplace=True)
-        except:
-            self.log.log_unknown_exception()
         # set baseline
+        ims_precomp = self.ims.copy()
         try:
             base1, base2 = params['baseline_pts']
             ims_precomp.set_baseline(base1, base2)
@@ -466,7 +460,7 @@ class DSA(object):
         unit_t = dt.strUnit()[1:-1]
         try:
             if quant == 'Frame number':
-                return np.arange(ff, ff + len(self.ims_precomp)*N, N), ""
+                return np.arange(ff, ff + len(self.edges)*N, N), ""
             elif quant == 'Time':
                 return self.ims_precomp.times, unit_t
             elif quant == 'Position (x, right)':
@@ -559,9 +553,17 @@ class DSA(object):
         # Check if need to recompute
         if not self.is_edges_param_changed(params):
             return None
-        # Edge detection
+        # Only use certains frames
         self.precompute_images(self.app.tab1.get_params())
-        tmp_ims = self.ims_precomp
+        try:
+            tmp_ims = self.ims_precomp.reduce_temporal_resolution(
+                precomp_params['N'],
+                mean=False,
+                inplace=False)
+        except:
+            tmp_ims = self.ims_precomp
+            self.log.log_unknown_exception()
+        # Edge detection
         hook = self.get_progressbar_hook('Detecting edges', 'Detected edges')
         try:
             if self.edge_detection_method == 'canny':
