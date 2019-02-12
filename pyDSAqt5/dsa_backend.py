@@ -212,14 +212,19 @@ class DSA(object):
         # store new parameters
         hook = self.get_progressbar_hook('Preparing images for edge detection',
                                          'Images ready for edge detection')
+        # Only use a certain amount of frames
+        ims_precomp = self.ims.copy()
+        try:
+            ims_precomp.reduce_temporal_resolution(params['N'], mean=False,
+                                                   inplace=True)
+        except:
+            self.log.log_unknown_exception()
         # set baseline
         try:
-            ims_precomp = self.ims.copy()
             base1, base2 = params['baseline_pts']
             ims_precomp.set_baseline(base1, base2)
         except:
             self.log.log_unknown_exception()
-            ims_precomp = self.ims.copy()
         hook(0, 4)
         # apply crop
         try:
@@ -255,6 +260,9 @@ class DSA(object):
             if params[d].strUnit() != self.precomp_old_params[d].strUnit():
                 return True
             elif params[d].asNumber() != self.precomp_old_params[d].asNumber():
+                return True
+        for p in ['N']:
+            if params[p] != self.precomp_old_params[p]:
                 return True
         for crop in ['lims', 'baseline_pts', 'cropt']:
             if np.any(params[crop] != self.precomp_old_params[crop]):
@@ -451,13 +459,14 @@ class DSA(object):
             return [], ""
         #
         dx = self.precomp_old_params['dx']
+        N = self.precomp_old_params['N']
         dt = self.precomp_old_params['dt']
         ff, lf = self.precomp_old_params['cropt']
         unit_x = dx.strUnit()[1:-1]
         unit_t = dt.strUnit()[1:-1]
         try:
             if quant == 'Frame number':
-                return np.arange(ff, ff + len(self.ims_precomp), 1), ""
+                return np.arange(ff, ff + len(self.ims_precomp)*N, N), ""
             elif quant == 'Time':
                 return self.ims_precomp.times, unit_t
             elif quant == 'Position (x, right)':

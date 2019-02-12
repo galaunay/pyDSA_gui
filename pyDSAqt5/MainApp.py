@@ -113,8 +113,13 @@ class TabImport(Tab):
         self.ui.tab1_scaling_box.setEnabled(True)
         if self.dsa.nmb_frames > 1:
             self.ui.tab1_time_box.setEnabled(True)
+            self.ui.tab1_number_frame_box.setEnabled(True)
+            self.ui.tab1_set_N.setValue(1)
+            self.ui.tab1_set_N.setMinimum(1)
+            self.ui.tab1_set_N.setMaximum(self.dsa.nmb_frames)
         else:
             self.ui.tab1_time_box.setEnabled(False)
+            self.ui.tab1_number_frame_box.setEnabled(False)
 
     def is_inputs_valid(self):
         try:
@@ -275,6 +280,10 @@ class TabImport(Tab):
             else:
                 dx = make_unit('')
             dic['dx'] = dx
+        # number of frames
+        if arg is None or arg == 'N':
+            N = int(self.ui.tab1_set_N.value())
+            dic['N'] = N
         # cropx and cropy
         if arg is None or arg == 'lims':
             xlims, ylims = self.ui.mplwidgetimport.rect_hand.lims

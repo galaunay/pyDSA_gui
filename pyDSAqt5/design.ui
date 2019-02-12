@@ -224,6 +224,25 @@
             </widget>
            </item>
            <item>
+            <widget class="QGroupBox" name="tab1_number_frame_box">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="title">
+              <string>Use every N frames</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_24">
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout">
+                <item>
+                 <widget class="QSpinBox" name="tab1_set_N"/>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
             <spacer name="verticalSpacer">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -1695,8 +1714,8 @@
    <slot>tab2.update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>108</x>
-     <y>292</y>
+     <x>138</x>
+     <y>232</y>
     </hint>
     <hint type="destinationlabel">
      <x>4</x>
@@ -1711,8 +1730,8 @@
    <slot>tab2.update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>108</x>
-     <y>343</y>
+     <x>138</x>
+     <y>283</y>
     </hint>
     <hint type="destinationlabel">
      <x>3</x>
@@ -1727,8 +1746,8 @@
    <slot>tab2.update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>108</x>
-     <y>427</y>
+     <x>138</x>
+     <y>367</y>
     </hint>
     <hint type="destinationlabel">
      <x>5</x>
@@ -1743,8 +1762,8 @@
    <slot>tab2.update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>108</x>
-     <y>570</y>
+     <x>138</x>
+     <y>510</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -1759,8 +1778,8 @@
    <slot>tab2.update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>108</x>
-     <y>612</y>
+     <x>138</x>
+     <y>552</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -1776,7 +1795,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>145</x>
-     <y>518</y>
+     <y>458</y>
     </hint>
     <hint type="destinationlabel">
      <x>4</x>
@@ -1792,7 +1811,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>89</x>
-     <y>518</y>
+     <y>458</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -1807,8 +1826,8 @@
    <slot>tab2.toggle_contour(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>73</x>
-     <y>397</y>
+     <x>91</x>
+     <y>379</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -2303,8 +2322,8 @@
    <slot>tab2.update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>141</x>
-     <y>203</y>
+     <x>146</x>
+     <y>181</y>
     </hint>
     <hint type="destinationlabel">
      <x>-1</x>
