@@ -64,6 +64,12 @@ extract them, and install them (in order) with:
 
 ``python setup.py install``
 
+## Documentation
+
+pyDSAqt5 is designed to be simple and straightforward to use.
+If you don't understand the effect of an option, 
+please refers to the inline documentation of [pyDSA](https://framagit.org/gabylaunay/pyDSA), 
+where all the features are documented in details.
 
 ## Issues and bugs
 
