@@ -47,6 +47,7 @@ colors = {'baseline': 'tab:blue',
           'ca': 'tab:blue',
           'plot1': 'tab:blue',
           'plot2': 'tab:orange',
+          'figure_background': '#FAFAFA',
           'vertical line': 'tab:green'}
 
 
@@ -97,20 +98,26 @@ class MplToolBar(MplNavigationBar):
 
 
 class MplCanvas(Canvas):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, fill=False):
         # Plot
-        self.figure = Figure(dpi=100, figsize=(200, 200))
+        self.figure = Figure(dpi=100, figsize=(200, 200),
+                             facecolor=colors['figure_background'])
         super(MplCanvas, self).__init__(self.figure)
         self.setParent(parent)
         self.parent = parent
-        self.ax = self.figure.subplots(1, 1)
+        print(f'fill: {fill}')
+        if fill:
+            self.ax = self.figure.add_axes([0, 0, 1, 1])
+        else:
+            self.ax = self.figure.subplots(1, 1)
 
 
 class MplWidget(QWidget):
     def __init__(self, *args, **kwargs):
+        fill = kwargs.pop('fill')
         QWidget.__init__(self, *args, **kwargs)
         self.setLayout(QVBoxLayout())
-        self.canvas = MplCanvas(self)
+        self.canvas = MplCanvas(parent=self, fill=fill)
         self.toolbar = MplToolBar(self.canvas, self)
         self.layout().addWidget(self.toolbar)
         self.layout().addWidget(self.canvas)
@@ -123,7 +130,7 @@ class MplWidget(QWidget):
 
 class MplWidgetImport(MplWidget):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(fill=True, *args, **kwargs)
         # Image
         self.data = np.random.rand(200, 300)
         self.im = self.ax.imshow(self.data,
@@ -225,7 +232,7 @@ class MplWidgetImport(MplWidget):
 
 class MplWidgetDetect(MplWidget):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(fill=True, *args, **kwargs)
         #
         self.axbackground = None
         self.need_replot = True
@@ -304,7 +311,7 @@ class MplWidgetDetect(MplWidget):
 
 class MplWidgetFit(MplWidget):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(fill=True, *args, **kwargs)
         #
         self.axbackground = None
         self.need_replot = True
@@ -409,7 +416,7 @@ class MplWidgetFit(MplWidget):
 
 class MplWidgetAnalyze(MplWidget):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(fill=False, *args, **kwargs)
         # Figure and axis
         self.ax.yaxis.label.set_color(colors['plot1'])
         self.ax.tick_params(axis='y', colors=colors['plot1'])
