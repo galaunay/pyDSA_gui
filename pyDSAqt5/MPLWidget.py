@@ -433,6 +433,8 @@ class MplWidgetAnalyze(MplWidget):
         self.current_y2 = []
         self.plot1 = None
         self.plot2 = None
+        self.plot1_orig = None  # In case we smooth the other one
+        self.plot2_orig = None
         self.indicator1 = None
         self.indicator2 = None
         # Vertical line
@@ -475,7 +477,8 @@ class MplWidgetAnalyze(MplWidget):
             self.vertical_line.finish_drag()
             self.vertical_line.unselect_hand()
 
-    def update_plots(self, x, y, y2, xname, yname, y2name,
+    def update_plots(self, x, y, y2, y_orig, y2_orig,
+                     xname, yname, y2name,
                      draw=True, replot=False):
         # Because of issues with the vertical line hand...
         if draw:
@@ -497,6 +500,12 @@ class MplWidgetAnalyze(MplWidget):
                                       color=colors['plot1'])[0]
             self.plot2 = self.ax2.plot(x, y2,
                                        color=colors['plot2'])[0]
+            self.plot1_orig = self.ax.plot(x, y,
+                                           color=colors['plot1'],
+                                           alpha=0.2)[0]
+            self.plot2_orig = self.ax2.plot(x, y2,
+                                            color=colors['plot2'],
+                                            alpha=0.2)[0]
             self.indicator1 = self.ax.plot([], [], color=colors['plot1'],
                                            marker="o", ls='none')[0]
             self.indicator2 = self.ax2.plot([], [], color=colors['plot2'],
@@ -506,6 +515,8 @@ class MplWidgetAnalyze(MplWidget):
             # Update plots
             self.plot1.set_data(x, y)
             self.plot2.set_data(x, y2)
+            self.plot1_orig.set_data(x, y_orig)
+            self.plot2_orig.set_data(x, y2_orig)
         # Hide second axis if necessary
         is_y2 = np.logical_not(np.all(np.isnan(y2)))
         if is_y2:
@@ -513,7 +524,7 @@ class MplWidgetAnalyze(MplWidget):
         else:
             self.ax2.set_visible(False)
         # Update limits
-        self.update_lims(x, y, y2)
+        self.update_lims(x, y, y2, y_orig, y2_orig)
         # Update the vertical line position
         if len(x) > 1:
             self.vertical_line.update_line_pos((np.max(x) + np.min(x))/2)
@@ -528,7 +539,7 @@ class MplWidgetAnalyze(MplWidget):
         if draw:
             self.canvas.draw()
 
-    def update_lims(self, x, y, y2):
+    def update_lims(self, x, y, y2, y_orig, y2_orig):
         # margin
         margin = 1/50
         # x
@@ -544,6 +555,7 @@ class MplWidgetAnalyze(MplWidget):
             dx = 0.1
         self.ax.set_xlim(x_min - dx*margin, x_max + dx*margin)
         # y
+        y = np.concatenate((y, y_orig))
         if len(y) <= 1 or np.all(np.isnan(y)):
             y_min, y_max = -1, 1
         else:
@@ -556,6 +568,7 @@ class MplWidgetAnalyze(MplWidget):
             dy = 0.1
         self.ax.set_ylim(y_min - dy*margin, y_max + dy*margin)
         # y2
+        y2 = np.concatenate((y2, y2_orig))
         if len(y2) <= 1 or np.all(np.isnan(y2)):
             y2_min, y2_max = -1, 1
         else:

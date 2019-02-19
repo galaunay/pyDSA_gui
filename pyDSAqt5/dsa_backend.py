@@ -29,6 +29,7 @@ __status__ = "Development"
 
 import pyDSA as dsa
 import numpy as np
+from scipy import ndimage
 
 
 class DSA(object):
@@ -68,6 +69,8 @@ class DSA(object):
         self.fits = None
         self.fits_old_params = None
         self.fits_old_method = self.fit_method
+        # Plottable quantities
+        self.plottable_quantity_cache = {}
 
     def is_initialized(self):
         return self.ims is not None
@@ -446,64 +449,85 @@ class DSA(object):
         lines[:, 1] = deltay - lines[:, 1]
         return lines
 
-    def get_plotable_quantity(self, quant):
+    def get_plotable_quantity(self, quant, smooth=0):
         # fits should be computed already...
         if self.fits is None:
             self.log.log('Fit need to be computed first', level=3)
             return [], ""
-        #
+        # check if already cached !
+        cache_name = f"{quant}_smooth{smooth}"
+        try:
+            return self.plottable_quantity_cache[cache_name]
+        except:
+            pass
+        # Get units
         dx = self.precomp_old_params['dx']
         N = self.precomp_old_params['N']
         dt = self.precomp_old_params['dt']
         ff, lf = self.precomp_old_params['cropt']
         unit_x = dx.strUnit()[1:-1]
         unit_t = dt.strUnit()[1:-1]
+        # Get quantity
         try:
             if quant == 'Frame number':
-                return np.arange(ff, ff + len(self.edges)*N, N), ""
+                vals, unit = np.arange(ff, ff + len(self.edges)*N, N), ""
             elif quant == 'Time':
-                return self.ims_precomp.times, unit_t
+                vals, unit = self.ims_precomp.times, unit_t
             elif quant == 'Position (x, right)':
                 _, pt2s = self.fits.get_drop_positions()
-                return pt2s[:, 0], unit_x
+                vals, unit = pt2s[:, 0], unit_x
             elif quant == 'Position (x, left)':
                 pt1s, _ = self.fits.get_drop_positions()
-                return pt1s[:, 0], unit_x
+                vals, unit = pt1s[:, 0], unit_x
             elif quant == 'CL velocity (x, left)':
                 pt1s, _ = self.fits.get_drop_positions()
                 pt1s = pt1s[:, 0]
                 vel = np.gradient(pt1s, self.fits.dt)
-                return vel, f"{unit_x}/{unit_t}"
+                vals, unit = vel, f"{unit_x}/{unit_t}"
             elif quant == 'CL velocity (x, right)':
                 _, pt2s = self.fits.get_drop_positions()
                 pt2s = pt2s[:, 0]
                 vel = np.gradient(pt2s, self.fits.dt)
-                return vel, f"{unit_x}/{unit_t}"
+                vals, unit = vel, f"{unit_x}/{unit_t}"
             elif quant == 'Position (x, center)':
                 xys = self.fits.get_drop_centers()
-                return xys[:, 0], unit_x
+                vals, unit = xys[:, 0], unit_x
             elif quant == 'CA (right)':
-                return 180 - self.fits.get_contact_angles()[:, 1], "°"
+                vals, unit = 180 - self.fits.get_contact_angles()[:, 1], "°"
             elif quant == 'CA (left)':
-                return self.fits.get_contact_angles()[:, 0], "°"
+                vals, unit = self.fits.get_contact_angles()[:, 0], "°"
             elif quant == 'CA (mean)':
                 thetas = self.fits.get_contact_angles()
                 thetas[:, 1] = 180 - thetas[:, 1]
-                return np.mean(thetas, axis=1), "°"
+                vals, unit = np.mean(thetas, axis=1), "°"
             elif quant == 'Base radius':
-                return self.fits.get_base_diameters()/2, unit_x
+                vals, unit = self.fits.get_base_diameters()/2, unit_x
             elif quant == 'Height':
-                return self.fits.get_drop_heights(), unit_x
+                vals, unit = self.fits.get_drop_heights(), unit_x
             elif quant == 'Area':
-                return self.fits.get_drop_areas(), f'{unit_x}^2'
+                vals, unit = self.fits.get_drop_areas(), f'{unit_x}^2'
             elif quant == 'Volume':
-                return self.fits.get_drop_volumes(), f'{unit_x}^3'
+                vals, unit = self.fits.get_drop_volumes(), f'{unit_x}^3'
             else:
                 self.log.log(f'Non-plotable quantity: {quant}', level=3)
-                return [], ""
+                vals, unit = [], ""
         except:
             self.log.log_unknown_exception()
-            return [], ""
+            vals, unit = [], ""
+        # Smooth if asked
+        if smooth != 0:
+            smoothed_vals = ndimage.gaussian_filter(vals, smooth, mode='nearest')
+            vals_ori = vals
+            vals = smoothed_vals
+        else:
+            vals_ori = [np.nan]*len(vals)
+        # store computed values
+        self.plottable_quantity_cache[cache_name] = vals, vals_ori, unit
+        # return
+        return vals, vals_ori, unit
+
+    def clear_plottable_quantity_cache(self):
+        self.plottable_quantity_cache = {}
 
     def is_edges_param_changed(self, params):
         canny_args = params[0].copy()

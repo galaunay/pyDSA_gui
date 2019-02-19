@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>893</width>
-    <height>701</height>
+    <width>1065</width>
+    <height>824</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -262,8 +262,8 @@
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
            <layout class="QGridLayout" name="gridLayout">
-            <item row="2" column="1">
-             <spacer name="verticalSpacer_2">
+            <item row="0" column="1">
+             <spacer name="verticalSpacer_3">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
               </property>
@@ -275,8 +275,8 @@
               </property>
              </spacer>
             </item>
-            <item row="1" column="0">
-             <spacer name="horizontalSpacer">
+            <item row="1" column="2">
+             <spacer name="horizontalSpacer_2">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
@@ -288,8 +288,8 @@
               </property>
              </spacer>
             </item>
-            <item row="1" column="2">
-             <spacer name="horizontalSpacer_2">
+            <item row="1" column="0">
+             <spacer name="horizontalSpacer">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
@@ -308,8 +308,8 @@
               </property>
              </widget>
             </item>
-            <item row="0" column="1">
-             <spacer name="verticalSpacer_3">
+            <item row="2" column="1">
+             <spacer name="verticalSpacer_2">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
               </property>
@@ -607,7 +607,7 @@
                  <number>50</number>
                 </property>
                 <property name="value">
-                 <number>1</number>
+                 <number>0</number>
                 </property>
                </widget>
               </item>
@@ -1267,6 +1267,30 @@
                 </property>
                </widget>
               </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_14">
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QLabel" name="label_23">
+                  <property name="text">
+                   <string>Smooth</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QSpinBox" name="tab4_smoothx">
+                  <property name="maximum">
+                   <number>1000</number>
+                  </property>
+                  <property name="value">
+                   <number>0</number>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
              </layout>
             </widget>
            </item>
@@ -1291,6 +1315,30 @@
               <item>
                <widget class="QComboBox" name="tab4_combo_yaxis"/>
               </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_17">
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QLabel" name="label_24">
+                  <property name="text">
+                   <string>Smooth</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QSpinBox" name="tab4_smoothy">
+                  <property name="maximum">
+                   <number>1000</number>
+                  </property>
+                  <property name="value">
+                   <number>0</number>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
              </layout>
             </widget>
            </item>
@@ -1314,6 +1362,30 @@
              <layout class="QVBoxLayout" name="verticalLayout_23">
               <item>
                <widget class="QComboBox" name="tab4_combo_yaxis2"/>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_19">
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QLabel" name="label_26">
+                  <property name="text">
+                   <string>Smooth</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QSpinBox" name="tab4_smoothy2">
+                  <property name="maximum">
+                   <number>1000</number>
+                  </property>
+                  <property name="value">
+                   <number>0</number>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </item>
              </layout>
             </widget>
@@ -1524,7 +1596,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>893</width>
+     <width>1065</width>
      <height>20</height>
     </rect>
    </property>
@@ -1635,7 +1707,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>272</x>
-     <y>658</y>
+     <y>781</y>
     </hint>
     <hint type="destinationlabel">
      <x>255</x>
@@ -1650,12 +1722,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>387</x>
-     <y>653</y>
+     <x>613</x>
+     <y>776</y>
     </hint>
     <hint type="destinationlabel">
      <x>272</x>
-     <y>658</y>
+     <y>781</y>
     </hint>
    </hints>
   </connection>
@@ -1667,11 +1739,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>272</x>
-     <y>658</y>
+     <y>781</y>
     </hint>
     <hint type="destinationlabel">
-     <x>387</x>
-     <y>653</y>
+     <x>613</x>
+     <y>776</y>
     </hint>
    </hints>
   </connection>
@@ -1875,11 +1947,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>272</x>
-     <y>658</y>
+     <y>781</y>
     </hint>
     <hint type="destinationlabel">
-     <x>387</x>
-     <y>653</y>
+     <x>613</x>
+     <y>776</y>
     </hint>
    </hints>
   </connection>
@@ -1891,7 +1963,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>272</x>
-     <y>658</y>
+     <y>781</y>
     </hint>
     <hint type="destinationlabel">
      <x>180</x>
@@ -1906,12 +1978,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>387</x>
-     <y>653</y>
+     <x>613</x>
+     <y>776</y>
     </hint>
     <hint type="destinationlabel">
      <x>272</x>
-     <y>658</y>
+     <y>781</y>
     </hint>
    </hints>
   </connection>
@@ -2071,7 +2143,7 @@
     </hint>
     <hint type="destinationlabel">
      <x>117</x>
-     <y>-17</y>
+     <y>0</y>
     </hint>
    </hints>
   </connection>
@@ -2082,44 +2154,12 @@
    <slot>tab4.update_plot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>131</x>
-     <y>197</y>
+     <x>161</x>
+     <y>229</y>
     </hint>
     <hint type="destinationlabel">
      <x>139</x>
-     <y>-8</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>tab4_yaxis2_box</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>tab4.toggle_axis2(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>85</x>
-     <y>280</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>159</x>
-     <y>-18</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>tab4_combo_yaxis2</sender>
-   <signal>currentIndexChanged(int)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>tab4.update_plot()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>142</x>
-     <y>268</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>282</x>
-     <y>-8</y>
+     <y>0</y>
     </hint>
    </hints>
   </connection>
@@ -2131,7 +2171,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>269</x>
-     <y>593</y>
+     <y>716</y>
     </hint>
     <hint type="destinationlabel">
      <x>8</x>
@@ -2146,12 +2186,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>360</x>
-     <y>585</y>
+     <x>583</x>
+     <y>711</y>
     </hint>
     <hint type="destinationlabel">
-     <x>249</x>
-     <y>584</y>
+     <x>269</x>
+     <y>716</y>
     </hint>
    </hints>
   </connection>
@@ -2162,12 +2202,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>248</x>
-     <y>573</y>
+     <x>269</x>
+     <y>716</y>
     </hint>
     <hint type="destinationlabel">
-     <x>417</x>
-     <y>584</y>
+     <x>640</x>
+     <y>711</y>
     </hint>
    </hints>
   </connection>
@@ -2178,12 +2218,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>332</x>
-     <y>620</y>
+     <x>555</x>
+     <y>743</y>
     </hint>
     <hint type="destinationlabel">
-     <x>232</x>
-     <y>616</y>
+     <x>269</x>
+     <y>748</y>
     </hint>
    </hints>
   </connection>
@@ -2194,12 +2234,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>255</x>
-     <y>610</y>
+     <x>269</x>
+     <y>748</y>
     </hint>
     <hint type="destinationlabel">
-     <x>399</x>
-     <y>612</y>
+     <x>622</x>
+     <y>743</y>
     </hint>
    </hints>
   </connection>
@@ -2210,12 +2250,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>326</x>
-     <y>647</y>
+     <x>549</x>
+     <y>775</y>
     </hint>
     <hint type="destinationlabel">
-     <x>247</x>
-     <y>642</y>
+     <x>269</x>
+     <y>780</y>
     </hint>
    </hints>
   </connection>
@@ -2226,12 +2266,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>411</x>
-     <y>643</y>
+     <x>634</x>
+     <y>775</y>
     </hint>
     <hint type="destinationlabel">
-     <x>251</x>
-     <y>647</y>
+     <x>269</x>
+     <y>780</y>
     </hint>
    </hints>
   </connection>
@@ -2242,8 +2282,8 @@
    <slot>tab1.set_first_frame(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>259</x>
-     <y>617</y>
+     <x>269</x>
+     <y>748</y>
     </hint>
     <hint type="destinationlabel">
      <x>1</x>
@@ -2258,8 +2298,8 @@
    <slot>tab1.set_last_frame(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>255</x>
-     <y>647</y>
+     <x>269</x>
+     <y>780</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -2274,12 +2314,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>245</x>
-     <y>653</y>
+     <x>269</x>
+     <y>780</y>
     </hint>
     <hint type="destinationlabel">
-     <x>469</x>
-     <y>651</y>
+     <x>692</x>
+     <y>775</y>
     </hint>
    </hints>
   </connection>
@@ -2290,8 +2330,8 @@
    <slot>tab4.export_as_csv()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>144</x>
-     <y>531</y>
+     <x>171</x>
+     <y>627</y>
     </hint>
     <hint type="destinationlabel">
      <x>4</x>
@@ -2326,8 +2366,88 @@
      <y>181</y>
     </hint>
     <hint type="destinationlabel">
-     <x>-1</x>
+     <x>0</x>
      <y>38</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab4_combo_yaxis2</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab4.update_plot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>171</x>
+     <y>332</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>282</x>
+     <y>0</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab4_yaxis2_box</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab4.toggle_axis2(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>85</x>
+     <y>280</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>159</x>
+     <y>0</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab4_smoothx</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab4.update_plot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>135</x>
+     <y>147</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>253</x>
+     <y>21</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab4_smoothy2</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab4.update_plot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>134</x>
+     <y>350</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>434</x>
+     <y>24</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab4_smoothy</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab4.update_plot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>123</x>
+     <y>245</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>567</x>
+     <y>23</y>
     </hint>
    </hints>
   </connection>

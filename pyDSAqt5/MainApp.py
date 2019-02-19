@@ -34,14 +34,9 @@ import numpy as np
 
 from IMTreatment.utils import make_unit
 import re
-try:
-    from .design import Ui_MainWindow
-    from .dsa_backend import DSA
-    from .log import Log
-except ModuleNotFoundError:
-    from design import Ui_MainWindow
-    from dsa_backend import DSA
-    from log import Log
+from .design import Ui_MainWindow
+from .dsa_backend import DSA
+from .log import Log
 
 
 def select_file(message="Open file", filetypes=None):
@@ -651,8 +646,10 @@ class TabAnalyze(Tab):
         except:
             self.log.log_unknown_exception()
             return None
+        # Clear quantity cache
+        self.dsa.clear_plottable_quantity_cache()
         #
-        self.update_plot(0, replot=True, draw=draw)
+        self.update_plot(replot=True, draw=draw)
         self.already_opened = True
 
     def enable_options(self):
@@ -671,38 +668,49 @@ class TabAnalyze(Tab):
 
     def clean_plot(self):
         self.ui.mplwidgetanalyze.update_plots(
-            [], [], [], xname="", yname="", y2name="",
+            [], [], [], [], [], xname="", yname="", y2name="",
             replot=False, draw=True)
 
-    def update_plot(self, index, replot=False, draw=True):
+    def update_plot(self, index=0, replot=False, draw=True):
         if not self.initialized:
             return None
         # get things to plot
         xaxis = self.ui.tab4_combo_xaxis.currentText()
+        xsmooth = self.ui.tab4_smoothx.value()
         yaxis = self.ui.tab4_combo_yaxis.currentText()
+        ysmooth = self.ui.tab4_smoothy.value()
         try:
-            x, unit_x = self.dsa.get_plotable_quantity(xaxis)
+            x, x_orig, unit_x = self.dsa.get_plotable_quantity(xaxis,
+                                                               smooth=xsmooth)
         except:
             self.log.log_unknown_exception()
             x = []
+            x_orig = []
             unit_x = ""
         try:
-            y, unit_y = self.dsa.get_plotable_quantity(yaxis)
+            y, y_orig, unit_y = self.dsa.get_plotable_quantity(yaxis,
+                                                               smooth=ysmooth)
         except:
             self.log.log_unknown_exception()
             y = [np.nan]*len(x)
+            y_orig = [np.nan]*len(x)
             unit_y = ""
         if self.use_yaxis2:
             yaxis2 = self.ui.tab4_combo_yaxis2.currentText()
+            ysmooth2 = self.ui.tab4_smoothy2.value()
             try:
-                y2, unit_y2 = self.dsa.get_plotable_quantity(yaxis2)
+                y2, y2_orig, unit_y2 = self.dsa.get_plotable_quantity(
+                    yaxis2,
+                    smooth=ysmooth2)
             except:
                 self.log.log_unknown_exception()
                 y2 = [np.nan]*len(x)
+                y2_orig = [np.nan]*len(x)
                 unit_y2 = ""
         else:
             yaxis2 = ""
             y2 = [np.nan]*len(x)
+            y2_orig = [np.nan]*len(x)
             unit_y2 = ""
         # Update local values labels
         self.ui.tab4_local_x_label.setText(f"{xaxis} [{unit_x}]")
@@ -719,7 +727,9 @@ class TabAnalyze(Tab):
         # if no x
         if len(x) == 0:
             y = []
+            y_orig = []
             y2 = []
+            y2_orig = []
         # check length, just in case
         if len(x) != len(y):
             self.log.log('Incoherence in plottable quantities length:'
@@ -735,6 +745,7 @@ class TabAnalyze(Tab):
         yname2 = f'{yaxis2} [{unit_y2}]'
         #
         self.ui.mplwidgetanalyze.update_plots(x, y, y2,
+                                              y_orig, y2_orig,
                                               xname=xname,
                                               yname=yname,
                                               y2name=yname2,
@@ -743,7 +754,7 @@ class TabAnalyze(Tab):
 
     def toggle_axis2(self, toggle):
         self.use_yaxis2 = toggle
-        self.update_plot(index=0)
+        self.update_plot()
 
     def export_as_csv(self, toggle):
         try:
