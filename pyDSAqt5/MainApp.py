@@ -172,6 +172,7 @@ class TabImport(Tab):
         filepath = select_file('Open image')[0]
         # Import image
         success = self.dsa.import_image(filepath)
+        self.current_ind = 0
         if success:
             # Disable frame sliders
             self.disable_frame_sliders()
@@ -593,8 +594,6 @@ class TabAnalyze(Tab):
         self.use_yaxis2 = False
 
     def initialize(self):
-        if self.dsa.nmb_frames == 1:
-            return None
         # Add option to combo boxes
         # TODO: Centralize the accessible things to make it more
         #       convenient to add some
@@ -620,9 +619,6 @@ class TabAnalyze(Tab):
         draw = True
         # if not self.already_opened:
         #     draw = False
-        # Do nothing if there is only one point...
-        if self.dsa.nmb_frames <= 1:
-            return None
         # Clean
         if self.already_opened:
             self.clean_plot()
@@ -653,18 +649,11 @@ class TabAnalyze(Tab):
         self.already_opened = True
 
     def enable_options(self):
-        if self.dsa.nmb_frames > 1:
-            self.ui.tab4_xaxis_box.setEnabled(True)
-            self.ui.tab4_yaxis_box.setEnabled(True)
-            self.ui.tab4_yaxis2_box.setEnabled(True)
-            self.ui.tab4_local_values_box.setEnabled(True)
-            self.ui.tab4_export_box.setEnabled(True)
-        else:
-            self.ui.tab4_xaxis_box.setEnabled(False)
-            self.ui.tab4_yaxis_box.setEnabled(False)
-            self.ui.tab4_yaxis2_box.setEnabled(False)
-            self.ui.tab4_local_values_box.setEnabled(False)
-            self.ui.tab4_export_box.setEnabled(False)
+        self.ui.tab4_xaxis_box.setEnabled(True)
+        self.ui.tab4_yaxis_box.setEnabled(True)
+        self.ui.tab4_yaxis2_box.setEnabled(True)
+        self.ui.tab4_local_values_box.setEnabled(True)
+        self.ui.tab4_export_box.setEnabled(True)
 
     def clean_plot(self):
         self.ui.mplwidgetanalyze.update_plots(

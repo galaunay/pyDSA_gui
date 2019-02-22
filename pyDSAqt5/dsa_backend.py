@@ -270,7 +270,10 @@ class DSA(object):
         if self.ims_precomp is None or self.is_precomp_params_changed(params):
             self.precompute_images(params)
         cropt = params['cropt']
-        return self.ims_precomp[ind - cropt[0] + 1]
+        if self.nmb_frames == 1:
+            return self.ims_precomp[0]
+        else:
+            return self.ims_precomp[ind - cropt[0] + 1]
 
     def is_edge_param_changed(self, params):
         if self.edge_cache_method != self.edge_detection_method:
@@ -470,7 +473,10 @@ class DSA(object):
         # Get quantity
         try:
             if quant == 'Frame number':
-                vals, unit = np.arange(ff, ff + len(self.edges)*N, N), ""
+                if self.nmb_frames == 1:
+                    vals, unit = [0, 1], ""
+                else:
+                    vals, unit = np.arange(ff, ff + len(self.edges)*N, N), ""
             elif quant == 'Time':
                 vals, unit = self.ims_precomp.times, unit_t
             elif quant == 'Position (x, right)':
@@ -521,6 +527,11 @@ class DSA(object):
             vals = smoothed_vals
         else:
             vals_ori = [np.nan]*len(vals)
+        # In case of only one frame, make sur the plot is stil visible
+        if self.nmb_frames == 1:
+            if len(vals) == 1:
+                vals = np.concatenate((vals, vals))
+                vals_ori = np.concatenate((vals_ori, vals_ori))
         # store computed values
         self.plottable_quantity_cache[cache_name] = vals, vals_ori, unit
         # return
@@ -579,11 +590,12 @@ class DSA(object):
             return None
         # Only use certains frames
         self.precompute_images(self.app.tab1.get_params())
+        N = precomp_params['N']
+        if N < 0:
+            N = 1
         try:
             tmp_ims = self.ims_precomp.reduce_temporal_resolution(
-                precomp_params['N'],
-                mean=False,
-                inplace=False)
+                N, mean=False, inplace=False)
         except:
             tmp_ims = self.ims_precomp
             self.log.log_unknown_exception()

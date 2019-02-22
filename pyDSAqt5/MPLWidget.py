@@ -105,7 +105,6 @@ class MplCanvas(Canvas):
         super(MplCanvas, self).__init__(self.figure)
         self.setParent(parent)
         self.parent = parent
-        print(f'fill: {fill}')
         if fill:
             self.ax = self.figure.add_axes([0, 0, 1, 1])
         else:
