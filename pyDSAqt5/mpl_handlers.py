@@ -32,6 +32,13 @@ import numpy as np
 from pyDSA.baseline import Baseline
 
 
+# Matplotlib 2.2 backward compatibility monkey patching
+def set_center(self, xy):
+    self.center = xy
+    self.xy = xy
+mpl.patches.Circle.set_center = set_center
+
+
 class Handler(object):
     def __init__(self, canvas, fig, ax, color, hand_ratio):
         self.fig = fig
