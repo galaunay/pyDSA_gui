@@ -20,7 +20,7 @@ Just fire up the GUI from the terminal (or anaconda console) with:
 
 
 
-## Installation
+## Installation<a name="installation"></a>
 
 ### Linux
 
@@ -64,11 +64,24 @@ extract them, and install them (in order) with:
 
 ``python setup.py install``
 
+## Updating
+
+Because pyDSAqt5 does not follow (yet) a strict version strategy, you will have to uninstall and
+reinstall the packages in order to make an update.
+
+Uninstalling can be done using :
+
+``pip uninstall IMTreatment pyDSA pyDSAqt5``
+or
+``conda uninstall IMTreatment pyDSA pyDSAqt5``
+
+To reinstall, please follow the [above instructions](#installation).
+
 ## Documentation
 
 pyDSAqt5 is designed to be simple and straightforward to use.
-If you don't understand the effect of an option, 
-please refers to the inline documentation of [pyDSA](https://framagit.org/gabylaunay/pyDSA), 
+If you don't understand the effect of an option,
+please refers to the inline documentation of [pyDSA](https://framagit.org/gabylaunay/pyDSA),
 where all the features are documented in details.
 
 ## Issues and bugs
@@ -79,7 +92,3 @@ Any of the followings will greatly help me fix the issue:
 - A description of the problem (as detailled as possible, for me to get it)
 - The logs from the terminal
 - A test case to reproduce the problem
-
-
-
-
