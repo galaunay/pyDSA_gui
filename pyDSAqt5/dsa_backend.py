@@ -478,7 +478,7 @@ class DSA(object):
                 else:
                     vals, unit = np.arange(ff, ff + len(self.edges)*N, N), ""
             elif quant == 'Time':
-                vals, unit = self.ims_precomp.times, unit_t
+                vals, unit = self.edges.times, unit_t
             elif quant == 'Position (x, right)':
                 _, pt2s = self.fits.get_drop_positions()
                 vals, unit = pt2s[:, 0], unit_x

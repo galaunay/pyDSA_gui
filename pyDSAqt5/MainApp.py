@@ -758,11 +758,17 @@ class TabAnalyze(Tab):
             data = []
             headers = []
             for quant in self.app.plottable_quant:
-                tmpd = self.dsa.get_plotable_quantity(quant)
-                data.append(tmpd[0])
-                unit = tmpd[1]
+                val, _, unit = self.dsa.get_plotable_quantity(quant, smooth=0)
+                # check that length matches
+                if len(data) > 0:
+                    if len(data[0]) != len(val):
+                        self.log.log(f"Quantity {quant} does not have the right"
+                                     f" length ({len(val)} instead of"
+                                     f" {len(data[0])})", level=3)
+                        continue
+                data.append(list(val))
                 headers.append(f'{quant} [{unit}]')
-            data = np.array(data).transpose()
+            data = np.array(data, dtype=float).transpose()
             np.savetxt(filepath, data, delimiter=', ',
                        header=", ".join(headers))
             self.log.log(f"Save data in {filepath}", level=1)
