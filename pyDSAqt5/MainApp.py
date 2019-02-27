@@ -232,6 +232,9 @@ class TabImport(Tab):
             self.enable_baseline()
             # Enable options
             self.app.enable_options()
+            # Set the time interval from the video
+            dt = self.dsa.get_dt()
+            self.ui.tab1_set_dt_text.setText(f"{dt:.6f}")
             # De-init other tabs
             self.app.tab2.initialized = False
             self.app.tab3.initialized = False
