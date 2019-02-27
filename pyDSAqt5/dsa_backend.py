@@ -27,7 +27,9 @@ __email__ = "gaby.launay@tutanota.com"
 __status__ = "Development"
 
 
+import cv2
 import pyDSA as dsa
+from IMTreatment.utils import make_unit
 import numpy as np
 from scipy import ndimage
 
@@ -45,35 +47,37 @@ class DSA(object):
         self.default_image = dsa.Image()
         self.default_image.import_from_arrays(range(300), range(200),
                                               np.random.rand(300, 200)*255)
-
         self.nmb_frames = None
         self.sizex = None
         self.sizey = None
-        self.ims = None
-        # Precompute
-        self.precomp_old_params = None
-        self.ims_precomp = None
+        # precomp
+        self.precomp_cache_params = None
         # Edges
         self.edge_detection_method = 'canny'
         self.edge_cache = []
         self.edge_cache_params = [None]*3
         self.edge_cache_method = None
-        self.edges = None
-        self.edges_old_params = None
-        self.edges_old_method = self.edge_detection_method
         # Fit
         self.fit_method = 'ellipse'
+        self.fits = None
         self.fit_cache = []
         self.fit_cache_params = [None]*3
         self.fit_cache_method = None
-        self.fits = None
-        self.fits_old_params = None
-        self.fits_old_method = self.fit_method
         # Plottable quantities
         self.plottable_quantity_cache = {}
 
     def is_initialized(self):
-        return self.ims is not None
+        return self.nmb_frames != 0
+
+    def check_cache(self):
+        if self.is_precomp_params_changed() or self.is_edge_param_changed():
+            self.reset_cache()
+            self.edge_cache_params = self.get_edge_params()
+            self.fit_cache_params = self.get_fit_params()
+            self.precomp_cache_params = self.get_precomp_params()
+        elif self.is_fit_params_changed():
+            self.reset_cache(edge=False)
+            self.fit_cache_params = self.get_fit_params()
 
     def reset_cache(self, edge=True, fit=True):
         if self.nmb_frames is not None:
@@ -102,6 +106,276 @@ class DSA(object):
                 self.ui.statusbar.showMessage(text_finished,
                                               self.app.statusbar_delay)
         return hook
+
+    def import_image(self, filepath):
+        raise NotImplementedError
+
+    def import_images(self, filepaths):
+        raise NotImplementedError
+
+    def import_video(self, filepath):
+        raise NotImplementedError
+
+    def is_valid_ind(self, ind):
+        if self.nmb_frames == 0:
+            return False
+        if ind > self.nmb_frames or ind < 0:
+            return False
+        return True
+
+    def get_dt(self):
+        raise NotImplementedError
+
+    def get_baseline_display_points(self, ind):
+        precomp_params = self.get_precomp_params()
+        lims = precomp_params['lims']
+        dx = precomp_params['dx'].asNumber()
+        baseline = self.get_current_precomp_im(ind).baseline
+        pt1 = baseline.pt1.copy()
+        pt2 = baseline.pt2.copy()
+        # x
+        deltax = lims[0][0]
+        pt1[0] = pt1[0]/dx - deltax
+        pt2[0] = pt2[0]/dx - deltax
+        # y
+        deltay = self.sizey + (lims[1][1] - self.sizey)
+        pt1[1] = deltay - pt1[1]/dx
+        pt2[1] = deltay - pt2[1]/dx
+        return pt1, pt2
+
+    def get_current_raw_im(self, ind):
+        raise NotImplementedError
+
+    def get_precomp_params(self):
+        return self.app.tab1.get_params()
+
+    def is_precomp_params_changed(self):
+        params = self.get_precomp_params()
+        if self.precomp_cache_params is None:
+            return True
+        for d in ['dx', 'dt']:
+            if params[d].strUnit() != self.precomp_cache_params[d].strUnit():
+                return True
+            elif params[d].asNumber() != self.precomp_cache_params[d].asNumber():
+                return True
+        for p in ['N']:
+            if params[p] != self.precomp_cache_params[p]:
+                return True
+        for crop in ['lims', 'baseline_pts', 'cropt']:
+            if np.any(params[crop] != self.precomp_cache_params[crop]):
+                return True
+        return False
+
+    def get_current_precomp_im(self, ind):
+        raise NotImplementedError
+
+    def get_edge_params(self):
+        return self.app.tab2.get_params()
+
+    def is_edge_param_changed(self):
+        params = self.get_edge_params()
+        if self.edge_cache_method != self.edge_detection_method:
+            return True
+        for p1, p2 in zip(params, self.edge_cache_params):
+            if p1 != p2:
+                return True
+        return False
+
+    def get_current_edge(self, ind):
+        raise NotImplementedError
+
+    def get_current_edge_pts(self, ind):
+        edge = self.get_current_edge(ind)
+        if len(edge.xy) == 0:
+            return [[], []]
+        # Return edge pts
+        pts = edge.xy.transpose().copy()
+        precomp_params = self.get_precomp_params()
+        lims = precomp_params['lims']
+        dx = precomp_params['dx'].asNumber()
+        deltax = lims[0][0]
+        deltay = lims[1][1]
+        pts[0] = pts[0]/dx - deltax
+        pts[1] = deltay - pts[1]/dx
+        return pts
+
+    def get_fit_params(self):
+        return self.app.tab3.get_params()
+
+    def is_fit_params_changed(self):
+        params = self.get_fit_params()
+        if self.fit_cache_method != self.fit_method:
+            return True
+        for p1, p2 in zip(params, self.fit_cache_params):
+            if p1 != p2:
+                return True
+        return False
+
+    def get_current_fit(self, ind):
+        raise NotImplementedError
+
+    def get_current_fit_pts(self, ind):
+        fit = self.get_current_fit(ind)
+        if fit.baseline is None:
+            return [[0], [0]], [[-999], [-999]]
+        # Get fit pts and center
+        pts = fit.get_fit_as_points()
+        if self.fit_method in ['circle', 'ellipse']:
+            fit_center = fit.fits[0].copy()
+        else:
+            fit_center = np.array([[-999], [-999]])
+        # Return fit pts
+        precomp_params = self.get_precomp_params()
+        lims = precomp_params['lims']
+        dx = precomp_params['dx'].asNumber()
+        deltax = lims[0][0]
+        deltay = lims[1][1]
+        pts[0] = pts[0]/dx - deltax
+        pts[1] = deltay - pts[1]/dx
+        fit_center[0] = fit_center[0]/dx - deltax
+        fit_center[1] = deltay - fit_center[1]/dx
+        return pts, fit_center
+
+    def get_current_ca(self, ind):
+        # get the fit
+        fit = self.get_current_fit(ind)
+        if fit is None:
+            return [[np.nan, np.nan], [np.nan, np.nan]]
+        # No need to recompute contact angles
+        if fit.thetas is None:
+            try:
+                fit.compute_contact_angle()
+            except:
+                self.log.log_unknown_exception()
+                return [[np.nan, np.nan], [np.nan, np.nan]]
+        if fit.thetas is None:
+            self.log.log("Couldn't compute contact angles "
+                         "for the current image",
+                         level=2)
+            return [[np.nan, np.nan], [np.nan, np.nan]]
+        # return angles
+        lines = fit._get_angle_display_lines()
+        lines = lines[0:2]
+        precomp_params = self.get_precomp_params()
+        dx = precomp_params['dx'].asNumber()
+        lines = np.array(lines)/dx
+        lims = precomp_params['lims']
+        deltax = lims[0][0]
+        deltay = lims[1][1]
+        lines[:, 0] -= deltax
+        lines[:, 1] = deltay - lines[:, 1]
+        return lines
+
+    def compute_fits(self):
+        raise NotImplementedError
+
+    def compute_cas(self, ind):
+        raise NotImplementedError
+
+    def get_plotable_quantity(self, quant, smooth=0):
+        # fits should be computed already...
+        if self.fits is None:
+            self.log.log('Fit need to be computed first', level=3)
+            return [], ""
+        # check if already cached !
+        cache_name = f"{quant}_smooth{smooth}"
+        try:
+            return self.plottable_quantity_cache[cache_name]
+        except:
+            pass
+        # Get units
+        precomp_params = self.get_precomp_params()
+        dx = precomp_params['dx']
+        N = precomp_params['N']
+        dt = precomp_params['dt']
+        ff, lf = precomp_params['cropt']
+        unit_x = dx.strUnit()[1:-1]
+        unit_t = dt.strUnit()[1:-1]
+        # Get quantity
+        try:
+            if quant == 'Frame number':
+                if self.nmb_frames == 1:
+                    vals, unit = [0, 1], ""
+                else:
+                    vals, unit = np.arange(ff, lf, N), ""
+            elif quant == 'Time':
+                vals, unit = self.fits.times, unit_t
+            elif quant == 'Position (x, right)':
+                _, pt2s = self.fits.get_drop_positions()
+                vals, unit = pt2s[:, 0], unit_x
+            elif quant == 'Position (x, left)':
+                pt1s, _ = self.fits.get_drop_positions()
+                vals, unit = pt1s[:, 0], unit_x
+            elif quant == 'CL velocity (x, left)':
+                pt1s, _ = self.fits.get_drop_positions()
+                pt1s = pt1s[:, 0]
+                vel = np.gradient(pt1s, self.fits.dt)
+                vals, unit = vel, f"{unit_x}/{unit_t}"
+            elif quant == 'CL velocity (x, right)':
+                _, pt2s = self.fits.get_drop_positions()
+                pt2s = pt2s[:, 0]
+                vel = np.gradient(pt2s, self.fits.dt)
+                vals, unit = vel, f"{unit_x}/{unit_t}"
+            elif quant == 'Position (x, center)':
+                xys = self.fits.get_drop_centers()
+                vals, unit = xys[:, 0], unit_x
+            elif quant == 'CA (right)':
+                vals, unit = 180 - self.fits.get_contact_angles()[:, 1], "°"
+            elif quant == 'CA (left)':
+                vals, unit = self.fits.get_contact_angles()[:, 0], "°"
+            elif quant == 'CA (mean)':
+                thetas = self.fits.get_contact_angles()
+                thetas[:, 1] = 180 - thetas[:, 1]
+                vals, unit = np.mean(thetas, axis=1), "°"
+            elif quant == 'Base radius':
+                vals, unit = self.fits.get_base_diameters()/2, unit_x
+            elif quant == 'Height':
+                vals, unit = self.fits.get_drop_heights(), unit_x
+            elif quant == 'Area':
+                vals, unit = self.fits.get_drop_areas(), f'{unit_x}^2'
+            elif quant == 'Volume':
+                vals, unit = self.fits.get_drop_volumes(), f'{unit_x}^3'
+            else:
+                self.log.log(f'Non-plotable quantity: {quant}', level=3)
+                vals, unit = [], ""
+        except:
+            self.log.log_unknown_exception()
+            vals, unit = [], ""
+        # Smooth if asked
+        if smooth != 0:
+            smoothed_vals = ndimage.gaussian_filter(vals, smooth, mode='nearest')
+            vals_ori = vals
+            vals = smoothed_vals
+        else:
+            vals_ori = [np.nan]*len(vals)
+        # In case of only one frame, make sur the plot is stil visible
+        if self.nmb_frames == 1:
+            if len(vals) == 1:
+                vals = np.concatenate((vals, vals))
+                vals_ori = np.concatenate((vals_ori, vals_ori))
+        # store computed values
+        self.plottable_quantity_cache[cache_name] = vals, vals_ori, unit
+        # return
+        return vals, vals_ori, unit
+
+    def clear_plottable_quantity_cache(self):
+        self.plottable_quantity_cache = {}
+
+
+class DSA_mem(DSA):
+    def __init__(self, app):
+        super().__init__(app)
+        # Ims
+        self.ims = None
+        # Precompute
+        self.ims_precomp = None
+        # Edges
+        self.edges = None
+        self.edges_old_params = None
+        self.edges_old_method = self.edge_detection_method
+        # Fit
+        self.fits_old_params = None
+        self.fits_old_method = self.fit_method
 
     def import_image(self, filepath):
         self.log.log(f'DSA backend: Importing image: {filepath}', level=1)
@@ -178,37 +452,18 @@ class DSA(object):
         self.sizey = self.ims[0].shape[1]
         return True
 
-    def is_valid_ind(self, ind):
-        if self.ims is None:
-            return False
-        if ind > self.nmb_frames or ind < 0:
-            return False
-        return True
-
-    def get_baseline_display_points(self, params, ind):
-        lims = self.precomp_old_params['lims']
-        dx = self.precomp_old_params['dx'].asNumber()
-        baseline = self.get_current_precomp_im(params, ind).baseline
-        pt1 = baseline.pt1.copy()
-        pt2 = baseline.pt2.copy()
-        # x
-        deltax = lims[0][0]
-        pt1[0] = pt1[0]/dx - deltax
-        pt2[0] = pt2[0]/dx - deltax
-        # y
-        deltay = self.sizey + (lims[1][1] - self.sizey)
-        pt1[1] = deltay - pt1[1]/dx
-        pt2[1] = deltay - pt2[1]/dx
-        return pt1, pt2
+    def get_dt(self):
+        return self.ims.dt
 
     def get_current_raw_im(self, ind):
         if self.ims is None:
             return self.default_image
         return self.ims[ind]
 
-    def precompute_images(self, params):
+    def precompute_images(self):
+        params = self.get_precomp_params()
         if self.ims_precomp is not None:
-            if not self.is_precomp_params_changed(params):
+            if not self.is_precomp_params_changed():
                 return None
         self.log.log('DSA backend: Preparing images for edge detection',
                      level=1)
@@ -244,53 +499,30 @@ class DSA(object):
         hook(3, 4)
         # store
         self.ims_precomp = ims_precomp
-        self.precomp_old_params = params
+        self.precomp_cache_params = params
         # reset following edges and fits
         self.reset_cache()
         self.edges = None
         self.fits = None
 
-    def is_precomp_params_changed(self, params):
-        if self.precomp_old_params is None:
-            return True
-        for d in ['dx', 'dt']:
-            if params[d].strUnit() != self.precomp_old_params[d].strUnit():
-                return True
-            elif params[d].asNumber() != self.precomp_old_params[d].asNumber():
-                return True
-        for p in ['N']:
-            if params[p] != self.precomp_old_params[p]:
-                return True
-        for crop in ['lims', 'baseline_pts', 'cropt']:
-            if np.any(params[crop] != self.precomp_old_params[crop]):
-                return True
-        return False
-
-    def get_current_precomp_im(self, params, ind):
-        if self.ims_precomp is None or self.is_precomp_params_changed(params):
-            self.precompute_images(params)
+    def get_current_precomp_im(self, ind):
+        params = self.get_precomp_params()
+        if self.ims_precomp is None or self.is_precomp_params_changed():
+            self.precompute_images()
         cropt = params['cropt']
         if self.nmb_frames == 1:
             return self.ims_precomp[0]
         else:
             return self.ims_precomp[ind - cropt[0] + 1]
 
-    def is_edge_param_changed(self, params):
-        if self.edge_cache_method != self.edge_detection_method:
-            return True
-        for p1, p2 in zip(params, self.edge_cache_params):
-            if p1 != p2:
-                return True
-        return False
-
-    def get_current_edge(self, params, ind):
+    def get_current_edge(self, ind):
+        params = self.get_edge_params()
         params_precomp = self.app.tab1.get_params()
-        im = self.get_current_precomp_im(params_precomp, ind)
+        im = self.get_current_precomp_im(ind)
         if self.edge_detection_method is None:
             return dsa.DropEdges([], im, None)
         # Reset cache if not valid anymore
-        if self.is_edge_param_changed(params):
-            self.reset_cache()
+        self.check_cache()
         # Use cache if possible
         edge = self.edge_cache[ind]
         if edge is None:
@@ -327,41 +559,19 @@ class DSA(object):
                          level=1)
         return edge
 
-    def get_current_edge_pts(self, params, ind):
-        edge = self.get_current_edge(params, ind)
-        if len(edge.xy) == 0:
-            return [[], []]
-        # Return edge pts
-        pts = edge.xy.transpose().copy()
-        lims = self.precomp_old_params['lims']
-        dx = self.precomp_old_params['dx'].asNumber()
-        deltax = lims[0][0]
-        deltay = lims[1][1]
-        pts[0] = pts[0]/dx - deltax
-        pts[1] = deltay - pts[1]/dx
-        return pts
-
-    def is_fit_params_changed(self, params):
-        if self.fit_cache_method != self.fit_method:
-            return True
-        for p1, p2 in zip(params, self.fit_cache_params):
-            if p1 != p2:
-                return True
-        return False
-
-    def get_current_fit(self, params, ind):
-        # Reset cache if not valid anymre
+    def get_current_fit(self, ind):
+        params = self.get_fit_params()
+        # nothing to compute
         if self.fit_method is None:
             return dsa.DropFit(None, [None, None], [None, None])
         # Reset cache if not valid anymore
-        if self.is_fit_params_changed(params):
-            self.reset_cache()
+        self.check_cache()
         # Use cache if possible
         fit = self.fit_cache[ind]
         if fit is None:
             # Ensure the edge is computed
             edge_params = self.app.tab2.get_params()
-            edge = self.get_current_edge(edge_params, ind)
+            edge = self.get_current_edge(ind)
             if edge is None:
                 return dsa.DropFit(edge.baseline, edge.x_bounds, edge.y_bounds)
             # log
@@ -401,146 +611,7 @@ class DSA(object):
                          level=1)
         return fit
 
-    def get_current_fit_pts(self, params, ind):
-        fit = self.get_current_fit(params, ind)
-        if fit.baseline is None:
-            return [[0], [0]], [[-999], [-999]]
-        # Get fit pts and center
-        pts = fit.get_fit_as_points()
-        if self.fit_method in ['circle', 'ellipse']:
-            fit_center = fit.fits[0].copy()
-        else:
-            fit_center = np.array([[-999], [-999]])
-        # Return fit pts
-        lims = self.precomp_old_params['lims']
-        dx = self.precomp_old_params['dx'].asNumber()
-        deltax = lims[0][0]
-        deltay = lims[1][1]
-        pts[0] = pts[0]/dx - deltax
-        pts[1] = deltay - pts[1]/dx
-        fit_center[0] = fit_center[0]/dx - deltax
-        fit_center[1] = deltay - fit_center[1]/dx
-        return pts, fit_center
-
-    def get_current_ca(self, ind):
-        # get the fit
-        fit_params = self.app.tab3.get_params()
-        fit = self.get_current_fit(fit_params, ind)
-        if fit is None:
-            return [[np.nan, np.nan], [np.nan, np.nan]]
-        # No need to recompute contact angles
-        if fit.thetas is None:
-            try:
-                fit.compute_contact_angle()
-            except:
-                self.log.log_unknown_exception()
-                return [[np.nan, np.nan], [np.nan, np.nan]]
-        if fit.thetas is None:
-            self.log.log("Couldn't compute contact angles "
-                         "for the current image",
-                         level=2)
-            return [[np.nan, np.nan], [np.nan, np.nan]]
-        # return angles
-        lines = fit._get_angle_display_lines()
-        lines = lines[0:2]
-        dx = self.precomp_old_params['dx'].asNumber()
-        lines = np.array(lines)/dx
-        lims = self.precomp_old_params['lims']
-        deltax = lims[0][0]
-        deltay = lims[1][1]
-        lines[:, 0] -= deltax
-        lines[:, 1] = deltay - lines[:, 1]
-        return lines
-
-    def get_plotable_quantity(self, quant, smooth=0):
-        # fits should be computed already...
-        if self.fits is None:
-            self.log.log('Fit need to be computed first', level=3)
-            return [], ""
-        # check if already cached !
-        cache_name = f"{quant}_smooth{smooth}"
-        try:
-            return self.plottable_quantity_cache[cache_name]
-        except:
-            pass
-        # Get units
-        dx = self.precomp_old_params['dx']
-        N = self.precomp_old_params['N']
-        dt = self.precomp_old_params['dt']
-        ff, lf = self.precomp_old_params['cropt']
-        unit_x = dx.strUnit()[1:-1]
-        unit_t = dt.strUnit()[1:-1]
-        # Get quantity
-        try:
-            if quant == 'Frame number':
-                if self.nmb_frames == 1:
-                    vals, unit = [0, 1], ""
-                else:
-                    vals, unit = np.arange(ff, ff + len(self.edges)*N, N), ""
-            elif quant == 'Time':
-                vals, unit = self.edges.times, unit_t
-            elif quant == 'Position (x, right)':
-                _, pt2s = self.fits.get_drop_positions()
-                vals, unit = pt2s[:, 0], unit_x
-            elif quant == 'Position (x, left)':
-                pt1s, _ = self.fits.get_drop_positions()
-                vals, unit = pt1s[:, 0], unit_x
-            elif quant == 'CL velocity (x, left)':
-                pt1s, _ = self.fits.get_drop_positions()
-                pt1s = pt1s[:, 0]
-                vel = np.gradient(pt1s, self.fits.dt)
-                vals, unit = vel, f"{unit_x}/{unit_t}"
-            elif quant == 'CL velocity (x, right)':
-                _, pt2s = self.fits.get_drop_positions()
-                pt2s = pt2s[:, 0]
-                vel = np.gradient(pt2s, self.fits.dt)
-                vals, unit = vel, f"{unit_x}/{unit_t}"
-            elif quant == 'Position (x, center)':
-                xys = self.fits.get_drop_centers()
-                vals, unit = xys[:, 0], unit_x
-            elif quant == 'CA (right)':
-                vals, unit = 180 - self.fits.get_contact_angles()[:, 1], "°"
-            elif quant == 'CA (left)':
-                vals, unit = self.fits.get_contact_angles()[:, 0], "°"
-            elif quant == 'CA (mean)':
-                thetas = self.fits.get_contact_angles()
-                thetas[:, 1] = 180 - thetas[:, 1]
-                vals, unit = np.mean(thetas, axis=1), "°"
-            elif quant == 'Base radius':
-                vals, unit = self.fits.get_base_diameters()/2, unit_x
-            elif quant == 'Height':
-                vals, unit = self.fits.get_drop_heights(), unit_x
-            elif quant == 'Area':
-                vals, unit = self.fits.get_drop_areas(), f'{unit_x}^2'
-            elif quant == 'Volume':
-                vals, unit = self.fits.get_drop_volumes(), f'{unit_x}^3'
-            else:
-                self.log.log(f'Non-plotable quantity: {quant}', level=3)
-                vals, unit = [], ""
-        except:
-            self.log.log_unknown_exception()
-            vals, unit = [], ""
-        # Smooth if asked
-        if smooth != 0:
-            smoothed_vals = ndimage.gaussian_filter(vals, smooth, mode='nearest')
-            vals_ori = vals
-            vals = smoothed_vals
-        else:
-            vals_ori = [np.nan]*len(vals)
-        # In case of only one frame, make sur the plot is stil visible
-        if self.nmb_frames == 1:
-            if len(vals) == 1:
-                vals = np.concatenate((vals, vals))
-                vals_ori = np.concatenate((vals_ori, vals_ori))
-        # store computed values
-        self.plottable_quantity_cache[cache_name] = vals, vals_ori, unit
-        # return
-        return vals, vals_ori, unit
-
-    def clear_plottable_quantity_cache(self):
-        self.plottable_quantity_cache = {}
-
-    def is_edges_param_changed(self, params):
+    def is_edges_param_changed(self):
         canny_args = params[0].copy()
         canny_args.update(params[-1])
         contour_args = params[1].copy()
@@ -563,7 +634,8 @@ class DSA(object):
                     return True
         return False
 
-    def compute_edges(self, params):
+    def compute_edges(self):
+        params = self.get_edge_params()
         self.log.log('DSA backend: Computing edges for the image set', level=1)
         #
         if self.edge_detection_method is None:
@@ -573,9 +645,9 @@ class DSA(object):
         # precompute
         precomp_params = self.app.tab1.get_params()
         if self.ims_precomp is None:
-            self.precompute_images(precomp_params)
-        if self.is_precomp_params_changed(precomp_params):
-            self.precompute_images(precomp_params)
+            self.precompute_images()
+        if self.is_precomp_params_changed():
+            self.precompute_images()
         # Get params
         canny_args = params[0].copy()
         canny_args.update(params[-1])
@@ -586,10 +658,10 @@ class DSA(object):
         new_params = {'detection_method': self.edge_detection_method,
                       'args': new_args[self.edge_detection_method]}
         # Check if need to recompute
-        if not self.is_edges_param_changed(params):
+        if not self.is_edges_param_changed():
             return None
         # Only use certains frames
-        self.precompute_images(self.app.tab1.get_params())
+        self.precompute_images()
         N = precomp_params['N']
         if N < 0:
             N = 1
@@ -629,7 +701,7 @@ class DSA(object):
         self.edges_old_method = self.edge_detection_method
         self.fits = None
 
-    def is_fits_param_changed(self, params):
+    def is_fits_param_changed(self):
         # Get params
         circle_args = params[0]
         ellipse_args = params[1]
@@ -655,11 +727,12 @@ class DSA(object):
                     return True
         return False
 
-    def compute_fits(self, params):
+    def compute_fits(self):
+        params = self.get_fit_params()
         self.log.log('DSA backend: fitting edges for the image set', level=1)
         # Check
         if self.edges is None:
-            self.compute_edges(self.app.tab2.get_params())
+            self.compute_edges()
             if self.edges is None:
                 self.fits = None
                 return None
@@ -678,7 +751,7 @@ class DSA(object):
         new_params = {'method': self.fit_method,
                       'args': new_args}
         # Check if need to recompute
-        if not self.is_fits_param_changed(params):
+        if not self.is_fits_param_changed():
             return None
         # Fit
         hook = self.get_progressbar_hook('Fitting edges',
@@ -704,18 +777,215 @@ class DSA(object):
             self.log.log_unknown_exception()
             self.fits = None
             return None
+        # cas
+        try:
+            self.fits.compute_contact_angle(iteration_hook=hook)
+        except:
+            self.log.log_unknown_exception()
         # Store
         self.fits = fits
         self.fits_old_params = new_params
         self.fits_old_method = self.fit_method
 
     def compute_cas(self):
-        if self.fits is None:
-            return None
-        if self.fits.fits[0].thetas is None:
-            hook = self.get_progressbar_hook('Computing contact angles',
-                                             'Computed contact angles')
+        pass
+
+
+class DSA_hdd(DSA):
+
+    def __init__(self, app):
+        super().__init__(app)
+
+    def import_video(self, filepath):
+        self.log.log(f'DSA backend: Importing video: {filepath}', level=1)
+        self.filepath_type = 'video'
+        self.filepath = filepath
+        self.vid = cv2.VideoCapture()
+        self.vid.open(filepath)
+        self.ims = None
+        self.nmb_frames = int(self.vid.get(cv2.CAP_PROP_FRAME_COUNT))
+        self.sizex = int(self.vid.get(cv2.CAP_PROP_FRAME_WIDTH))
+        self.sizey = int(self.vid.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        return True
+
+    def is_initialized(self):
+        if self.nmb_frames is not None:
+            return True
+        return False
+
+    def get_dt(self):
+        return 1/float(self.vid.get(cv2.CAP_PROP_FPS))
+
+    def get_current_raw_im(self, ind):
+        self.vid.set(cv2.CAP_PROP_POS_FRAMES, ind)
+        im = dsa.Image()
+        success, data = self.vid.read()
+        data = cv2.cvtColor(data, cv2.COLOR_RGB2GRAY)
+        data = data.transpose()[:, ::-1]
+        if not success:
+            self.log.log(f"Can't decode frame number {ind}", level=3)
+            return self.default_image
+        im.import_from_arrays(range(self.sizex), range(self.sizey),
+                              unit_x="", unit_y="",
+                              values=data, dtype=np.uint8,
+                              dontchecknans=True)
+        return im
+
+    def get_current_precomp_im(self, ind):
+        params = self.get_precomp_params()
+        im_precomp = self.get_current_raw_im(ind).copy()
+        # Baseline
+        try:
+            base1, base2 = params['baseline_pts']
+            im_precomp.set_baseline(base1, base2)
+        except:
+            self.log.log_unknown_exception()
+        # apply crop
+        try:
+            lims = params['lims']
+            im_precomp.crop(intervx=lims[0], intervy=lims[1],
+                            inplace=True)
+        except:
+            self.log.log_unknown_exception()
+        # apply scaling
+        try:
+            im_precomp.scale(scalex=params['dx'],
+                             scaley=params['dx'],
+                             inplace=True)
+        except:
+            self.log.log_unknown_exception()
+        # store
+        return im_precomp
+
+    def get_current_edge(self, ind):
+        # Reset cache if not valid anymore
+        self.check_cache()
+        params = self.get_edge_params()
+        im = self.get_current_precomp_im(ind)
+        if self.edge_detection_method is None:
+            return dsa.DropEdges([], im, None)
+        # Use cache if possible
+        edge = self.edge_cache[ind]
+        if edge is None:
+            # Get params
+            canny_args = params[0].copy()
+            canny_args.update(params[-1])
+            contour_args = params[1].copy()
+            contour_args.update(params[-1])
+            # Edge detection
             try:
-                self.fits.compute_contact_angle(iteration_hook=hook)
+                if self.edge_detection_method == 'canny':
+                    edge = im.edge_detection(**canny_args)
+                elif self.edge_detection_method == 'contour':
+                    edge = im.edge_detection_contour(**contour_args)
+                else:
+                    self.log.log("No edge detection method selected",
+                                 level=2)
+                    return dsa.DropEdges([], im, None)
+            except Exception:
+                self.log.log("Couldn't find a drop here", level=2)
+                return dsa.DropEdges([], im, None)
             except:
                 self.log.log_unknown_exception()
+                return dsa.DropEdges([], im, None)
+            # Update cache
+            self.edge_cache[ind] = edge
+            self.edge_cache_params = params
+            self.edge_cache_method = self.edge_detection_method
+        return edge
+
+    def get_current_fit(self, ind):
+        # Reset cache if not valid anymore
+        self.check_cache()
+        params = self.get_fit_params()
+        # nothing to compute
+        if self.fit_method is None:
+            return dsa.DropFit(None, [None, None], [None, None])
+        # update cached params
+        self.edge_cache_params = self.get_edge_params()
+        self.fit_cache_params = self.get_fit_params()
+        # Use cache if possible
+        fit = self.fit_cache[ind]
+        if fit is None:
+            # Ensure the edge is computed
+            edge = self.get_current_edge(ind)
+            # Get params
+            circle_args = params[0]
+            ellipse_args = params[1]
+            polyline_args = params[2]
+            spline_args = params[3]
+            try:
+                if self.fit_method == 'circle':
+                    fit = edge.fit_circle(**circle_args)
+                elif self.fit_method == 'ellipse':
+                    fit = edge.fit_ellipse(**ellipse_args)
+                elif self.fit_method == 'polyline':
+                    fit = edge.fit_polyline(**polyline_args)
+                elif self.fit_method == 'spline':
+                    fit = edge.fit_spline(**spline_args)
+                else:
+                    self.log.lof("No fitting method selected", level=2)
+                    return dsa.DropFit(edge.baseline, edge.x_bounds,
+                                       edge.y_bounds)
+            except Exception:
+                self.log.log("Couldn't find a fit here...", level=2)
+                return dsa.DropFit(edge.baseline, edge.x_bounds,
+                                   edge.y_bounds)
+            except:
+                self.log.log_unknown_exception()
+                return dsa.DropFit(edge.baseline, edge.x_bounds, edge.y_bounds)
+            # contact angle
+            fit.compute_contact_angle()
+            # Update cache
+            self.fit_cache[ind] = fit
+            self.fit_cache_params = params
+            self.fit_cache_method = self.fit_method
+        return fit
+
+    def compute_edges(self):
+        pass
+
+    def compute_fits(self):
+        self.log.log('DSA backend: fitting edges for the image set', level=1)
+        #
+        if self.edge_detection_method is None:
+            self.edges = None
+            self.fits = None
+            return None
+        # Get params
+        precomp_params = self.app.tab1.get_params()
+        # Compute
+        N = precomp_params['N']
+        dt = precomp_params['dt']
+        ff, lf = precomp_params['cropt']
+        fits = []
+        class Dummy(object):
+            pass
+        edges = Dummy()
+        edges.dt = dt
+        edges.times = np.arange(0, self.nmb_frames, 1)*dt
+        edges.unit_times = make_unit("s")
+        edges.unit_x = make_unit("")
+        edges.unit_y = make_unit("")
+        im = self.get_current_precomp_im(0)
+        edges.baseline = im.baseline
+        hook = self.get_progressbar_hook('Detecting edges', 'Detected edges')
+        for i in np.arange(ff, lf, N):
+            fit = self.get_current_fit(i)
+            fits.append(fit)
+            hook(i, lf - ff)
+        hook(self.nmb_frames, (lf - ff) - 1)
+        # store
+        if self.fit_method == 'circle':
+            fits2 = dsa.temporalfits.TemporalCircleFits(fits, edges)
+        elif self.fit_method == 'ellipse':
+            fits2 = dsa.temporalfits.TemporalEllipseFits(fits, edges)
+        elif self.fit_method == 'polyline':
+            fits2 = dsa.temporalfits.TemporalSplineFits(fits, edges)
+        elif self.fit_method == 'spline':
+            fits2 = dsa.temporalfits.TemporalSplineFits(fits, edges)
+        else:
+            self.app.log.log('No fitting method selected', level=2)
+            self.fits = None
+            return None
+        self.fits = fits2

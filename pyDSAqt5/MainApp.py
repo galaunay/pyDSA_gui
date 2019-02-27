@@ -324,12 +324,9 @@ class TabEdges(Tab):
         if not self.initialized:
             self.initialize()
         # Replot
-        precomp_params = self.app.tab1.get_params()
-        im = self.dsa.get_current_precomp_im(precomp_params,
-                                             self.app.current_ind)
+        im = self.dsa.get_current_precomp_im(self.app.current_ind)
         self.ui.mplwidgetdetect.update_image(im.values)
-        pt1, pt2 = self.dsa.get_baseline_display_points(precomp_params,
-                                                        self.app.current_ind)
+        pt1, pt2 = self.dsa.get_baseline_display_points(self.app.current_ind)
         self.ui.mplwidgetdetect.update_baseline(pt1, pt2)
         # Update the curent frame
         self._disable_frame_updater = True
@@ -364,8 +361,7 @@ class TabEdges(Tab):
         self.app.set_current_ind(frame_number - 1)
         # update image
         params_precomp = self.app.tab1.get_params()
-        im = self.dsa.get_current_precomp_im(params_precomp,
-                                             self.app.current_ind)
+        im = self.dsa.get_current_precomp_im(self.app.current_ind)
         self.ui.mplwidgetdetect.update_image(im.values)
         # update edge
         # TODO: replotting the edge markers for each frame take time,
@@ -408,7 +404,7 @@ class TabEdges(Tab):
     def update_edge(self, draw=True):
         params = self.get_params()
         try:
-            edge = self.dsa.get_current_edge_pts(params, self.app.current_ind)
+            edge = self.dsa.get_current_edge_pts(self.app.current_ind)
         except:
             self.log.log_unknown_exception()
             return None
@@ -448,11 +444,9 @@ class TabFits(Tab):
             self.initialize()
         # Update the plot only if necessary
         params_precomp = self.app.tab1.get_params()
-        im = self.dsa.get_current_precomp_im(params_precomp,
-                                             self.app.current_ind)
+        im = self.dsa.get_current_precomp_im(self.app.current_ind)
         self.ui.mplwidgetfit.update_image(im.values)
-        pt1, pt2 = self.dsa.get_baseline_display_points(params_precomp,
-                                                        self.app.current_ind)
+        pt1, pt2 = self.dsa.get_baseline_display_points(self.app.current_ind)
         self.ui.mplwidgetfit.update_baseline(pt1, pt2)
         # Update the curent frame
         self._disable_frame_updater = True
@@ -486,8 +480,7 @@ class TabFits(Tab):
         self.app.current_ind = frame_number - 1
         # update image
         precomp_params = self.app.tab1.get_params()
-        im = self.dsa.get_current_precomp_im(precomp_params,
-                                             self.app.current_ind)
+        im = self.dsa.get_current_precomp_im(self.app.current_ind)
         self.ui.mplwidgetfit.update_image(im.values)
         # update fit
         self.update_fit()
@@ -522,9 +515,7 @@ class TabFits(Tab):
     def update_fit(self):
         params = self.get_params()
         try:
-            fit, fit_center = self.dsa.get_current_fit_pts(
-                params,
-                self.app.current_ind)
+            fit, fit_center = self.dsa.get_current_fit_pts(self.app.current_ind)
         except:
             self.log.log_unknown_exception()
             return None
@@ -628,20 +619,14 @@ class TabAnalyze(Tab):
         # compute edges for every frames !
         params = self.app.tab2.get_params()
         try:
-            self.dsa.compute_edges(params)
+            self.dsa.compute_edges()
         except:
             self.log.log_unknown_exception()
             return None
         # compute fits for every frames !
         params = self.app.tab3.get_params()
         try:
-            self.dsa.compute_fits(params)
-        except:
-            self.log.log_unknown_exception()
-            return None
-        # compute contact angles for every frames !
-        try:
-            self.dsa.compute_cas()
+            self.dsa.compute_fits()
         except:
             self.log.log_unknown_exception()
             return None
