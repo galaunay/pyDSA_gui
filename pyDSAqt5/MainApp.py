@@ -29,7 +29,7 @@ __status__ = "Development"
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog,\
     QDialog
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
 import numpy as np
 
 from IMTreatment.utils import make_unit
@@ -773,9 +773,10 @@ class TabAnalyze(Tab):
 # TODO: Add keybindings
 # TODO: Make everything asynchroneous
 class AppWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, app):
         super().__init__()
         self.ui = Ui_MainWindow()
+        self.globalapp = app
         # Variables
         self.current_ind = 0
         self.statusbar_delay = 2000
@@ -819,7 +820,15 @@ class AppWindow(QMainWindow):
         self.ui.progressbar.setFormat("%p%")
         self.ui.progressbar.setValue(0)
         self.ui.progressbar.setVisible(False)
+        self.ui.cancelbutton = QtWidgets.QPushButton()
+        self.ui.cancelbutton.setText('Cancel')
+        self.ui.cancelbutton.setVisible(False)
+        self.ui.cancelbutton.clicked.connect(self.cancel_computation)
+        self.ui.statusbar.addPermanentWidget(self.ui.cancelbutton)
         self.ui.statusbar.addPermanentWidget(self.ui.progressbar)
+
+    def cancel_computation(self):
+        self.dsa.stop = True
 
     def enable_options(self):
         """ To run after importing at least an image"""
@@ -857,7 +866,7 @@ class AppWindow(QMainWindow):
 def run():
     app = QApplication(sys.argv)
     app.setStyle('fusion')
-    w = AppWindow()
+    w = AppWindow(app)
     w.show()
     # exit()
     sys.exit(app.exec_())

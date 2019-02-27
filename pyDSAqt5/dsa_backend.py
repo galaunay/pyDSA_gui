@@ -43,6 +43,8 @@ class DSA(object):
         # Input
         self.input_type = None
         self.filepath = None
+        # Computation control
+        self.stop = False
         # Images
         self.default_image = dsa.Image()
         self.default_image.import_from_arrays(range(300), range(200),
@@ -70,12 +72,12 @@ class DSA(object):
         return self.nmb_frames != 0
 
     def check_cache(self):
-        if self.is_precomp_params_changed() or self.is_edge_param_changed():
+        if self.is_precomp_params_changed() or self.is_edges_param_changed():
             self.reset_cache()
             self.edge_cache_params = self.get_edge_params()
             self.fit_cache_params = self.get_fit_params()
             self.precomp_cache_params = self.get_precomp_params()
-        elif self.is_fit_params_changed():
+        elif self.is_fits_params_changed():
             self.reset_cache(edge=False)
             self.fit_cache_params = self.get_fit_params()
 
@@ -94,6 +96,7 @@ class DSA(object):
             self.ui.progressbar.setVisible(True)
             self.ui.progressbar.setMaximum(maxi)
             self.ui.progressbar.setValue(i)
+            self.ui.cancelbutton.setVisible(True)
             # Add message to statusbar
             if text_progress != self.ui.statusbar.currentMessage():
                 self.ui.statusbar.showMessage(text_progress,
@@ -102,6 +105,7 @@ class DSA(object):
             # Add to log when finished
             if i == maxi:
                 self.ui.progressbar.setVisible(False)
+                self.ui.cancelbutton.setVisible(False)
                 self.log.log(text_finished, level=1)
                 self.ui.statusbar.showMessage(text_finished,
                                               self.app.statusbar_delay)
@@ -172,7 +176,7 @@ class DSA(object):
     def get_edge_params(self):
         return self.app.tab2.get_params()
 
-    def is_edge_param_changed(self):
+    def is_edges_param_changed(self):
         params = self.get_edge_params()
         if self.edge_cache_method != self.edge_detection_method:
             return True
@@ -202,7 +206,7 @@ class DSA(object):
     def get_fit_params(self):
         return self.app.tab3.get_params()
 
-    def is_fit_params_changed(self):
+    def is_fits_params_changed(self):
         params = self.get_fit_params()
         if self.fit_cache_method != self.fit_method:
             return True
@@ -245,6 +249,8 @@ class DSA(object):
         if fit.thetas is None:
             try:
                 fit.compute_contact_angle()
+            except AttributeError:
+                return [[np.nan, np.nan], [np.nan, np.nan]]
             except:
                 self.log.log_unknown_exception()
                 return [[np.nan, np.nan], [np.nan, np.nan]]
@@ -613,6 +619,7 @@ class DSA_mem(DSA):
         return fit
 
     def is_edges_param_changed(self):
+        params = self.get_edge_params()
         canny_args = params[0].copy()
         canny_args.update(params[-1])
         contour_args = params[1].copy()
@@ -702,7 +709,8 @@ class DSA_mem(DSA):
         self.edges_old_method = self.edge_detection_method
         self.fits = None
 
-    def is_fits_param_changed(self):
+    def is_fits_params_changed(self):
+        params = self.get_fit_params()
         # Get params
         circle_args = params[0]
         ellipse_args = params[1]
@@ -752,7 +760,7 @@ class DSA_mem(DSA):
         new_params = {'method': self.fit_method,
                       'args': new_args}
         # Check if need to recompute
-        if not self.is_fits_param_changed():
+        if not self.is_fits_params_changed():
             return None
         # Fit
         hook = self.get_progressbar_hook('Fitting edges',
@@ -979,6 +987,13 @@ class DSA_hdd(DSA):
         pass
 
     def compute_fits(self):
+        # # use cached value if possible
+        # if (not self.is_edges_param_changed()
+        #     and not self.is_precomp_params_changed()
+        #     and not self.is_fits_params_changed()):
+        #     return self.fits
+        # Just for safety...
+        self.stop = False
         self.log.log('DSA backend: fitting edges for the image set', level=1)
         #
         if self.edge_detection_method is None:
@@ -1001,10 +1016,17 @@ class DSA_hdd(DSA):
             ts = [0, 1]
         else:
             for i, ind in enumerate(np.arange(ff, lf, N)):
-                fit = self.get_current_fit(ind)
+                self.app.globalapp.processEvents()
+                if self.stop:
+                    fit = fits[-1]
+                    fit.fits = [None, None]
+                    fit.thetas = None
+                else:
+                    fit = self.get_current_fit(ind)
                 fits.append(fit)
                 ts.append(ind*dt)
                 hook(i, int((lf - ff)/N))
+        self.stop = False
         hook(99, 100)
         #
         class Dummy(object):
