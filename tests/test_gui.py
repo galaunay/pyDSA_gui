@@ -73,6 +73,8 @@ class TestGui(object):
         # Set time sclaing
         self.ui.tab1_set_dt_text.setText('0.34')
         QTest.qWait(self.delay)
+        # Set number of frames to take
+        self.ui.tab1_set_N.setValue(10)
 
         #======================================================================
         # TAB 2
@@ -139,8 +141,34 @@ class TestGui(object):
         # Goto import tab
         self.ui.tabWidget.setCurrentIndex(0)
         QTest.qWait(self.delay)
-        self.w.tab1.import_images(None, [f'../tests/{i+1}.png'
-                                         for i in range(5)])
+        self.w.tab1.import_images(None,
+                                  [os.path.join(pwd, f'./test{i+1}.png')
+                                   for i in range(8)])
+        # Set number of frames to take
+        self.ui.tab1_set_N.setValue(1)
+
+        #==============================================================================
+        # Just chec if other tab are alright
+        #==============================================================================
+        self.ui.tabWidget.setCurrentIndex(1)
+        self.ui.tab2_contour_box.setChecked(True)
+        QTest.qWait(self.delay)
+        self.ui.tabWidget.setCurrentIndex(2)
+        QTest.qWait(self.delay)
+        self.ui.tabWidget.setCurrentIndex(3)
+        QTest.qWait(self.delay)
+        self.ui.tab4_combo_yaxis.setCurrentIndex(6)
+        QTest.qWait(self.delay)
+        self.ui.tab4_yaxis2_box.setChecked(False)
+        QTest.qWait(self.delay)
+
+        #==============================================================================
+        # Back to TAB 1 to import an image
+        #==============================================================================
+        # Goto import tab
+        self.ui.tabWidget.setCurrentIndex(0)
+        QTest.qWait(self.delay)
+        self.w.tab1.import_image(None, os.path.join(pwd, './test1.png'))
         #==============================================================================
         # Just chec if other tab are alright
         #==============================================================================

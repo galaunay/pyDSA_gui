@@ -291,6 +291,7 @@ class DSA(object):
         ff, lf = precomp_params['cropt']
         unit_x = dx.strUnit()[1:-1]
         unit_t = dt.strUnit()[1:-1]
+        dt = float(dt.asNumber())
         # Get quantity
         try:
             if quant == 'Frame number':
@@ -796,6 +797,21 @@ class DSA_hdd(DSA):
     def __init__(self, app):
         super().__init__(app)
 
+    def import_image(self, filepath):
+        return self.import_images([filepath])
+
+    def import_images(self, filepaths):
+        self.log.log(f'DSA backend: Importing image set: {filepaths}', level=1)
+        filepaths.sort()
+        self.filepath = filepaths
+        self.vid = filepaths
+        self.ims = None
+        self.nmb_frames = len(filepaths)
+        tmp_im = dsa.import_from_image(filepaths[0], dtype=np.uint8)
+        self.sizex = tmp_im.shape[0]
+        self.sizey = tmp_im.shape[1]
+        return True
+
     def import_video(self, filepath):
         self.log.log(f'DSA backend: Importing video: {filepath}', level=1)
         self.filepath_type = 'video'
@@ -806,6 +822,7 @@ class DSA_hdd(DSA):
         self.nmb_frames = int(self.vid.get(cv2.CAP_PROP_FRAME_COUNT))
         self.sizex = int(self.vid.get(cv2.CAP_PROP_FRAME_WIDTH))
         self.sizey = int(self.vid.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        self.dt = 1
         return True
 
     def is_initialized(self):
@@ -814,21 +831,34 @@ class DSA_hdd(DSA):
         return False
 
     def get_dt(self):
-        return 1/float(self.vid.get(cv2.CAP_PROP_FPS))
+        if isinstance(self.vid, cv2.VideoCapture):
+            return 1/float(self.vid.get(cv2.CAP_PROP_FPS))
+        elif isinstance(self.vid, list):
+            return self.dt
+        else:
+            self.log.log("Cannot get the value of dt...", level=3)
+            return 1
 
     def get_current_raw_im(self, ind):
-        self.vid.set(cv2.CAP_PROP_POS_FRAMES, ind)
         im = dsa.Image()
-        success, data = self.vid.read()
-        data = cv2.cvtColor(data, cv2.COLOR_RGB2GRAY)
-        data = data.transpose()[:, ::-1]
-        if not success:
-            self.log.log(f"Can't decode frame number {ind}", level=3)
-            return self.default_image
-        im.import_from_arrays(range(self.sizex), range(self.sizey),
-                              unit_x="", unit_y="",
-                              values=data, dtype=np.uint8,
-                              dontchecknans=True)
+        if isinstance(self.vid, cv2.VideoCapture):
+            self.vid.set(cv2.CAP_PROP_POS_FRAMES, ind)
+            success, data = self.vid.read()
+            data = cv2.cvtColor(data, cv2.COLOR_RGB2GRAY)
+            data = data.transpose()[:, ::-1]
+            if not success:
+                self.log.log(f"Can't decode frame number {ind}", level=3)
+                return self.default_image
+            im.import_from_arrays(range(self.sizex), range(self.sizey),
+                                  unit_x="", unit_y="",
+                                  values=data, dtype=np.uint8,
+                                  dontchecknans=True)
+        elif isinstance(self.vid, list):
+            im = dsa.import_from_image(self.vid[ind], cache_infos=False,
+                                       dtype=np.uint8)
+        else:
+            self.log.log("Cannot get the current image... ", level=3)
+            im = self.default_image
         return im
 
     def get_current_precomp_im(self, ind):
@@ -924,18 +954,21 @@ class DSA_hdd(DSA):
                 elif self.fit_method == 'spline':
                     fit = edge.fit_spline(**spline_args)
                 else:
-                    self.log.lof("No fitting method selected", level=2)
+                    self.log.log("No fitting method selected", level=2)
                     return dsa.DropFit(edge.baseline, edge.x_bounds,
                                        edge.y_bounds)
             except Exception:
                 self.log.log("Couldn't find a fit here...", level=2)
-                return dsa.DropFit(edge.baseline, edge.x_bounds,
+                fit = dsa.DropFit(edge.baseline, edge.x_bounds,
                                    edge.y_bounds)
             except:
                 self.log.log_unknown_exception()
-                return dsa.DropFit(edge.baseline, edge.x_bounds, edge.y_bounds)
+                fit = dsa.DropFit(edge.baseline, edge.x_bounds, edge.y_bounds)
             # contact angle
-            fit.compute_contact_angle()
+            try:
+                fit.compute_contact_angle()
+            except:
+                pass
             # Update cache
             self.fit_cache[ind] = fit
             self.fit_cache_params = params
@@ -956,25 +989,33 @@ class DSA_hdd(DSA):
         precomp_params = self.app.tab1.get_params()
         # Compute
         N = precomp_params['N']
-        dt = precomp_params['dt']
+        dt = float(precomp_params['dt'].asNumber())
         ff, lf = precomp_params['cropt']
+        im = self.get_current_precomp_im(0)
+        hook = self.get_progressbar_hook('Detecting edges', 'Detected edges')
         fits = []
+        ts = []
+        # in case of just one image
+        if self.nmb_frames == 1:
+            fits = [self.get_current_fit(0)]*2
+            ts = [0, 1]
+        else:
+            for i, ind in enumerate(np.arange(ff, lf, N)):
+                fit = self.get_current_fit(ind)
+                fits.append(fit)
+                ts.append(ind*dt)
+                hook(i, int((lf - ff)/N))
+        hook(99, 100)
+        #
         class Dummy(object):
             pass
         edges = Dummy()
         edges.dt = dt
-        edges.times = np.arange(0, self.nmb_frames, 1)*dt
+        edges.times = ts
         edges.unit_times = make_unit("s")
         edges.unit_x = make_unit("")
         edges.unit_y = make_unit("")
-        im = self.get_current_precomp_im(0)
         edges.baseline = im.baseline
-        hook = self.get_progressbar_hook('Detecting edges', 'Detected edges')
-        for i in np.arange(ff, lf, N):
-            fit = self.get_current_fit(i)
-            fits.append(fit)
-            hook(i, lf - ff)
-        hook(self.nmb_frames, (lf - ff) - 1)
         # store
         if self.fit_method == 'circle':
             fits2 = dsa.temporalfits.TemporalCircleFits(fits, edges)

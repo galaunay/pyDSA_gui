@@ -35,7 +35,7 @@ import numpy as np
 from IMTreatment.utils import make_unit
 import re
 from .design import Ui_MainWindow
-from .dsa_backend import DSA
+from .dsa_backend import DSA_hdd as DSA
 from .log import Log
 
 
@@ -167,9 +167,10 @@ class TabImport(Tab):
         pt2 = [9/10*w, 2/3*h]
         self.ui.mplwidgetimport.update_baseline(pt1, pt2)
 
-    def import_image(self, toggle=None):
-        # Select image to import
-        filepath = select_file('Open image')[0]
+    def import_image(self, toggle=None, filepath=None):
+        if filepath is None:
+            # Select image to import
+            filepath = select_file('Open image')[0]
         # Import image
         success = self.dsa.import_image(filepath)
         self.current_ind = 0
