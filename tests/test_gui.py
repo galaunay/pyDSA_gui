@@ -37,7 +37,7 @@ class TestGui(object):
 
     def setup(self):
         self.app = QApplication([])
-        self.w = AppWindow()
+        self.w = AppWindow(self.app)
         self.ui = self.w.ui
         self.delay = 100
 
