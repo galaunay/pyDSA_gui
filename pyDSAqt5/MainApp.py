@@ -26,6 +26,7 @@ __email__ = "gaby.launay@tutanota.com"
 __status__ = "Development"
 
 
+from datetime import datetime
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog,\
     QDialog
@@ -759,7 +760,9 @@ class TabAnalyze(Tab):
                 headers.append(f'{quant} [{unit}]')
             data = np.array(data, dtype=float).transpose()
             np.savetxt(filepath, data, delimiter=', ',
-                       header=", ".join(headers))
+                       header=f"File: {self.dsa.filepath}\n"
+                       f"Analysis date: {datetime.utcnow()}\n"
+                       + ", ".join(headers))
             self.log.log(f"Save data in {filepath}", level=1)
         except:
             self.log.log_unknown_exception()
