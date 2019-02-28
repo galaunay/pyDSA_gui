@@ -814,21 +814,41 @@ class DSA_hdd(DSA):
     def import_images(self, filepaths):
         self.log.log(f'DSA backend: Importing image set: {filepaths}', level=1)
         filepaths.sort()
+        try:
+            tmp_im = dsa.import_from_image(filepaths[0], dtype=np.uint8)
+        except OSError:
+            self.log.log(f'Could not load images from first image: '
+                         f'{filepaths[0]}', level=3)
+            return None
+        except:
+            self.log.log_unknown_exception()
+            return None
         self.filepath = filepaths
         self.vid = filepaths
         self.ims = None
         self.nmb_frames = len(filepaths)
-        tmp_im = dsa.import_from_image(filepaths[0], dtype=np.uint8)
         self.sizex = tmp_im.shape[0]
         self.sizey = tmp_im.shape[1]
         return True
 
     def import_video(self, filepath):
         self.log.log(f'DSA backend: Importing video: {filepath}', level=1)
+        try:
+            vid = cv2.VideoCapture()
+            vid.open(filepath)
+            success, data = vid.read()
+            if not success:
+                raise OSError()
+        except OSError:
+            self.log.log(f'Could not load video from: '
+                         f'{filepath}', level=3)
+            return None
+        except:
+            self.log.log_unknown_exception()
+            return None
+        self.vid = vid
         self.filepath_type = 'video'
         self.filepath = filepath
-        self.vid = cv2.VideoCapture()
-        self.vid.open(filepath)
         self.ims = None
         self.nmb_frames = int(self.vid.get(cv2.CAP_PROP_FRAME_COUNT))
         self.sizex = int(self.vid.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -861,19 +881,35 @@ class DSA_hdd(DSA):
         im = dsa.Image()
         if isinstance(self.vid, cv2.VideoCapture):
             self.vid.set(cv2.CAP_PROP_POS_FRAMES, ind)
-            success, data = self.vid.read()
-            data = cv2.cvtColor(data, cv2.COLOR_RGB2GRAY)
-            data = data.transpose()[:, ::-1]
+            try:
+                success, data = self.vid.read()
+            except OSError:
+                self.log.log(f'Could not load video from: '
+                             f'{self.filepath}', level=3)
+                return self.default_image
+            except:
+                self.log.log_unknown_exception()
+                return self.default_image
             if not success:
                 self.log.log(f"Can't decode frame number {ind}", level=3)
                 return self.default_image
+            data = cv2.cvtColor(data, cv2.COLOR_RGB2GRAY)
+            data = data.transpose()[:, ::-1]
             im.import_from_arrays(range(self.sizex), range(self.sizey),
                                   unit_x="", unit_y="",
                                   values=data, dtype=np.uint8,
                                   dontchecknans=True)
         elif isinstance(self.vid, list):
-            im = dsa.import_from_image(self.vid[ind], cache_infos=False,
-                                       dtype=np.uint8)
+            try:
+                im = dsa.import_from_image(self.vid[ind], cache_infos=False,
+                                           dtype=np.uint8)
+            except OSError:
+                self.log.log(f'Could not load image from: '
+                             f'{self.vid[ind]}', level=3)
+                return self.default_image
+            except:
+                self.log.log_unknown_exception()
+                return self.default_image
         else:
             self.log.log("Cannot get the current image... ", level=3)
             im = self.default_image
