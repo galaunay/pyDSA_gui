@@ -21,7 +21,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -334,7 +334,7 @@
                <number>0</number>
               </property>
               <item>
-               <widget class="QLabel" name="label">
+               <widget class="QLabel" name="tab1_label_frame">
                 <property name="minimumSize">
                  <size>
                   <width>40</width>
@@ -377,7 +377,7 @@
                <number>0</number>
               </property>
               <item>
-               <widget class="QLabel" name="label_17">
+               <widget class="QLabel" name="tab1_label_first">
                 <property name="minimumSize">
                  <size>
                   <width>40</width>
@@ -420,7 +420,7 @@
                <number>0</number>
               </property>
               <item>
-               <widget class="QLabel" name="label_18">
+               <widget class="QLabel" name="tab1_label_last">
                 <property name="minimumSize">
                  <size>
                   <width>40</width>
@@ -837,7 +837,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_4">
             <item>
-             <widget class="QLabel" name="label_2">
+             <widget class="QLabel" name="tab2_label_frame">
               <property name="text">
                <string>Frames</string>
               </property>
@@ -1178,7 +1178,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_10">
             <item>
-             <widget class="QLabel" name="label_20">
+             <widget class="QLabel" name="tab3_label_frame">
               <property name="text">
                <string>Frames</string>
               </property>

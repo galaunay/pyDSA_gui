@@ -2,12 +2,11 @@
 
 # Form implementation generated from reading ui file 'design.ui'
 #
-# Created by: PyQt5 UI code generator 5.12
+# Created by: PyQt5 UI code generator 5.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -141,10 +140,10 @@ class Ui_MainWindow(object):
         self.horizontalLayout_12 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_12.setContentsMargins(-1, 0, -1, -1)
         self.horizontalLayout_12.setObjectName("horizontalLayout_12")
-        self.label = QtWidgets.QLabel(self.tabimport)
-        self.label.setMinimumSize(QtCore.QSize(40, 0))
-        self.label.setObjectName("label")
-        self.horizontalLayout_12.addWidget(self.label)
+        self.tab1_label_frame = QtWidgets.QLabel(self.tabimport)
+        self.tab1_label_frame.setMinimumSize(QtCore.QSize(40, 0))
+        self.tab1_label_frame.setObjectName("tab1_label_frame")
+        self.horizontalLayout_12.addWidget(self.tab1_label_frame)
         self.tab1_spinbox_frame = QtWidgets.QSpinBox(self.tabimport)
         self.tab1_spinbox_frame.setEnabled(False)
         self.tab1_spinbox_frame.setObjectName("tab1_spinbox_frame")
@@ -158,10 +157,10 @@ class Ui_MainWindow(object):
         self.horizontalLayout_15 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_15.setContentsMargins(-1, 0, -1, -1)
         self.horizontalLayout_15.setObjectName("horizontalLayout_15")
-        self.label_17 = QtWidgets.QLabel(self.tabimport)
-        self.label_17.setMinimumSize(QtCore.QSize(40, 0))
-        self.label_17.setObjectName("label_17")
-        self.horizontalLayout_15.addWidget(self.label_17)
+        self.tab1_label_first = QtWidgets.QLabel(self.tabimport)
+        self.tab1_label_first.setMinimumSize(QtCore.QSize(40, 0))
+        self.tab1_label_first.setObjectName("tab1_label_first")
+        self.horizontalLayout_15.addWidget(self.tab1_label_first)
         self.tab1_spinbox_first = QtWidgets.QSpinBox(self.tabimport)
         self.tab1_spinbox_first.setEnabled(False)
         self.tab1_spinbox_first.setObjectName("tab1_spinbox_first")
@@ -175,10 +174,10 @@ class Ui_MainWindow(object):
         self.horizontalLayout_16 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_16.setContentsMargins(-1, 0, -1, -1)
         self.horizontalLayout_16.setObjectName("horizontalLayout_16")
-        self.label_18 = QtWidgets.QLabel(self.tabimport)
-        self.label_18.setMinimumSize(QtCore.QSize(40, 0))
-        self.label_18.setObjectName("label_18")
-        self.horizontalLayout_16.addWidget(self.label_18)
+        self.tab1_label_last = QtWidgets.QLabel(self.tabimport)
+        self.tab1_label_last.setMinimumSize(QtCore.QSize(40, 0))
+        self.tab1_label_last.setObjectName("tab1_label_last")
+        self.horizontalLayout_16.addWidget(self.tab1_label_last)
         self.tab1_spinbox_last = QtWidgets.QSpinBox(self.tabimport)
         self.tab1_spinbox_last.setEnabled(False)
         self.tab1_spinbox_last.setObjectName("tab1_spinbox_last")
@@ -334,9 +333,9 @@ class Ui_MainWindow(object):
         self.verticalLayout_6.addLayout(self.gridLayout_2)
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
-        self.label_2 = QtWidgets.QLabel(self.tabdetect)
-        self.label_2.setObjectName("label_2")
-        self.horizontalLayout_4.addWidget(self.label_2)
+        self.tab2_label_frame = QtWidgets.QLabel(self.tabdetect)
+        self.tab2_label_frame.setObjectName("tab2_label_frame")
+        self.horizontalLayout_4.addWidget(self.tab2_label_frame)
         self.tab2_spinbox = QtWidgets.QSpinBox(self.tabdetect)
         self.tab2_spinbox.setEnabled(False)
         self.tab2_spinbox.setObjectName("tab2_spinbox")
@@ -467,9 +466,9 @@ class Ui_MainWindow(object):
         self.verticalLayout_15.addLayout(self.gridLayout_3)
         self.horizontalLayout_10 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_10.setObjectName("horizontalLayout_10")
-        self.label_20 = QtWidgets.QLabel(self.tabfit)
-        self.label_20.setObjectName("label_20")
-        self.horizontalLayout_10.addWidget(self.label_20)
+        self.tab3_label_frame = QtWidgets.QLabel(self.tabfit)
+        self.tab3_label_frame.setObjectName("tab3_label_frame")
+        self.horizontalLayout_10.addWidget(self.tab3_label_frame)
         self.tab3_spinbox = QtWidgets.QSpinBox(self.tabfit)
         self.tab3_spinbox.setEnabled(False)
         self.tab3_spinbox.setObjectName("tab3_spinbox")
@@ -657,7 +656,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(2)
         self.tab1_import_image_button.clicked.connect(MainWindow.tab1.import_image)
         self.tab1_import_video_button.clicked.connect(MainWindow.tab1.import_video)
         self.tab1_reset_crop.clicked.connect(MainWindow.tab1.reset_crop)
@@ -737,13 +736,13 @@ class Ui_MainWindow(object):
         self.tab1_set_dt_text.setToolTip(_translate("MainWindow", "Interval of time between two frames (in second)"))
         self.tab1_set_dt_text.setText(_translate("MainWindow", "1"))
         self.tab1_number_frame_box.setTitle(_translate("MainWindow", "Use every N frames"))
-        self.label.setText(_translate("MainWindow", "Frame"))
+        self.tab1_label_frame.setText(_translate("MainWindow", "Frame"))
         self.tab1_spinbox_frame.setToolTip(_translate("MainWindow", "Frame number to display"))
         self.tab1_frameslider.setToolTip(_translate("MainWindow", "Frame number to display"))
-        self.label_17.setText(_translate("MainWindow", "First"))
+        self.tab1_label_first.setText(_translate("MainWindow", "First"))
         self.tab1_spinbox_first.setToolTip(_translate("MainWindow", "First frame to analyze"))
         self.tab1_frameslider_first.setToolTip(_translate("MainWindow", "First frame to analyze"))
-        self.label_18.setText(_translate("MainWindow", "Last"))
+        self.tab1_label_last.setText(_translate("MainWindow", "Last"))
         self.tab1_spinbox_last.setToolTip(_translate("MainWindow", "Last frame to analyze"))
         self.tab1_frameslider_last.setToolTip(_translate("MainWindow", "Last frame to analyze"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabimport), _translate("MainWindow", "Import"))
@@ -769,7 +768,7 @@ class Ui_MainWindow(object):
         self.tab2_ign_pixels.setToolTip(_translate("MainWindow", "Number of pixel ignored near the baseline (increase this if the drop edges are difficult to see near the baseline)"))
         self.label_10.setText(_translate("MainWindow", "Size ratio"))
         self.tab2_size_ratio.setToolTip(_translate("MainWindow", "Maximal size ratio between separated edges (if applicable)"))
-        self.label_2.setText(_translate("MainWindow", "Frames"))
+        self.tab2_label_frame.setText(_translate("MainWindow", "Frames"))
         self.tab2_spinbox.setToolTip(_translate("MainWindow", "Frame number to display"))
         self.tab2_frameslider.setToolTip(_translate("MainWindow", "Frame number to display"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabdetect), _translate("MainWindow", "Edge detection"))
@@ -787,7 +786,7 @@ class Ui_MainWindow(object):
         self.tab3_spline_deg.setToolTip(_translate("MainWindow", "Degree of the spline (up to 5)"))
         self.label_14.setText(_translate("MainWindow", "Smooth"))
         self.tab3_spline_smooth.setToolTip(_translate("MainWindow", "Smoothiness of the spline"))
-        self.label_20.setText(_translate("MainWindow", "Frames"))
+        self.tab3_label_frame.setText(_translate("MainWindow", "Frames"))
         self.tab3_spinbox.setToolTip(_translate("MainWindow", "Frame number to display"))
         self.tab3_frameslider.setToolTip(_translate("MainWindow", "Frame number to display"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabfit), _translate("MainWindow", "Fitting"))
@@ -805,6 +804,5 @@ class Ui_MainWindow(object):
         self.tab4_export_csv_button.setText(_translate("MainWindow", "Export as csv"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabanalyze), _translate("MainWindow", "Analyze"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab4_log), _translate("MainWindow", "Log"))
-
 
 from .MPLWidget import MplWidgetAnalyze, MplWidgetDetect, MplWidgetFit, MplWidgetImport

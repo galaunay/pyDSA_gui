@@ -135,12 +135,14 @@ class TabImport(Tab):
                       self.ui.tab1_frameslider_first,
                       self.ui.tab1_frameslider_last]:
             slide.setEnabled(True)
+            slide.setVisible(True)
             slide.setMinimum(1)
             slide.setMaximum(self.dsa.nmb_frames)
         for spin in [self.ui.tab1_spinbox_frame,
                      self.ui.tab1_spinbox_first,
                      self.ui.tab1_spinbox_last]:
             spin.setEnabled(True)
+            spin.setVisible(True)
             spin.setMinimum(1)
             spin.setMaximum(self.dsa.nmb_frames)
         self.ui.tab1_frameslider_last.setValue(self.dsa.nmb_frames)
@@ -152,10 +154,16 @@ class TabImport(Tab):
                       self.ui.tab1_frameslider_first,
                       self.ui.tab1_frameslider_last]:
             slide.setEnabled(False)
+            slide.setVisible(False)
         for spin in [self.ui.tab1_spinbox_frame,
                      self.ui.tab1_spinbox_first,
                      self.ui.tab1_spinbox_last]:
             spin.setEnabled(False)
+            spin.setVisible(False)
+        for text in [self.ui.tab1_label_frame,
+                     self.ui.tab1_label_last,
+                     self.ui.tab1_label_first]:
+            text.setVisible(False)
 
     def enable_cropping(self):
         im = self.dsa.get_current_raw_im(self.app.current_ind)
@@ -381,12 +389,20 @@ class TabEdges(Tab):
         self.ui.tab2_spinbox.setEnabled(True)
         self.ui.tab2_frameslider.setValue(self.app.current_ind)
         self.ui.tab2_spinbox.setValue(self.app.current_ind)
+        for widg in [self.ui.tab2_label_frame,
+                     self.ui.tab2_spinbox,
+                     self.ui.tab2_frameslider]:
+            widg.setVisible(True)
         self._disable_frame_updater = False
 
     def disable_frame_sliders(self):
         self._disable_frame_updater = True
         self.ui.tab2_frameslider.setEnabled(False)
         self.ui.tab2_spinbox.setEnabled(False)
+        for widg in [self.ui.tab2_label_frame,
+                     self.ui.tab2_spinbox,
+                     self.ui.tab2_frameslider]:
+            widg.setVisible(False)
         self._disable_frame_updater = False
 
     def get_params(self):
@@ -498,12 +514,20 @@ class TabFits(Tab):
         self.ui.tab3_spinbox.setEnabled(True)
         self.ui.tab3_frameslider.setValue(self.app.current_ind)
         self.ui.tab3_spinbox.setValue(self.app.current_ind)
+        for widg in [self.ui.tab3_label_frame,
+                     self.ui.tab3_spinbox,
+                     self.ui.tab3_frameslider]:
+            widg.setVisible(True)
         self._disable_frame_updater = False
 
     def disable_frame_sliders(self):
         self._disable_frame_updater = True
         self.ui.tab3_frameslider.setEnabled(False)
         self.ui.tab3_spinbox.setEnabled(False)
+        for widg in [self.ui.tab3_label_frame,
+                     self.ui.tab3_spinbox,
+                     self.ui.tab3_frameslider]:
+            widg.setVisible(False)
         self._disable_frame_updater = False
 
     def get_params(self):
