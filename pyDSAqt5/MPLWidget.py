@@ -477,7 +477,7 @@ class MplWidgetAnalyze(MplWidget):
             self.vertical_line.unselect_hand()
 
     def update_plots(self, x, y, y2, y_orig, y2_orig,
-                     xname, yname, y2name,
+                     xname, yname, y2name, same_y_lims=False,
                      draw=True, replot=False):
         # Because of issues with the vertical line hand...
         if draw:
@@ -523,7 +523,7 @@ class MplWidgetAnalyze(MplWidget):
         else:
             self.ax2.set_visible(False)
         # Update limits
-        self.update_lims(x, y, y2, y_orig, y2_orig)
+        self.update_lims(x, y, y2, y_orig, y2_orig, samelims=same_y_lims)
         # Update the vertical line position
         if len(x) > 1:
             self.vertical_line.update_line_pos((np.max(x) + np.min(x))/2)
@@ -538,7 +538,7 @@ class MplWidgetAnalyze(MplWidget):
         if draw:
             self.canvas.draw()
 
-    def update_lims(self, x, y, y2, y_orig, y2_orig):
+    def update_lims(self, x, y, y2, y_orig, y2_orig, samelims=False):
         # margin
         margin = 1/50
         # x
@@ -565,7 +565,6 @@ class MplWidgetAnalyze(MplWidget):
         dy = y_max - y_min
         if dy == 0:
             dy = 0.1
-        self.ax.set_ylim(y_min - dy*margin, y_max + dy*margin)
         # y2
         y2 = np.concatenate((y2, y2_orig))
         if len(y2) <= 1 or np.all(np.isnan(y2)):
@@ -578,7 +577,16 @@ class MplWidgetAnalyze(MplWidget):
         dy2 = y2_max - y2_min
         if dy2 == 0:
             dy2 = 0.1
-        self.ax2.set_ylim(y2_min - dy2*margin, y2_max + dy2*margin)
+        # Set y lims
+        if samelims:
+            y_min = np.min([y_min, y2_min])
+            y_max = np.max([y_max, y2_max])
+            dy = np.max([dy, dy2])
+            self.ax.set_ylim(y_min - dy*margin, y_max + dy*margin)
+            self.ax2.set_ylim(y_min - dy*margin, y_max + dy*margin)
+        else:
+            self.ax.set_ylim(y_min - dy*margin, y_max + dy*margin)
+            self.ax2.set_ylim(y2_min - dy2*margin, y2_max + dy2*margin)
         # dummy ax3
         self.ax3.set_xlim(self.ax.get_xlim())
         self.ax3.set_ylim(self.ax.get_xlim())

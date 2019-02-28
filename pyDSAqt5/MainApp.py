@@ -722,12 +722,20 @@ class TabAnalyze(Tab):
         xname = f'{xaxis} [{unit_x}]'
         yname = f'{yaxis} [{unit_y}]'
         yname2 = f'{yaxis2} [{unit_y2}]'
+        # Should the plots share the same ylims
+        shared_names = ['Position', 'CL velocity', 'CA']
+        sameylims = False
+        for sname in shared_names:
+            if yaxis.startswith(sname) and yaxis2.startswith(sname):
+                sameylims = True
+                break
         #
         self.ui.mplwidgetanalyze.update_plots(x, y, y2,
                                               y_orig, y2_orig,
                                               xname=xname,
                                               yname=yname,
                                               y2name=yname2,
+                                              same_y_lims=sameylims,
                                               replot=replot,
                                               draw=draw)
 
