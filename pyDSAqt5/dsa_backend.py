@@ -815,7 +815,8 @@ class DSA_hdd(DSA):
         self.log.log(f'DSA backend: Importing image set: {filepaths}', level=1)
         filepaths.sort()
         try:
-            tmp_im = dsa.import_from_image(filepaths[0], dtype=np.uint8)
+            tmp_im = dsa.import_from_image(filepaths[0], dtype=np.uint8,
+                                           cache_infos=False)
         except OSError:
             self.log.log(f'Could not load images from first image: '
                          f'{filepaths[0]}', level=3)
