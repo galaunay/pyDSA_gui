@@ -282,7 +282,7 @@ class DSA(object):
         # fits should be computed already...
         if self.fits is None:
             self.log.log('Fit need to be computed first', level=3)
-            return [], ""
+            return [], [], ""
         # check if already cached !
         cache_name = f"{quant}_smooth{smooth}"
         try:
@@ -804,6 +804,9 @@ class DSA_hdd(DSA):
 
     def __init__(self, app):
         super().__init__(app)
+        self.cached_current_raw_im = None
+        self.cached_current_precomp_im = None
+        self.cached_current_ind = None
 
     def import_image(self, filepath):
         return self.import_images([filepath])
@@ -848,6 +851,13 @@ class DSA_hdd(DSA):
             return 1
 
     def get_current_raw_im(self, ind):
+        # check if can use the cached one
+        if (self.cached_current_ind is not None
+            and self.cached_current_raw_im is not None):
+            if self.cached_current_ind == ind:
+                print("Used cached raw")
+                return self.cached_current_raw_im
+        # Import from hdd
         im = dsa.Image()
         if isinstance(self.vid, cv2.VideoCapture):
             self.vid.set(cv2.CAP_PROP_POS_FRAMES, ind)
@@ -867,9 +877,22 @@ class DSA_hdd(DSA):
         else:
             self.log.log("Cannot get the current image... ", level=3)
             im = self.default_image
+        # update the cache
+        if self.cached_current_ind != ind:
+            self.cached_current_precomp_im = None
+            self.cached_current_ind = ind
+        self.cached_current_raw_im = im
+        # return
         return im
 
     def get_current_precomp_im(self, ind):
+        # check if can use the cached one
+        if (self.cached_current_ind is not None
+            and self.cached_current_precomp_im is not None):
+            if self.cached_current_ind == ind:
+                print("Used cached precomp")
+                return self.cached_current_precomp_im
+        # import from hdd
         params = self.get_precomp_params()
         im_precomp = self.get_current_raw_im(ind).copy()
         # Baseline
@@ -892,6 +915,11 @@ class DSA_hdd(DSA):
                              inplace=True)
         except:
             self.log.log_unknown_exception()
+        # update the cache
+        if self.cached_current_ind != ind:
+            self.cached_current_raw_im = None
+            self.cached_current_ind = ind
+        self.cached_current_precomp_im = im_precomp
         # store
         return im_precomp
 

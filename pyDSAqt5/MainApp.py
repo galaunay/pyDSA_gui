@@ -715,9 +715,13 @@ class TabAnalyze(Tab):
                          f'\n{xaxis} is {len(x)} and {yaxis} is {len(y)}',
                          level=3)
             if len(x) < len(y):
-                y[0:len(x)]
+                x = [np.nan]*len(x)
+                y = [np.nan]*len(x)
+                y2 = [np.nan]*len(x)
             else:
-                x[0:len(y)]
+                x = [np.nan]*len(y)
+                y = [np.nan]*len(y)
+                y2 = [np.nan]*len(y)
         # Names
         xname = f'{xaxis} [{unit_x}]'
         yname = f'{yaxis} [{unit_y}]'
