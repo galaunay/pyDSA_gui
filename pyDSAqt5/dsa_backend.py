@@ -1068,7 +1068,7 @@ class DSA_hdd(DSA):
         dt = float(precomp_params['dt'].asNumber())
         ff, lf = precomp_params['cropt']
         im = self.get_current_precomp_im(0)
-        hook = self.get_progressbar_hook('Detecting edges', 'Detected edges')
+        hook = self.get_progressbar_hook('Computing', 'Computation done')
         fits = []
         ts = []
         # in case of just one image
