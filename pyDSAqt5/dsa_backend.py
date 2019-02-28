@@ -77,9 +77,12 @@ class DSA(object):
             self.edge_cache_params = self.get_edge_params()
             self.fit_cache_params = self.get_fit_params()
             self.precomp_cache_params = self.get_precomp_params()
-        elif self.is_fits_params_changed():
+            return True
+        if self.is_fits_params_changed():
             self.reset_cache(edge=False)
             self.fit_cache_params = self.get_fit_params()
+            return True
+        return False
 
     def reset_cache(self, edge=True, fit=True):
         if self.nmb_frames is not None:
@@ -87,6 +90,7 @@ class DSA(object):
                 self.edge_cache = [None]*self.nmb_frames
             if fit:
                 self.fit_cache = [None]*self.nmb_frames
+            self.clear_plottable_quantity_cache()
 
     def get_progressbar_hook(self, text_progress, text_finished):
         def hook(i, maxi):
@@ -161,9 +165,6 @@ class DSA(object):
             if params[d].strUnit() != self.precomp_cache_params[d].strUnit():
                 return True
             elif params[d].asNumber() != self.precomp_cache_params[d].asNumber():
-                return True
-        for p in ['N']:
-            if params[p] != self.precomp_cache_params[p]:
                 return True
         for crop in ['lims', 'baseline_pts', 'cropt']:
             if np.any(params[crop] != self.precomp_cache_params[crop]):
@@ -278,6 +279,9 @@ class DSA(object):
     def compute_cas(self, ind):
         raise NotImplementedError
 
+    def get_run_params(self):
+        return self.app.tab4.get_params()
+
     def get_plotable_quantity(self, quant, smooth=0):
         # fits should be computed already...
         if self.fits is None:
@@ -292,12 +296,14 @@ class DSA(object):
         # Get units
         precomp_params = self.get_precomp_params()
         dx = precomp_params['dx']
-        N = precomp_params['N']
         dt = precomp_params['dt']
         ff, lf = precomp_params['cropt']
         unit_x = dx.strUnit()[1:-1]
         unit_t = dt.strUnit()[1:-1]
         dt = float(dt.asNumber())
+        #
+        run_params = self.get_run_params()
+        N = run_params['N']
         # Get quantity
         try:
             if quant == 'Frame number':
@@ -670,7 +676,8 @@ class DSA_mem(DSA):
             return None
         # Only use certains frames
         self.precompute_images()
-        N = precomp_params['N']
+        run_params = self.get_run_params()
+        N = run_params['N']
         if N < 0:
             N = 1
         try:
@@ -1065,7 +1072,8 @@ class DSA_hdd(DSA):
         # Get params
         precomp_params = self.app.tab1.get_params()
         # Compute
-        N = precomp_params['N']
+        run_params = self.get_run_params()
+        N = run_params['N']
         dt = float(precomp_params['dt'].asNumber())
         ff, lf = precomp_params['cropt']
         im = self.get_current_precomp_im(0)

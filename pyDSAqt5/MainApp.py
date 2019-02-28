@@ -107,15 +107,6 @@ class TabImport(Tab):
     def enable_options(self):
         self.ui.tab1_crop_box.setEnabled(True)
         self.ui.tab1_scaling_box.setEnabled(True)
-        if self.dsa.nmb_frames > 1:
-            self.ui.tab1_time_box.setEnabled(True)
-            self.ui.tab1_number_frame_box.setEnabled(True)
-            self.ui.tab1_set_N.setValue(1)
-            self.ui.tab1_set_N.setMinimum(1)
-            self.ui.tab1_set_N.setMaximum(self.dsa.nmb_frames)
-        else:
-            self.ui.tab1_time_box.setEnabled(False)
-            self.ui.tab1_number_frame_box.setEnabled(False)
 
     def is_inputs_valid(self):
         try:
@@ -289,10 +280,6 @@ class TabImport(Tab):
             else:
                 dx = make_unit('')
             dic['dx'] = dx
-        # number of frames
-        if arg is None or arg == 'N':
-            N = int(self.ui.tab1_set_N.value())
-            dic['N'] = N
         # cropx and cropy
         if arg is None or arg == 'lims':
             xlims, ylims = self.ui.mplwidgetimport.rect_hand.lims
@@ -636,21 +623,29 @@ class TabAnalyze(Tab):
         # initialize if needed
         if not self.initialized:
             self.initialize()
-        draw = True
-        # if not self.already_opened:
-        #     draw = False
+        else:
+            # if self.dsa.check_cache():
+            self.update_plot()
+
+    def get_params(self, arg=None):
+        dic = {}
+        # number of frames
+        if arg is None or arg == 'N':
+            N = int(self.ui.tab4_set_N.value())
+            dic['N'] = N
+        return dic
+
+    def compute(self):
         # Clean
         if self.already_opened:
             self.clean_plot()
         # compute edges for every frames !
-        params = self.app.tab2.get_params()
         try:
             self.dsa.compute_edges()
         except:
             self.log.log_unknown_exception()
             return None
         # compute fits for every frames !
-        params = self.app.tab3.get_params()
         try:
             self.dsa.compute_fits()
         except:
@@ -659,7 +654,7 @@ class TabAnalyze(Tab):
         # Clear quantity cache
         self.dsa.clear_plottable_quantity_cache()
         #
-        self.update_plot(replot=True, draw=draw)
+        self.update_plot(replot=True, draw=True)
         self.already_opened = True
 
     def enable_options(self):
@@ -668,6 +663,14 @@ class TabAnalyze(Tab):
         self.ui.tab4_yaxis2_box.setEnabled(True)
         self.ui.tab4_local_values_box.setEnabled(True)
         self.ui.tab4_export_box.setEnabled(True)
+        self.ui.tab4_run_box.setEnabled(True)
+        if self.dsa.nmb_frames > 1:
+            self.ui.tab4_set_N.setEnabled(True)
+            self.ui.tab4_set_N.setValue(int(self.dsa.nmb_frames/100))
+            self.ui.tab4_set_N.setMinimum(1)
+            self.ui.tab4_set_N.setMaximum(self.dsa.nmb_frames)
+        else:
+            self.ui.tab4_set_N.setEnabled(False)
 
     def clean_plot(self):
         self.ui.mplwidgetanalyze.update_plots(

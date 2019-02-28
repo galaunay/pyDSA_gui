@@ -479,6 +479,13 @@ class MplWidgetAnalyze(MplWidget):
     def update_plots(self, x, y, y2, y_orig, y2_orig,
                      xname, yname, y2name, same_y_lims=False,
                      draw=True, replot=False):
+        # check
+        if np.all(np.isnan(x)) and np.all(np.isnan(y)):
+            x = []
+            y = []
+            y2 = []
+            y_orig = []
+            y2_orig = []
         # Because of issues with the vertical line hand...
         if draw:
             self.canvas.draw()

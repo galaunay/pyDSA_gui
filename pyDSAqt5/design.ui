@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1065</width>
-    <height>824</height>
+    <height>829</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,7 +21,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>3</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -217,25 +217,6 @@
                    <string>1</string>
                   </property>
                  </widget>
-                </item>
-               </layout>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
-            <widget class="QGroupBox" name="tab1_number_frame_box">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="title">
-              <string>Use every N frames</string>
-             </property>
-             <layout class="QVBoxLayout" name="verticalLayout_24">
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout">
-                <item>
-                 <widget class="QSpinBox" name="tab1_set_N"/>
                 </item>
                </layout>
               </item>
@@ -1240,6 +1221,73 @@
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_11">
            <item>
+            <widget class="QGroupBox" name="tab4_run_box">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_24">
+              <item>
+               <widget class="QLabel" name="label">
+                <property name="text">
+                 <string>Use every N frames</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="tab4_set_N"/>
+              </item>
+              <item>
+               <widget class="QPushButton" name="tab4_run_button">
+                <property name="text">
+                 <string>Compute</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="tab4_export_box">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="title">
+              <string>Export</string>
+             </property>
+             <property name="flat">
+              <bool>false</bool>
+             </property>
+             <property name="checkable">
+              <bool>false</bool>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_27">
+              <item>
+               <widget class="QPushButton" name="tab4_export_csv_button">
+                <property name="text">
+                 <string>Export as csv</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_13">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
             <widget class="QGroupBox" name="tab4_xaxis_box">
              <property name="enabled">
               <bool>false</bool>
@@ -1398,15 +1446,6 @@
              <property name="title">
               <string>Local values</string>
              </property>
-             <property name="flat">
-              <bool>false</bool>
-             </property>
-             <property name="checkable">
-              <bool>false</bool>
-             </property>
-             <property name="checked">
-              <bool>false</bool>
-             </property>
              <layout class="QVBoxLayout" name="verticalLayout_22">
               <item>
                <widget class="QLabel" name="tab4_local_x_label">
@@ -1454,35 +1493,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="tab4_export_box">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="title">
-              <string>Export</string>
-             </property>
-             <property name="flat">
-              <bool>false</bool>
-             </property>
-             <property name="checkable">
-              <bool>false</bool>
-             </property>
-             <property name="checked">
-              <bool>false</bool>
-             </property>
-             <layout class="QVBoxLayout" name="verticalLayout_27">
-              <item>
-               <widget class="QPushButton" name="tab4_export_csv_button">
-                <property name="text">
-                 <string>Export as csv</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
-            <spacer name="verticalSpacer_12">
+            <spacer name="verticalSpacer_14">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
              </property>
@@ -1498,65 +1509,75 @@
          </widget>
         </item>
         <item>
-         <layout class="QGridLayout" name="gridLayout_4">
-          <item row="1" column="1">
-           <widget class="MplWidgetAnalyze" name="mplwidgetanalyze" native="true">
-            <property name="cursor">
-             <cursorShape>ArrowCursor</cursorShape>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <spacer name="verticalSpacer_10">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="1" column="2">
-           <spacer name="horizontalSpacer_7">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="0" column="1">
-           <spacer name="verticalSpacer_11">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="1" column="0">
-           <spacer name="horizontalSpacer_8">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
+         <layout class="QVBoxLayout" name="verticalLayout_25">
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <layout class="QGridLayout" name="gridLayout_4">
+            <item row="0" column="1">
+             <spacer name="verticalSpacer_11">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="1" column="0">
+             <spacer name="horizontalSpacer_8">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="1" column="2">
+             <spacer name="horizontalSpacer_7">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="2" column="1">
+             <spacer name="verticalSpacer_10">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="1" column="1">
+             <widget class="MplWidgetAnalyze" name="mplwidgetanalyze" native="true">
+              <property name="cursor">
+               <cursorShape>ArrowCursor</cursorShape>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </item>
@@ -2138,8 +2159,8 @@
    <slot>tab4.update_plot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>147</x>
-     <y>126</y>
+     <x>171</x>
+     <y>327</y>
     </hint>
     <hint type="destinationlabel">
      <x>117</x>
@@ -2154,8 +2175,8 @@
    <slot>tab4.update_plot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>161</x>
-     <y>229</y>
+     <x>171</x>
+     <y>430</y>
     </hint>
     <hint type="destinationlabel">
      <x>139</x>
@@ -2331,7 +2352,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>171</x>
-     <y>627</y>
+     <y>250</y>
     </hint>
     <hint type="destinationlabel">
      <x>4</x>
@@ -2379,7 +2400,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>171</x>
-     <y>332</y>
+     <y>533</y>
     </hint>
     <hint type="destinationlabel">
      <x>282</x>
@@ -2394,8 +2415,8 @@
    <slot>tab4.toggle_axis2(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>85</x>
-     <y>280</y>
+     <x>103</x>
+     <y>577</y>
     </hint>
     <hint type="destinationlabel">
      <x>159</x>
@@ -2410,8 +2431,8 @@
    <slot>tab4.update_plot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>135</x>
-     <y>147</y>
+     <x>170</x>
+     <y>358</y>
     </hint>
     <hint type="destinationlabel">
      <x>253</x>
@@ -2426,8 +2447,8 @@
    <slot>tab4.update_plot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>134</x>
-     <y>350</y>
+     <x>170</x>
+     <y>564</y>
     </hint>
     <hint type="destinationlabel">
      <x>434</x>
@@ -2442,12 +2463,28 @@
    <slot>tab4.update_plot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>123</x>
-     <y>245</y>
+     <x>170</x>
+     <y>461</y>
     </hint>
     <hint type="destinationlabel">
      <x>567</x>
      <y>23</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab4_run_button</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab4.compute()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>89</x>
+     <y>171</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>3</x>
+     <y>32</y>
     </hint>
    </hints>
   </connection>
@@ -2477,5 +2514,6 @@
   <slot>tab1.set_first_frame(int)</slot>
   <slot>tab1.set_last_frame(int)</slot>
   <slot>tab4.export_as_csv()</slot>
+  <slot>tab4.compute()</slot>
  </slots>
 </ui>
