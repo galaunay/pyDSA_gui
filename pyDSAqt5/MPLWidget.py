@@ -499,10 +499,10 @@ class MplWidgetAnalyze(MplWidget):
                                       color=colors['plot1'])[0]
             self.plot2 = self.ax2.plot(x, y2,
                                        color=colors['plot2'])[0]
-            self.plot1_orig = self.ax.plot(x, y,
+            self.plot1_orig = self.ax.plot(x, y_orig,
                                            color=colors['plot1'],
                                            alpha=0.2)[0]
-            self.plot2_orig = self.ax2.plot(x, y2,
+            self.plot2_orig = self.ax2.plot(x, y2_orig,
                                             color=colors['plot2'],
                                             alpha=0.2)[0]
             self.indicator1 = self.ax.plot([], [], color=colors['plot1'],
