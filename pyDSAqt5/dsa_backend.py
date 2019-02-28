@@ -1015,11 +1015,7 @@ class DSA_hdd(DSA):
         pass
 
     def compute_fits(self):
-        # # use cached value if possible
-        # if (not self.is_edges_param_changed()
-        #     and not self.is_precomp_params_changed()
-        #     and not self.is_fits_params_changed()):
-        #     return self.fits
+        self.ui.tabWidget.setEnabled(False)
         # Just for safety...
         self.stop = False
         self.log.log('DSA backend: fitting edges for the image set', level=1)
@@ -1027,6 +1023,7 @@ class DSA_hdd(DSA):
         if self.edge_detection_method is None:
             self.edges = None
             self.fits = None
+            self.ui.tabWidget.setEnabled(True)
             return None
         # Get params
         precomp_params = self.app.tab1.get_params()
@@ -1077,6 +1074,6 @@ class DSA_hdd(DSA):
             fits2 = dsa.temporalfits.TemporalSplineFits(fits, edges)
         else:
             self.app.log.log('No fitting method selected', level=2)
-            self.fits = None
-            return None
+            fits2 = None
         self.fits = fits2
+        self.ui.tabWidget.setEnabled(True)
