@@ -77,10 +77,12 @@ class DSA(object):
             self.edge_cache_params = self.get_edge_params()
             self.fit_cache_params = self.get_fit_params()
             self.precomp_cache_params = self.get_precomp_params()
+            self.clear_plottable_quantity_cache()
             return True
         if self.is_fits_params_changed():
             self.reset_cache(edge=False)
             self.fit_cache_params = self.get_fit_params()
+            self.clear_plottable_quantity_cache()
             return True
         return False
 
@@ -91,6 +93,7 @@ class DSA(object):
             if fit:
                 self.fit_cache = [None]*self.nmb_frames
             self.clear_plottable_quantity_cache()
+            self.fits = None
 
     def get_progressbar_hook(self, text_progress, text_finished):
         def hook(i, maxi):
@@ -310,7 +313,7 @@ class DSA(object):
                 if self.nmb_frames == 1:
                     vals, unit = [0, 1], ""
                 else:
-                    vals, unit = np.arange(ff, lf, N), ""
+                    vals, unit = np.arange(ff, ff + N*len(self.fits), N), ""
             elif quant == 'Time':
                 vals, unit = self.fits.times, unit_t
             elif quant == 'Position (x, right)':
@@ -831,6 +834,7 @@ class DSA_hdd(DSA):
         except:
             self.log.log_unknown_exception()
             return None
+        self.reset_cache()
         self.filepath = filepaths
         self.vid = filepaths
         self.ims = None
@@ -854,6 +858,7 @@ class DSA_hdd(DSA):
         except:
             self.log.log_unknown_exception()
             return None
+        self.reset_cache()
         self.vid = vid
         self.filepath_type = 'video'
         self.filepath = filepath
@@ -879,11 +884,13 @@ class DSA_hdd(DSA):
             return 1
 
     def get_current_raw_im(self, ind):
+        if not self.is_valid_ind(ind):
+            self.log.log("Couldn't the asked frame number {ind}", level=3)
+            return self.default_image
         # check if can use the cached one
         if (self.cached_current_ind is not None
             and self.cached_current_raw_im is not None):
             if self.cached_current_ind == ind:
-                print("Used cached raw")
                 return self.cached_current_raw_im
         # Import from hdd
         im = dsa.Image()
@@ -934,7 +941,6 @@ class DSA_hdd(DSA):
         if (self.cached_current_ind is not None
             and self.cached_current_precomp_im is not None):
             if self.cached_current_ind == ind:
-                print("Used cached precomp")
                 return self.cached_current_precomp_im
         # import from hdd
         params = self.get_precomp_params()
@@ -1059,11 +1065,12 @@ class DSA_hdd(DSA):
         pass
 
     def compute_fits(self):
+        self.log.log('DSA backend: fitting edges for the image set', level=1)
+        # Forbid the user to interact with th gui
         self.ui.tabWidget.setEnabled(False)
         # Just for safety...
         self.stop = False
-        self.log.log('DSA backend: fitting edges for the image set', level=1)
-        #
+        # checks
         if self.edge_detection_method is None:
             self.edges = None
             self.fits = None
@@ -1071,7 +1078,6 @@ class DSA_hdd(DSA):
             return None
         # Get params
         precomp_params = self.app.tab1.get_params()
-        # Compute
         run_params = self.get_run_params()
         N = run_params['N']
         dt = float(precomp_params['dt'].asNumber())
@@ -1080,7 +1086,7 @@ class DSA_hdd(DSA):
         hook = self.get_progressbar_hook('Computing', 'Computation done')
         fits = []
         ts = []
-        # in case of just one image
+        # Compute
         if self.nmb_frames == 1:
             fits = [self.get_current_fit(0)]*2
             ts = [0, 1]
@@ -1089,7 +1095,7 @@ class DSA_hdd(DSA):
                 self.app.globalapp.processEvents()
                 if self.stop:
                     fit = fits[-1]
-                    fit.fits = [None, None]
+                    fit.fits = [None]*len(fit.fits)
                     fit.thetas = None
                 else:
                     fit = self.get_current_fit(ind)
@@ -1098,7 +1104,7 @@ class DSA_hdd(DSA):
                 hook(i, int((lf - ff)/N))
         self.stop = False
         hook(99, 100)
-        #
+        # Create dummy edges (necessary to create a fitting class...)
         class Dummy(object):
             pass
         edges = Dummy()

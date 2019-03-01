@@ -88,7 +88,7 @@ class TabImport(Tab):
 
     def enter_tab(self):
         # Update the frame number
-        self.ui.tab1_frameslider.setValue(self.app.current_ind + 1)
+        self.ui.tab1_spinbox_frame.setValue(self.app.current_ind + 1)
 
     def leave_tab(self):
         # reset zoom
@@ -107,6 +107,7 @@ class TabImport(Tab):
     def enable_options(self):
         self.ui.tab1_crop_box.setEnabled(True)
         self.ui.tab1_scaling_box.setEnabled(True)
+        self.ui.tab1_time_box.setEnabled(True)
 
     def is_inputs_valid(self):
         try:
@@ -172,8 +173,8 @@ class TabImport(Tab):
             # Select image to import
             filepath = select_file('Open image')[0]
         # Import image
+        self.app.current_ind = 0
         success = self.dsa.import_image(filepath)
-        self.current_ind = 0
         if success:
             # Disable frame sliders
             self.disable_frame_sliders()
@@ -623,9 +624,8 @@ class TabAnalyze(Tab):
         # initialize if needed
         if not self.initialized:
             self.initialize()
-        else:
-            # if self.dsa.check_cache():
-            self.update_plot()
+        self.dsa.compute_fits()
+        self.update_plot()
 
     def get_params(self, arg=None):
         dic = {}
@@ -665,12 +665,16 @@ class TabAnalyze(Tab):
         self.ui.tab4_export_box.setEnabled(True)
         self.ui.tab4_run_box.setEnabled(True)
         if self.dsa.nmb_frames > 1:
-            self.ui.tab4_set_N.setEnabled(True)
-            self.ui.tab4_set_N.setValue(int(self.dsa.nmb_frames/100))
+            self.ui.tab4_run_box.setEnabled(True)
+            # self.ui.tab4_set_N.setEnabled(True)
+            precomp_params = self.app.tab1.get_params()
+            ff, lf = precomp_params['cropt']
+            self.ui.tab4_set_N.setValue(int((lf-ff)/100))
             self.ui.tab4_set_N.setMinimum(1)
             self.ui.tab4_set_N.setMaximum(self.dsa.nmb_frames)
         else:
-            self.ui.tab4_set_N.setEnabled(False)
+            self.ui.tab4_run_box.setEnabled(False)
+            # self.ui.tab4_set_N.setEnabled(False)
 
     def clean_plot(self):
         self.ui.mplwidgetanalyze.update_plots(

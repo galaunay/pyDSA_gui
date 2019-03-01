@@ -127,6 +127,8 @@ class TestGui(object):
         # Set number of frames to take
         self.ui.tab4_set_N.setValue(10)
         QTest.qWait(self.delay)
+        self.w.tab4.compute()
+        QTest.qWait(self.delay)
         self.ui.tab4_yaxis2_box.setChecked(True)
         QTest.qWait(self.delay)
         self.ui.tab4_combo_xaxis.setCurrentIndex(1)

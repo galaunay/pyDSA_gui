@@ -1227,6 +1227,19 @@
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_24">
               <item>
+               <widget class="QPushButton" name="tab4_run_button">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>50</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Compute</string>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="QLabel" name="label">
                 <property name="text">
                  <string>Use every N frames</string>
@@ -1235,13 +1248,6 @@
               </item>
               <item>
                <widget class="QSpinBox" name="tab4_set_N"/>
-              </item>
-              <item>
-               <widget class="QPushButton" name="tab4_run_button">
-                <property name="text">
-                 <string>Compute</string>
-                </property>
-               </widget>
               </item>
              </layout>
             </widget>
