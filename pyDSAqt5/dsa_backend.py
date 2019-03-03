@@ -64,7 +64,7 @@ class DSA(object):
         self.fits = None
         self.fit_cache = []
         self.fit_cache_params = [None]*3
-        self.fit_cache_method = None
+        self.fit_cache_method = 'ellipse'
         # Plottable quantities
         self.plottable_quantity_cache = {}
 
