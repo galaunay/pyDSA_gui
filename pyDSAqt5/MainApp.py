@@ -669,7 +669,7 @@ class TabAnalyze(Tab):
             # self.ui.tab4_set_N.setEnabled(True)
             precomp_params = self.app.tab1.get_params()
             ff, lf = precomp_params['cropt']
-            self.ui.tab4_set_N.setValue(int((lf-ff)/100))
+            self.ui.tab4_set_N.setValue(int((lf-ff)/50))
             self.ui.tab4_set_N.setMinimum(1)
             self.ui.tab4_set_N.setMaximum(self.dsa.nmb_frames)
         else:
@@ -800,7 +800,8 @@ class TabAnalyze(Tab):
                                      f" {len(data[0])})", level=3)
                         continue
                 data.append(list(val))
-                headers.append(f'{quant} [{unit}]')
+                headers.append(f'{quant.replace(",", "")}'
+                               f' [{unit.replace(",", "")}]')
             data = np.array(data, dtype=float).transpose()
             np.savetxt(filepath, data, delimiter=', ',
                        header=f"File: {self.dsa.filepath}\n"
