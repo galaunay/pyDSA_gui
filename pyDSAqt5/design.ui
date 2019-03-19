@@ -884,6 +884,9 @@
              <property name="enabled">
               <bool>false</bool>
              </property>
+             <property name="toolTip">
+              <string>Fit a circle to the droplet edges.</string>
+             </property>
              <property name="title">
               <string>Circle</string>
              </property>
@@ -928,6 +931,9 @@
              <property name="enabled">
               <bool>false</bool>
              </property>
+             <property name="toolTip">
+              <string>Fit a single ellipse to the drop edges.</string>
+             </property>
              <property name="title">
               <string>Ellipse</string>
              </property>
@@ -968,6 +974,9 @@
             <widget class="QGroupBox" name="tab3_ellipses_box">
              <property name="enabled">
               <bool>false</bool>
+             </property>
+             <property name="toolTip">
+              <string>Fit two ellipses to each droplet side.</string>
              </property>
              <property name="title">
               <string>Ellipses</string>
@@ -1013,8 +1022,11 @@
              <property name="enabled">
               <bool>false</bool>
              </property>
+             <property name="toolTip">
+              <string>Fit two polynomials to each droplet side.</string>
+             </property>
              <property name="title">
-              <string>Pol&amp;yline</string>
+              <string>Pol&amp;ylines</string>
              </property>
              <property name="flat">
               <bool>false</bool>
@@ -1057,8 +1069,11 @@
              <property name="enabled">
               <bool>false</bool>
              </property>
+             <property name="toolTip">
+              <string>Fit two splines to each droplet side.</string>
+             </property>
              <property name="title">
-              <string>Spline</string>
+              <string>Splines</string>
              </property>
              <property name="flat">
               <bool>false</bool>
@@ -1291,7 +1306,11 @@
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="tab4_set_N"/>
+               <widget class="QSpinBox" name="tab4_set_N">
+                <property name="toolTip">
+                 <string>The default value is calculated so that around 50 frames are analysed.</string>
+                </property>
+               </widget>
               </item>
              </layout>
             </widget>
