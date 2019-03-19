@@ -106,6 +106,9 @@ class TestGui(object):
         # Test ellipse fit
         self.ui.tab3_ellipse_box.setChecked(True)
         QTest.qWait(self.delay)
+        # Test two ellipses fit
+        self.ui.tab3_ellipses_box.setChecked(True)
+        QTest.qWait(self.delay)
         # Test polyline fit
         self.ui.tab3_polyline_box.setChecked(True)
         self.ui.tab3_polyline_deg.setValue(7)
