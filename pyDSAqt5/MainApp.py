@@ -464,6 +464,7 @@ class TabFits(Tab):
         sizey = abs(self.ui.mplwidgetimport.ax.viewLim.height)
         self.ui.tab3_circle_ymin.setMaximum(sizey)
         self.ui.tab3_ellipse_ymin.setMaximum(sizey)
+        self.ui.tab3_ellipses_ymin.setMaximum(sizey)
         #
         self.already_opened = True
         self.ui.mplwidgetfit.tab_opened = True
@@ -477,6 +478,7 @@ class TabFits(Tab):
     def enable_options(self):
         self.ui.tab3_circle_box.setEnabled(True)
         self.ui.tab3_ellipse_box.setEnabled(True)
+        self.ui.tab3_ellipses_box.setEnabled(True)
         self.ui.tab3_polyline_box.setEnabled(True)
         self.ui.tab3_spline_box.setEnabled(True)
 
@@ -521,10 +523,11 @@ class TabFits(Tab):
     def get_params(self):
         circle = {'triple_pts': [[0, self.ui.tab3_circle_ymin.value()]]*2}
         ellipse = {'triple_pts': [[0, self.ui.tab3_ellipse_ymin.value()]]*2}
+        ellipses = {'triple_pts': [[0, self.ui.tab3_ellipses_ymin.value()]]*2}
         polyline = {'deg': self.ui.tab3_polyline_deg.value()}
         spline = {'k': self.ui.tab3_spline_deg.value(),
                   's': self.ui.tab3_spline_smooth.value()/100}
-        return circle, ellipse, polyline, spline
+        return circle, ellipse, ellipses, polyline, spline
 
     def update_fit(self):
         params = self.get_params()
@@ -544,6 +547,7 @@ class TabFits(Tab):
         checks = [b.setChecked(False)
                   for b in [self.ui.tab3_circle_box,
                             self.ui.tab3_ellipse_box,
+                            self.ui.tab3_ellipses_box,
                             self.ui.tab3_polyline_box,
                             self.ui.tab3_spline_box]
                   if b != box and b.isChecked()]
@@ -553,6 +557,7 @@ class TabFits(Tab):
         checks = np.array([box.isChecked()
                            for box in [self.ui.tab3_circle_box,
                                        self.ui.tab3_ellipse_box,
+                                       self.ui.tab3_ellipses_box,
                                        self.ui.tab3_polyline_box,
                                        self.ui.tab3_spline_box]])
         if not np.any(checks):
@@ -574,6 +579,14 @@ class TabFits(Tab):
         if toggle:
             self.dsa.fit_method = 'ellipse'
             self._uncheck_others(self.ui.tab3_ellipse_box)
+        else:
+            self._update_fit_method()
+        self.update_fit()
+
+    def toggle_ellipses(self, toggle):
+        if toggle:
+            self.dsa.fit_method = 'ellipses'
+            self._uncheck_others(self.ui.tab3_ellipses_box)
         else:
             self._update_fit_method()
         self.update_fit()

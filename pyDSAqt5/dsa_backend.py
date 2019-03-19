@@ -226,8 +226,11 @@ class DSA(object):
         fit = self.get_current_fit(ind)
         if fit.baseline is None:
             return [[0], [0]], [[-999], [-999]]
-        # Get fit pts and center
         pts = fit.get_fit_as_points()
+        # Not fit here...
+        if isinstance(pts, dsa.DropFit):
+            return [[-999, -998], [-999, -998]], np.array([[-999], [-999]])
+        # Get fit pts and center
         if self.fit_method in ['circle', 'ellipse']:
             fit_center = fit.fits[0].copy()
         else:
@@ -596,13 +599,16 @@ class DSA_mem(DSA):
             # Get params
             circle_args = params[0]
             ellipse_args = params[1]
-            polyline_args = params[2]
-            spline_args = params[3]
+            ellipse_args = params[2]
+            polyline_args = params[3]
+            spline_args = params[4]
             try:
                 if self.fit_method == 'circle':
                     fit = edge.fit_circle(**circle_args)
                 elif self.fit_method == 'ellipse':
                     fit = edge.fit_ellipse(**ellipse_args)
+                elif self.fit_method == 'ellipses':
+                    fit = edge.fit_ellipses(**ellipses_args)
                 elif self.fit_method == 'polyline':
                     fit = edge.fit_polyline(**polyline_args)
                 elif self.fit_method == 'spline':
@@ -724,11 +730,13 @@ class DSA_mem(DSA):
         # Get params
         circle_args = params[0]
         ellipse_args = params[1]
-        polyline_args = params[2]
-        spline_args = params[3]
+        ellipses_args = params[2]
+        polyline_args = params[3]
+        spline_args = params[4]
         # Check if need to recompute
         new_args = {'circle': circle_args,
                     'ellipse': ellipse_args,
+                    'ellipses': ellipses_args,
                     'polyline': polyline_args,
                     'spline': spline_args}[self.fit_method]
         new_params = {'method': self.fit_method,
@@ -761,10 +769,12 @@ class DSA_mem(DSA):
         # Get params
         circle_args = params[0]
         ellipse_args = params[1]
-        polyline_args = params[2]
-        spline_args = params[3]
+        ellipses_args = params[2]
+        polyline_args = params[3]
+        spline_args = params[4]
         new_args = {'circle': circle_args,
                     'ellipse': ellipse_args,
+                    'ellipses': ellipses_args,
                     'polyline': polyline_args,
                     'spline': spline_args}[self.fit_method]
         new_params = {'method': self.fit_method,
@@ -782,6 +792,9 @@ class DSA_mem(DSA):
             elif self.fit_method == 'ellipse':
                 fits = self.edges.fit_ellipse(iteration_hook=hook,
                                               **ellipse_args)
+            elif self.fit_method == 'ellipses':
+                fits = self.edges.fit_ellipses(iteration_hook=hook,
+                                               **ellipses_args)
             elif self.fit_method == 'polyline':
                 fits = self.edges.fit_polyline(iteration_hook=hook,
                                                **polyline_args)
@@ -1028,13 +1041,16 @@ class DSA_hdd(DSA):
             # Get params
             circle_args = params[0]
             ellipse_args = params[1]
-            polyline_args = params[2]
-            spline_args = params[3]
+            ellipses_args = params[2]
+            polyline_args = params[3]
+            spline_args = params[4]
             try:
                 if self.fit_method == 'circle':
                     fit = edge.fit_circle(**circle_args)
                 elif self.fit_method == 'ellipse':
                     fit = edge.fit_ellipse(**ellipse_args)
+                elif self.fit_method == 'ellipses':
+                    fit = edge.fit_ellipses(**ellipses_args)
                 elif self.fit_method == 'polyline':
                     fit = edge.fit_polyline(**polyline_args)
                 elif self.fit_method == 'spline':
@@ -1119,6 +1135,8 @@ class DSA_hdd(DSA):
             fits2 = dsa.temporalfits.TemporalCircleFits(fits, edges)
         elif self.fit_method == 'ellipse':
             fits2 = dsa.temporalfits.TemporalEllipseFits(fits, edges)
+        elif self.fit_method == 'ellipses':
+            fits2 = dsa.temporalfits.TemporalEllipsesFits(fits, edges)
         elif self.fit_method == 'polyline':
             fits2 = dsa.temporalfits.TemporalSplineFits(fits, edges)
         elif self.fit_method == 'spline':
