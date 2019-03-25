@@ -19,12 +19,12 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt5.QtTest import QTest
-from PyQt5.Qt import Qt
-from PyQt5.QtCore import QPoint
-from PyQt5.QtWidgets import QApplication, QDialog
+from PyQt5.QtWidgets import QApplication
 from pyDSAqt5.MainApp import AppWindow
 import pytest
 import os
+from os.path import join
+import glob
 
 
 class MockEvent(object):
@@ -40,6 +40,10 @@ class TestGui(object):
         self.w = AppWindow(self.app)
         self.ui = self.w.ui
         self.delay = 100
+        pwd = os.path.dirname(os.path.realpath(__file__))
+        filelist = glob.glob(join(pwd, '*.info'))
+        for filepath in filelist:
+            os.remove(filepath)
 
     def test_whole_process(self):
         QTest.qWait(self.delay)
@@ -192,6 +196,13 @@ class TestGui(object):
         # # Wait at the end
         # #==============================================================================
         # QTest.qWait(50000000)
+        #==============================================================================
+        # Clean
+        #==============================================================================
+        pwd = os.path.dirname(os.path.realpath(__file__))
+        filelist = glob.glob(join(pwd, '*.info'))
+        for filepath in filelist:
+            os.remove(filepath)
 
 if __name__ == "__main__":
     test = TestGui()
