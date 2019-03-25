@@ -97,7 +97,10 @@ class DSA(object):
         return self.nmb_frames != 0
 
     def get_infofile(self):
-        if self.input_type == "images":
+        if self.input_type == "image":
+            infofile_path = os.path.splitext(os.path.abspath(self.filepath[0]))[0]
+            infofile_path += ".info"
+        elif self.input_type == "images":
             path = self.filepath[0]
             infofile_path = os.path.dirname(os.path.abspath(path))
             infofile_path = os.path.join(infofile_path, "infofile.info")
@@ -890,8 +893,16 @@ class DSA_hdd(DSA):
         self.cached_current_precomp_im = None
         self.cached_current_ind = None
 
+    def reset_cache(self, edge=True, fit=True):
+        super().reset_cache(edge=edge, fit=fit)
+        self.cached_current_raw_im = None
+        self.cached_current_precomp_im = None
+        self.cached_current_ind = None
+
     def import_image(self, filepath):
-        return self.import_images([filepath])
+        success = self.import_images([filepath])
+        self.input_type = "image"
+        return success
 
     def import_images(self, filepaths):
         self.log.log(f'DSA backend: Importing image set: {filepaths}', level=1)
@@ -958,7 +969,7 @@ class DSA_hdd(DSA):
 
     def get_current_raw_im(self, ind):
         if not self.is_valid_ind(ind):
-            self.log.log("Couldn't the asked frame number {ind}", level=3)
+            self.log.log(f"Couldn't get the asked frame number: {ind}", level=3)
             return self.default_image
         # check if can use the cached one
         if (self.cached_current_ind is not None
