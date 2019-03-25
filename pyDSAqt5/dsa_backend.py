@@ -32,6 +32,31 @@ import pyDSA as dsa
 from IMTreatment.utils import make_unit
 import numpy as np
 from scipy import ndimage
+import json
+import os
+import unum
+
+
+class myJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, unum.Unum):
+            return {"__unum.Unum__": [obj.asNumber(), obj.strUnit()]}
+        if isinstance(obj, np.ndarray):
+            return list(obj)
+        return json.JSONEncoder.default(self, obj)
+
+
+class myJSONDecoder(json.JSONDecoder):
+
+    def __init__(self, *args, **kwargs):
+        json.JSONDecoder.__init__(self, object_hook=self.object_hook,
+                                  *args, **kwargs)
+
+    def object_hook(self, dct):
+        if "__unum.Unum__" == list(dct.keys())[0]:
+            unit = dct["__unum.Unum__"]
+            return unit[0]*make_unit(unit[1][1:-1])
+        return dct
 
 
 class DSA(object):
@@ -70,6 +95,40 @@ class DSA(object):
 
     def is_initialized(self):
         return self.nmb_frames != 0
+
+    def get_infofile(self):
+        if self.input_type == "images":
+            path = self.filepath[0]
+            infofile_path = os.path.dirname(os.path.abspath(path))
+            infofile_path = os.path.join(infofile_path, "infofile.info")
+        else:
+            infofile_path = os.path.splitext(os.path.abspath(self.filepath))[0]
+            infofile_path += ".info"
+        return infofile_path
+
+    def save_infofile(self):
+        # get infos
+        info = self.get_precomp_params()
+        infofile_path = self.get_infofile()
+        # make it serializable
+        with open(infofile_path, 'w+') as f:
+            json.dump(info, f, cls=myJSONEncoder)
+
+    def read_infofile(self):
+        infofile_path = self.get_infofile()
+        # No file (yet)
+        if not os.path.isfile(infofile_path):
+            return None
+        # get infos
+        try:
+            with open(infofile_path, 'r') as f:
+                dic = json.load(f, cls=myJSONDecoder)
+        except:
+            self.log.log('Corrupted infofile, reinitializing...', level=2)
+            os.remove(infofile_path)
+            return None
+        # return
+        return dic
 
     def check_cache(self):
         if self.is_precomp_params_changed() or self.is_edges_param_changed():
@@ -463,7 +522,7 @@ class DSA_mem(DSA):
             self.log.log_unknown_exception()
             return None
         self.ims = ims
-        self.filepath_type = 'video'
+        self.input_type = 'video'
         self.filepath = filepath
         self.reset_cache()
         self.nmb_frames = len(self.ims)
@@ -850,6 +909,7 @@ class DSA_hdd(DSA):
         self.reset_cache()
         self.filepath = filepaths
         self.vid = filepaths
+        self.input_type = 'images'
         self.ims = None
         self.nmb_frames = len(filepaths)
         self.sizex = tmp_im.shape[0]
@@ -873,7 +933,7 @@ class DSA_hdd(DSA):
             return None
         self.reset_cache()
         self.vid = vid
-        self.filepath_type = 'video'
+        self.input_type = 'video'
         self.filepath = filepath
         self.ims = None
         self.nmb_frames = int(self.vid.get(cv2.CAP_PROP_FRAME_COUNT))

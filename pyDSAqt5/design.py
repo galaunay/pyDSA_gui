@@ -102,6 +102,9 @@ class Ui_MainWindow(object):
         self.tab1_set_dt_text.setObjectName("tab1_set_dt_text")
         self.horizontalLayout_13.addWidget(self.tab1_set_dt_text)
         self.verticalLayout_21.addLayout(self.horizontalLayout_13)
+        self.tab1_dt_from_video = QtWidgets.QPushButton(self.tab1_time_box)
+        self.tab1_dt_from_video.setObjectName("tab1_dt_from_video")
+        self.verticalLayout_21.addWidget(self.tab1_dt_from_video)
         self.verticalLayout_2.addWidget(self.tab1_time_box)
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_2.addItem(spacerItem)
@@ -682,7 +685,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(3)
+        self.tabWidget.setCurrentIndex(0)
         self.tab1_import_image_button.clicked.connect(MainWindow.tab1.import_image)
         self.tab1_import_video_button.clicked.connect(MainWindow.tab1.import_video)
         self.tab1_reset_crop.clicked.connect(MainWindow.tab1.reset_crop)
@@ -737,6 +740,7 @@ class Ui_MainWindow(object):
         self.tab4_run_button.clicked.connect(MainWindow.tab4.compute)
         self.tab3_ellipses_box.toggled['bool'].connect(MainWindow.tab3.toggle_ellipses)
         self.tab3_ellipses_ymin.valueChanged['int'].connect(MainWindow.tab3.update_fit)
+        self.tab1_dt_from_video.clicked['bool'].connect(MainWindow.tab1.dt_from_video)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -764,6 +768,8 @@ class Ui_MainWindow(object):
         self.label_15.setText(_translate("MainWindow", "dt:"))
         self.tab1_set_dt_text.setToolTip(_translate("MainWindow", "Interval of time between two frames (in second)"))
         self.tab1_set_dt_text.setText(_translate("MainWindow", "1"))
+        self.tab1_dt_from_video.setToolTip(_translate("MainWindow", "Reset the cropping window"))
+        self.tab1_dt_from_video.setText(_translate("MainWindow", "From video"))
         self.tab1_label_frame.setText(_translate("MainWindow", "Frame"))
         self.tab1_spinbox_frame.setToolTip(_translate("MainWindow", "Frame number to display"))
         self.tab1_frameslider.setToolTip(_translate("MainWindow", "Frame number to display"))

@@ -180,6 +180,10 @@ class MplWidgetImport(MplWidget):
         self.baseline_hand.update_pts(pt1, pt2)
         self.canvas.draw()
 
+    def update_scaling_pts(self, pts):
+        self.scaling_hand.update_pts(pts)
+        self.canvas.draw()
+
     def get_scale(self):
         return self.scaling_hand.get_scale()
 

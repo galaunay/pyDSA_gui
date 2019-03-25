@@ -102,12 +102,18 @@ class TabImport(Tab):
             self.app.set_current_ind(cropt[1] - 1)
         elif self.app.current_ind < cropt[0] - 1:
             self.app.set_current_ind(cropt[0] - 1)
+        # Save settings as infofile
+        self.dsa.save_infofile()
         return True
 
     def enable_options(self):
         self.ui.tab1_crop_box.setEnabled(True)
         self.ui.tab1_scaling_box.setEnabled(True)
         self.ui.tab1_time_box.setEnabled(True)
+        if self.dsa.input_type == "video":
+            self.ui.tab1_dt_from_video.setVisible(True)
+        else:
+            self.ui.tab1_dt_from_video.setVisible(False)
 
     def is_inputs_valid(self):
         try:
@@ -190,6 +196,8 @@ class TabImport(Tab):
             # De-init next tabs
             self.app.tab2.initialized = False
             self.app.tab3.initialized = False
+            # initilize stuff from infofile
+            self.update_from_infofile()
 
     def import_images(self, toggle=None, filepath=None):
         # Select images to import
@@ -215,6 +223,8 @@ class TabImport(Tab):
             # De-init other tabs
             self.app.tab2.initialized = False
             self.app.tab3.initialized = False
+            # initilize stuff from infofile
+            self.update_from_infofile()
 
     def import_video(self, toggle=None, filepath=None):
         # Select video to import
@@ -240,6 +250,36 @@ class TabImport(Tab):
             # De-init other tabs
             self.app.tab2.initialized = False
             self.app.tab3.initialized = False
+            # initilize stuff from infofile
+            self.update_from_infofile()
+
+    def update_from_infofile(self):
+        sizey = abs(self.ui.mplwidgetimport.ax.viewLim.height)
+        infos = self.dsa.read_infofile()
+        if infos is None:
+            return None
+        # sizey = abs(self.ui.mplwidgetimport.ax.viewLim.height)
+        # dt
+        dt = str(infos['dt'].asNumber())
+        self.ui.tab1_set_dt_text.setText(dt)
+        # dx
+        dx = f"{infos['dl']}{infos['dx'].strUnit()[1:-1]}"
+        self.ui.tab1_set_scaling_text.setText(dx)
+        if len(infos['scaling_pts']) > 0:
+            self.ui.mplwidgetimport.update_scaling_pts(infos['scaling_pts'])
+        # cropx and xropy
+        xlim, ylim = infos['lims']
+        ylim = sizey - ylim[::-1]
+        self.ui.mplwidgetimport.update_crop_area(*xlim, *ylim)
+        # baseline
+        bpt1, bpt2 = infos['baseline_pts']
+        bpt1[1] = sizey - bpt1[1]
+        bpt2[1] = sizey - bpt2[1]
+        self.ui.mplwidgetimport.update_baseline(bpt1, bpt2)
+        # cropt
+        self.ui.tab1_spinbox_first.setValue(infos['cropt'][0])
+        self.ui.tab1_spinbox_last.setValue(infos['cropt'][1])
+        self.ui.tab1_spinbox_frame.setValue(infos['cropt'][0])
 
     def set_current_frame(self, frame_number):
         self.app.current_ind = frame_number - 1
@@ -257,6 +297,10 @@ class TabImport(Tab):
         crop_lims = [0, im.shape[0], 0, im.shape[1]]
         self.ui.mplwidgetimport.update_crop_area(*crop_lims)
 
+    def dt_from_video(self, b):
+        dt = self.dsa.get_dt()
+        self.ui.tab1_set_dt_text.setText(f"{dt:.6f}")
+
     def set_scaling(self):
         self.ui.mplwidgetimport.is_scaling = True
 
@@ -271,16 +315,19 @@ class TabImport(Tab):
             dt = float(self.ui.tab1_set_dt_text.text())*make_unit('s')
             dic['dt'] = dt
         if arg is None or arg == 'dx':
-            dx_real = self.ui.mplwidgetimport.get_scale()
-            if dx_real is not None:
-                dx_txt = self.ui.tab1_set_scaling_text.text()
-                match = re.match(r'\s*([0-9.]+)\s*(.*)\s*', dx_txt)
-                dx_txt = float(match.groups()[0])
-                dx_unit = match.groups()[1]
-                dx = dx_txt/dx_real*make_unit(dx_unit)
+            scaling_pts = self.ui.mplwidgetimport.scaling_hand.pts
+            dl_real = self.ui.mplwidgetimport.get_scale()
+            dl_txt = self.ui.tab1_set_scaling_text.text()
+            match = re.match(r'\s*([0-9.]+)\s*(.*)\s*', dl_txt)
+            dl_txt = float(match.groups()[0])
+            dl_unit = match.groups()[1]
+            if dl_real is not None:
+                dx = dl_txt/dl_real*make_unit(dl_unit)
             else:
                 dx = make_unit('')
             dic['dx'] = dx
+            dic['dl'] = dl_txt
+            dic['scaling_pts'] = scaling_pts
         # cropx and cropy
         if arg is None or arg == 'lims':
             xlims, ylims = self.ui.mplwidgetimport.rect_hand.lims

@@ -21,7 +21,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -219,6 +219,16 @@
                  </widget>
                 </item>
                </layout>
+              </item>
+              <item>
+               <widget class="QPushButton" name="tab1_dt_from_video">
+                <property name="toolTip">
+                 <string>Reset the cropping window</string>
+                </property>
+                <property name="text">
+                 <string>From video</string>
+                </property>
+               </widget>
               </item>
              </layout>
             </widget>
@@ -1796,8 +1806,8 @@
    <slot>tab2.set_current_frame(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>232</x>
-     <y>788</y>
+     <x>257</x>
+     <y>811</y>
     </hint>
     <hint type="destinationlabel">
      <x>255</x>
@@ -1812,12 +1822,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>285</x>
-     <y>792</y>
+     <x>323</x>
+     <y>806</y>
     </hint>
     <hint type="destinationlabel">
-     <x>232</x>
-     <y>788</y>
+     <x>257</x>
+     <y>811</y>
     </hint>
    </hints>
   </connection>
@@ -1828,12 +1838,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>232</x>
-     <y>788</y>
+     <x>257</x>
+     <y>811</y>
     </hint>
     <hint type="destinationlabel">
-     <x>285</x>
-     <y>792</y>
+     <x>323</x>
+     <y>806</y>
     </hint>
    </hints>
   </connection>
@@ -1876,8 +1886,8 @@
    <slot>tab2.update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>39</x>
-     <y>209</y>
+     <x>68</x>
+     <y>232</y>
     </hint>
     <hint type="destinationlabel">
      <x>4</x>
@@ -1892,8 +1902,8 @@
    <slot>tab2.update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>39</x>
-     <y>260</y>
+     <x>68</x>
+     <y>283</y>
     </hint>
     <hint type="destinationlabel">
      <x>3</x>
@@ -1908,8 +1918,8 @@
    <slot>tab2.update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>39</x>
-     <y>353</y>
+     <x>68</x>
+     <y>367</y>
     </hint>
     <hint type="destinationlabel">
      <x>5</x>
@@ -1924,8 +1934,8 @@
    <slot>tab2.update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>39</x>
-     <y>487</y>
+     <x>68</x>
+     <y>510</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -1940,8 +1950,8 @@
    <slot>tab2.update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>39</x>
-     <y>538</y>
+     <x>68</x>
+     <y>552</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -1956,8 +1966,8 @@
    <slot>tab2.update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>96</x>
-     <y>438</y>
+     <x>130</x>
+     <y>458</y>
     </hint>
     <hint type="destinationlabel">
      <x>4</x>
@@ -1972,8 +1982,8 @@
    <slot>tab2.update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>40</x>
-     <y>438</y>
+     <x>70</x>
+     <y>458</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -1988,8 +1998,8 @@
    <slot>tab2.toggle_contour(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>46</x>
-     <y>302</y>
+     <x>64</x>
+     <y>368</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -2004,8 +2014,8 @@
    <slot>tab2.toggle_canny(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>46</x>
-     <y>74</y>
+     <x>64</x>
+     <y>138</y>
     </hint>
     <hint type="destinationlabel">
      <x>7</x>
@@ -2436,8 +2446,8 @@
    <slot>tab2.update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>39</x>
-     <y>125</y>
+     <x>68</x>
+     <y>139</y>
     </hint>
     <hint type="destinationlabel">
      <x>72</x>
@@ -2452,8 +2462,8 @@
    <slot>tab2.update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>39</x>
-     <y>167</y>
+     <x>68</x>
+     <y>181</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -2484,8 +2494,8 @@
    <slot>tab4.toggle_axis2(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>103</x>
-     <y>577</y>
+     <x>139</x>
+     <y>576</y>
     </hint>
     <hint type="destinationlabel">
      <x>159</x>
@@ -2589,6 +2599,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>tab1_dt_from_video</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab1.dt_from_video(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>104</x>
+     <y>483</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>4</x>
+     <y>554</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tab1.import_image()</slot>
@@ -2617,5 +2643,6 @@
   <slot>tab4.export_as_csv()</slot>
   <slot>tab4.compute()</slot>
   <slot>tab3.toggle_ellipses(bool)</slot>
+  <slot>tab1.dt_from_video(bool)</slot>
  </slots>
 </ui>

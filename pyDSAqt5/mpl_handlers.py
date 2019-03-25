@@ -326,6 +326,12 @@ class ScalingHandler(Handler):
         return ((self.pts[0][0] - self.pts[1][0])**2
                 + (self.pts[0][1] - self.pts[1][1])**2)**.5
 
+    def update_pts(self, pts):
+        # update
+        self.pts = pts
+        self.update_hand_size()
+        self.update_hands()
+
 
 class VerticalLineHandler(Handler):
     def __init__(self, canvas, fig, ax, color):
