@@ -129,6 +129,7 @@ class TabImport(Tab):
         return True
 
     def enable_frame_sliders(self):
+        self._disable_frame_updater = True
         for slide in [self.ui.tab1_frameslider,
                       self.ui.tab1_frameslider_first,
                       self.ui.tab1_frameslider_last]:
@@ -146,6 +147,7 @@ class TabImport(Tab):
         self.ui.tab1_frameslider_last.setValue(self.dsa.nmb_frames)
         self.ui.tab1_frameslider_first.setValue(0)
         self.ui.tab1_spinbox_frame.setValue(0)
+        self._disable_frame_updater = False
 
     def disable_frame_sliders(self):
         for slide in [self.ui.tab1_frameslider,
@@ -282,6 +284,8 @@ class TabImport(Tab):
         self.ui.tab1_spinbox_frame.setValue(infos['cropt'][0])
 
     def set_current_frame(self, frame_number):
+        if self._disable_frame_updater:
+            return None
         self.app.current_ind = frame_number - 1
         im = self.dsa.get_current_raw_im(self.app.current_ind)
         self.ui.mplwidgetimport.update_image(im.values)
