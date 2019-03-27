@@ -112,6 +112,7 @@ class DSA(object):
     def save_infofile(self):
         # get infos
         info = self.get_precomp_params()
+        info.update({"infofile_maker": "pydsaqt5"})
         infofile_path = self.get_infofile()
         # make it serializable
         with open(infofile_path, 'w+') as f:
@@ -129,6 +130,11 @@ class DSA(object):
         except:
             self.log.log('Corrupted infofile, reinitializing...', level=2)
             os.remove(infofile_path)
+            return None
+        # check
+        if not 'infofile_maker' in dic.keys():
+            return None
+        if not dic['infofile_maker'] == "pydsaqt5":
             return None
         # return
         return dic
