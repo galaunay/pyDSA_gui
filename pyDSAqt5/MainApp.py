@@ -287,8 +287,9 @@ class TabImport(Tab):
         if self._disable_frame_updater:
             return None
         self.app.current_ind = frame_number - 1
-        im = self.dsa.get_current_raw_im(self.app.current_ind)
-        self.ui.mplwidgetimport.update_image(im.values)
+        im = self.dsa.get_current_raw_im(
+            self.app.current_ind,
+            thread_hook=self.ui.mplwidgetimport.update_image)
 
     def set_first_frame(self, frame_number):
         self.ui.tab1_spinbox_frame.setValue(frame_number)

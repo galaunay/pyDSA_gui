@@ -35,6 +35,7 @@ from scipy import ndimage
 import json
 import os
 import unum
+from threading import Thread, Condition
 
 
 class myJSONEncoder(json.JSONEncoder):
@@ -898,6 +899,15 @@ class DSA_hdd(DSA):
         self.cached_current_raw_im = None
         self.cached_current_precomp_im = None
         self.cached_current_ind = None
+        self.vid = None
+        self.needed_inds = []
+        self.available_ims = []
+        self.import_cv = Condition()
+        self.import_thread = ImportThread(self.needed_inds,
+                                          self.available_ims,
+                                          self,
+                                          cv=self.import_cv)
+        self.import_thread.start()
 
     def reset_cache(self, edge=True, fit=True):
         super().reset_cache(edge=edge, fit=fit)
@@ -973,7 +983,7 @@ class DSA_hdd(DSA):
             self.log.log("Cannot get the value of dt...", level=3)
             return 1
 
-    def get_current_raw_im(self, ind):
+    def get_current_raw_im(self, ind, thread_hook=None):
         if not self.is_valid_ind(ind):
             self.log.log(f"Couldn't get the asked frame number: {ind}", level=3)
             return self.default_image
@@ -982,49 +992,61 @@ class DSA_hdd(DSA):
             and self.cached_current_raw_im is not None):
             if self.cached_current_ind == ind:
                 return self.cached_current_raw_im
-        # Import from hdd
-        im = dsa.Image()
-        if isinstance(self.vid, cv2.VideoCapture):
-            self.vid.set(cv2.CAP_PROP_POS_FRAMES, ind)
-            try:
-                success, data = self.vid.read()
-            except OSError:
-                self.log.log(f'Could not load video from: '
-                             f'{self.filepath}', level=3)
+        # import
+        self.needed_inds.append([ind, thread_hook])
+        with self.import_cv:
+            self.import_cv.notify()
+        if thread_hook is None:
+            with self.import_cv:
+                while len(self.available_ims) == 0:
+                    self.import_cv.wait()
+            im = self.available_ims.pop()
+            if im is None:
                 return self.default_image
-            except:
-                self.log.log_unknown_exception()
-                return self.default_image
-            if not success:
-                self.log.log(f"Can't decode frame number {ind}", level=3)
-                return self.default_image
-            data = cv2.cvtColor(data, cv2.COLOR_RGB2GRAY)
-            data = data.transpose()[:, ::-1]
-            im.import_from_arrays(range(self.sizex), range(self.sizey),
-                                  unit_x="", unit_y="",
-                                  values=data, dtype=np.uint8,
-                                  dontchecknans=True)
-        elif isinstance(self.vid, list):
-            try:
-                im = dsa.import_from_image(self.vid[ind], cache_infos=False,
-                                           dtype=np.uint8)
-            except OSError:
-                self.log.log(f'Could not load image from: '
-                             f'{self.vid[ind]}', level=3)
-                return self.default_image
-            except:
-                self.log.log_unknown_exception()
-                return self.default_image
-        else:
-            self.log.log("Cannot get the current image... ", level=3)
-            im = self.default_image
+            if self.cached_current_ind != ind:
+                self.cached_current_precomp_im = None
+                self.cached_current_ind = ind
+            self.cached_current_raw_im = im
+            # return
+            return im
+
+        # # Import from hdd
+        # im = dsa.Image()
+        # if isinstance(self.vid, cv2.VideoCapture):
+        #     self.vid.set(cv2.CAP_PROP_POS_FRAMES, ind)
+        #     try:
+        #         success, data = self.vid.read()
+        #     except OSError:
+        #         self.log.log(f'Could not load video from: '
+        #                      f'{self.filepath}', level=3)
+        #         return self.default_image
+        #     except:
+        #         self.log.log_unknown_exception()
+        #         return self.default_image
+        #     if not success:
+        #         self.log.log(f"Can't decode frame number {ind}", level=3)
+        #         return self.default_image
+        #     data = cv2.cvtColor(data, cv2.COLOR_RGB2GRAY)
+        #     data = data.transpose()[:, ::-1]
+        #     im.import_from_arrays(range(self.sizex), range(self.sizey),
+        #                           unit_x="", unit_y="",
+        #                           values=data, dtype=np.uint8,
+        #                           dontchecknans=True)
+        # elif isinstance(self.vid, list):
+        #     try:
+        #         im = dsa.import_from_image(self.vid[ind], cache_infos=False,
+        #                                    dtype=np.uint8)
+        #     except OSError:
+        #         self.log.log(f'Could not load image from: '
+        #                      f'{self.vid[ind]}', level=3)
+        #         return self.default_image
+        #     except:
+        #         self.log.log_unknown_exception()
+        #         return self.default_image
+        # else:
+        #     self.log.log("Cannot get the current image... ", level=3)
+        #     im = self.default_image
         # update the cache
-        if self.cached_current_ind != ind:
-            self.cached_current_precomp_im = None
-            self.cached_current_ind = ind
-        self.cached_current_raw_im = im
-        # return
-        return im
 
     def get_current_precomp_im(self, ind):
         # check if can use the cached one
@@ -1223,3 +1245,83 @@ class DSA_hdd(DSA):
             fits2 = None
         self.fits = fits2
         self.ui.tabWidget.setEnabled(True)
+
+    def __del__(self):
+        self.import_thread.stop = True
+        self.import_thread.join()
+
+
+class ImportThread(Thread):
+    def __init__(self, needed_inds, available_ims, dsa_backend,
+                 cv, *args, **kwargs):
+        self.needed_inds = needed_inds
+        self.available_ims = available_ims
+        self.db = dsa_backend
+        self.cv = cv
+        self.stop = False
+        super().__init__(*args, **kwargs)
+
+    def get_raw_im(self, ind, hook):
+        with self.cv:
+            # Import from hdd
+            im = dsa.Image()
+            if isinstance(self.db.vid, cv2.VideoCapture):
+                self.db.vid.set(cv2.CAP_PROP_POS_FRAMES, ind)
+                # try:
+                success, data = self.db.vid.read()
+                # except OSError:
+                #     self.db.log.log(f'Could not load video from: '
+                #                  f'{self.filepath}', level=3)
+                #     self.available_ims.append(None)
+                #     return None
+                # except:
+                #     self.db.log.log_unknown_exception()
+                #     self.available_ims.append(None)
+                #     return None
+                if not success:
+                    self.db.log.log(f"Can't decode frame number {ind}", level=3)
+                    self.available_ims.append(None)
+                    return None
+                data = cv2.cvtColor(data, cv2.COLOR_RGB2GRAY)
+                data = data.transpose()[:, ::-1]
+                im.import_from_arrays(range(self.db.sizex), range(self.db.sizey),
+                                      unit_x="", unit_y="",
+                                      values=data, dtype=np.uint8,
+                                      dontchecknans=True)
+            elif isinstance(self.db.vid, list):
+                try:
+                    im = dsa.import_from_image(self.db.vid[ind], cache_infos=False,
+                                               dtype=np.uint8)
+                except OSError:
+                    self.db.log.log(f'Could not load image from: '
+                                 f'{self.db.vid[ind]}', level=3)
+                    self.available_ims.append(None)
+                    return None
+                except:
+                    self.db.log.log_unknown_exception()
+                    self.available_ims.append(None)
+                    return None
+            else:
+                self.db.log.log("Cannot get the current image... ", level=3)
+                self.available_ims.append(None)
+                return None
+            # return
+            if hook is not None:
+                hook(im.values)
+            else:
+                self.available_ims.append(im)
+                self.cv.notify()
+
+    def run(self):
+        while not self.stop:
+            # Nothing asked...
+            with self.cv:
+                while len(self.needed_inds) == 0:
+                    self.cv.wait()
+            if len(self.needed_inds) != 0:
+                # get ind to gather
+                ind, hook = self.needed_inds[-1]
+                while len(self.needed_inds) != 0:
+                    self.needed_inds.pop()
+                self.get_raw_im(ind, hook=hook)
+        #
