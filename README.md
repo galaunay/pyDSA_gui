@@ -1,4 +1,10 @@
-# pyDSAqt5
+<div align="center">
+  <img width="400px" src="https://framagit.org/gabylaunay/pyDSA/raw/master/branding/pyDSA_logo_markdown.png"><br>
+</div>
+
+
+# PyDSAqt5: Graphical interface for drop shape analysis.
+
 
 PyDSAqt5 is a graphical interface for [pyDSA](https://framagit.org/gabylaunay/pyDSA), a drop shape analyzer.
 
