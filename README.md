@@ -24,6 +24,30 @@ Just fire up the GUI from the terminal (or anaconda console) with:
 
 <img src="doc/screenshot4.png" alt="Import" width="300"/>
 
+## Documentation
+
+pyDSAqt5 is designed to be simple and straightforward to use.
+If you don't understand the effect of an option,
+please refers to the inline documentation of [pyDSA](https://framagit.org/gabylaunay/pyDSA),
+where all the features are documented in details.
+
+## Citing this software
+
+If PyDSA have been usefull for you, please consider citing it:
+```
+Launay G. PyDSA: Drop shape analysis in Python, 2018-, https://framagit.org/gabylaunay/pyDSA [Online; accessed <today>].
+```
+
+bibtex entry:
+``` bibtex
+@Misc{,
+  author =    {Gaby Launay},
+  title =     {{PyDSA}: Drop shape analysis in {Python}},
+  year =      {2018--},
+  url = "https://framagit.org/gabylaunay/pyDSA",
+  note = {[Online; accessed <today>]}
+}
+```
 
 
 ## Installation<a name="installation"></a>
@@ -82,13 +106,6 @@ or
 ``conda uninstall IMTreatment pyDSA pyDSAqt5``
 
 To reinstall, please follow the [above instructions](#installation).
-
-## Documentation
-
-pyDSAqt5 is designed to be simple and straightforward to use.
-If you don't understand the effect of an option,
-please refers to the inline documentation of [pyDSA](https://framagit.org/gabylaunay/pyDSA),
-where all the features are documented in details.
 
 ## Issues and bugs
 
