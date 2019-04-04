@@ -1,5 +1,5 @@
 <div align="center">
-  <img width=500px" src="https://framagit.org/gabylaunay/pyDSA/raw/master/branding/pyDSA_logo_python_text.svg"><br><br>
+  <img width=500px" src="https://framagit.org/gabylaunay/pyDSA/raw/master/branding/pyDSA_logo_text.svg"><br><br>
 </div>
 
 
