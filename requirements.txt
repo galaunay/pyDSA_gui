@@ -1,0 +1,7 @@
+pyQt5
+numpy
+matplotlib>=2.2.0
+opencv-python
+scipy
+imageio
+scikit-image
