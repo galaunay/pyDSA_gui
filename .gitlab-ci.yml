@@ -18,6 +18,7 @@ before_script:
   - cd ..
   - rm -rf pyDSA
   ## For qt
+  - apt-cache search libgl1
   - apt-get install -y libgl1-mesa-dev
 pytest:
   stage: test
