@@ -20,10 +20,11 @@ before_script:
   ## For qt
   - apt-get install -y libglib2.0-0
   - apt-get install -y libglib2.0-dev
-pytest:
-  stage: test
-  script:
-    - pytest
+
+# pytest:
+#   stage: test
+#   script:
+#     - pytest
 
 # coverage:
 #   stage: test
