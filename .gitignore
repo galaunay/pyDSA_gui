@@ -11,3 +11,4 @@ pyDSAqt5.egg-info
 dist
 build
 .pytest_cache
+pyDSA_gui.egg-info
