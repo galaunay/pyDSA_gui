@@ -8,11 +8,19 @@
 
 pyDSA_gui is a graphical interface for [pyDSA](https://framagit.org/gabylaunay/pyDSA_core), a drop shape analyzer.
 
+## Installation<a name="installation"></a>
+
+``pip install pyDSA_gui``
+
+To update pyDSA_gui, use:
+
+``pip install -U pyDSA_gui``
+
 ## Usage
 
 Just fire up the GUI from the terminal (or anaconda console) with:
 
-``pyDSA_gui``
+``pyDSA``
 
 ## Mandatory screenshots
 
@@ -48,47 +56,6 @@ bibtex entry:
   note = {[Online; accessed <today>]}
 }
 ```
-
-
-## Installation<a name="installation"></a>
-
-### Pypi
-
-``pip install pyDSA_core``
-
-### Manually (Linux)
-
-You will need [git](https://git-scm.com/) to be installed.
-
-Then install pyDSA_gui:
-
-``pip install 'git+https://framagit.org/gabylaunay/pyDSA_gui.git#egg=pyDSA_gui'``
-
-### Manually (Anaconda)
-
-Install git with:
-
-``conda install git``
-
-And then install pyDSA_gui:
-
-``pip install git+https://framagit.org/gabylaunay/pyDSA_gui.git#egg=pyDSA_gui``
-
-### Manually (Winpython)
-
-You will need to download the following packages:
-
-- [IMTreatment](https://framagit.org/gabylaunay/IMTreatment/-/archive/master/IMTreatment-master.zip)
-- [pyDSA_core](https://framagit.org/gabylaunay/pyDSA_core/-/archive/master/pyDSA_core-master.zip)
-- [pyDSA_gui](https://framagit.org/gabylaunay/pyDSA_gui/-/archive/master/pyDSA_gui-master.zip)
-
-extract them, and install them (in order) with:
-
-``python setup.py install``
-
-## Updating
-
-``pip install -U pydsa_gui``
 
 ## Issues and bugs
 
