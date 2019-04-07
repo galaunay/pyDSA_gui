@@ -3,16 +3,16 @@
 </div>
 
 
-# PyDSAqt5: Graphical interface for drop shape analysis.
+# pyDSA_gui: Graphical interface for drop shape analysis.
 
 
-PyDSAqt5 is a graphical interface for [pyDSA](https://framagit.org/gabylaunay/pyDSA), a drop shape analyzer.
+pyDSA_gui is a graphical interface for [pyDSA](https://framagit.org/gabylaunay/pyDSA), a drop shape analyzer.
 
 ## Usage
 
 Just fire up the GUI from the terminal (or anaconda console) with:
 
-``pyDSAqt5``
+``pyDSA_gui``
 
 ## Mandatory screenshots
 
@@ -26,7 +26,7 @@ Just fire up the GUI from the terminal (or anaconda console) with:
 
 ## Documentation
 
-pyDSAqt5 is designed to be simple and straightforward to use.
+pyDSA_gui is designed to be simple and straightforward to use.
 If you don't understand the effect of an option,
 please refers to the inline documentation of [pyDSA](https://framagit.org/gabylaunay/pyDSA),
 where all the features are documented in details.
@@ -62,9 +62,9 @@ To install the dependencies that are not available on pipy, run:
 
 ``pip install 'git+https://framagit.org/gabylaunay/pyDSA.git#egg=pyDSA'``.
 
-Then install pyDSAqt5:
+Then install pyDSA_gui:
 
-``pip install 'git+https://framagit.org/gabylaunay/pyDSAqt5.git#egg=pyDSAqt5'``
+``pip install 'git+https://framagit.org/gabylaunay/pyDSA_gui.git#egg=pyDSA_gui'``
 
 ### Anaconda
 
@@ -78,17 +78,17 @@ Install the dependencies:
 
 ``pip install git+https://framagit.org/gabylaunay/pyDSA.git#egg=pyDSA``.
 
-And finally install pyDSAqt5:
+And finally install pyDSA_gui:
 
-``pip install git+https://framagit.org/gabylaunay/pyDSAqt5.git#egg=pyDSAqt5``
+``pip install git+https://framagit.org/gabylaunay/pyDSA_gui.git#egg=pyDSA_gui``
 
 ### Winpython
 
 You will need to download the following packages:
 
 - [IMTreatment](https://framagit.org/gabylaunay/IMTreatment/-/archive/master/IMTreatment-master.zip)
-- [pyDSA](https://framagit.org/gabylaunay/pyDSA/-/archive/master/pyDSA-master.zip)
-- [pyDSAqt5](https://framagit.org/gabylaunay/pyDSAqt5/-/archive/master/pyDSAqt5-master.zip)
+- [pyDSA_core](https://framagit.org/gabylaunay/pyDSA_core/-/archive/master/pyDSA_core-master.zip)
+- [pyDSA_gui](https://framagit.org/gabylaunay/pyDSA_gui/-/archive/master/pyDSA_gui-master.zip)
 
 extract them, and install them (in order) with:
 
@@ -96,20 +96,20 @@ extract them, and install them (in order) with:
 
 ## Updating
 
-Because pyDSAqt5 does not follow (yet) a strict version strategy, you will have to uninstall and
+Because pyDSA_gui does not follow (yet) a strict version strategy, you will have to uninstall and
 reinstall the packages in order to make an update.
 
 Uninstalling can be done using :
 
-``pip uninstall IMTreatment pyDSA pyDSAqt5``
+``pip uninstall IMTreatment pyDSA pyDSA_gui``
 or
-``conda uninstall IMTreatment pyDSA pyDSAqt5``
+``conda uninstall IMTreatment pyDSA pyDSA_gui``
 
 To reinstall, please follow the [above instructions](#installation).
 
 ## Issues and bugs
 
-If pyDSAqt5 crashes or behaves abnormally, you can report [here](https://framagit.org/gabylaunay/pyDSAqt5/issues) or just send me an email at [gaby.launay@northumbria.ac.uk](mailto:gaby.launay@northumbria.ac.uk).
+If pyDSA_gui crashes or behaves abnormally, you can report [here](https://framagit.org/gabylaunay/pyDSA_gui/issues) or just send me an email at [gaby.launay@northumbria.ac.uk](mailto:gaby.launay@northumbria.ac.uk).
 Any of the followings will greatly help me fix the issue:
 
 - A description of the problem (as detailled as possible, for me to get it)

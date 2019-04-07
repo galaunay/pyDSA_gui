@@ -20,7 +20,7 @@
 
 from PyQt5.QtTest import QTest
 from PyQt5.QtWidgets import QApplication
-from pyDSAqt5.MainApp import AppWindow
+from pyDSA_gui.MainApp import AppWindow
 import pytest
 import os
 from os.path import join
