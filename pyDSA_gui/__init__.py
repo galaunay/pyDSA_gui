@@ -26,4 +26,4 @@ __version__ = ""
 __email__ = "gaby.launay@tutanota.com"
 __status__ = "Development"
 
-name = "pyDSAqt5"
+name = "pyDSA_gui"

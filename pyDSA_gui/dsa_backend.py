@@ -28,7 +28,7 @@ __status__ = "Development"
 
 
 import cv2
-import pyDSA as dsa
+import pyDSA_core as dsa
 from IMTreatment.utils import make_unit
 import numpy as np
 from scipy import ndimage

@@ -34,7 +34,7 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import numpy as np
-from pyDSA.baseline import Baseline
+from pyDSA_core.baseline import Baseline
 
 from .mpl_handlers import BaselineHandler, RectangleHandler, ScalingHandler, \
     VerticalLineHandler

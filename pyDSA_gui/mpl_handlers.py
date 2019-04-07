@@ -29,7 +29,7 @@ __status__ = "Development"
 
 import matplotlib as mpl
 import numpy as np
-from pyDSA.baseline import Baseline
+from pyDSA_core.baseline import Baseline
 
 
 # Matplotlib 2.2 backward compatibility monkey patching
