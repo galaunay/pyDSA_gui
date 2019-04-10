@@ -29,7 +29,7 @@ __status__ = "Development"
 from datetime import datetime
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog,\
-    QDialog
+    QDialog, QTableWidgetItem
 from PyQt5 import QtWidgets, QtCore, QtGui
 import numpy as np
 
@@ -82,9 +82,6 @@ class Tab(object):
 
 
 class TabImport(Tab):
-
-    def __init__(self, ui, app, dsa, log):
-        super().__init__(ui, app, dsa, log)
 
     def enter_tab(self):
         # Update the frame number
@@ -876,6 +873,23 @@ class TabAnalyze(Tab):
             self.log.log_unknown_exception()
 
 
+class TabData(Tab):
+
+    def enter_tab(self):
+        # resize
+        self.ui.tab5_DataTable.setColumnCount(len(self.app.plottable_quant))
+        # Update table
+        for n, quant in enumerate(self.app.plottable_quant):
+            val, _, unit = self.dsa.get_plotable_quantity(quant, smooth=0)
+            if n == 0:
+                self.ui.tab5_DataTable.setRowCount(len(val))
+            for m, item in enumerate(val):
+                newitem = QTableWidgetItem(f"{item}")
+                self.ui.tab5_DataTable.setItem(m, n, newitem)
+                print(item)
+        # Update headers
+        self.ui.tab5_DataTable.setHorizontalHeaderLabels(self.app.plottable_quant)
+
 # TODO: Add export_as_script
 # TODO: Add tests (QT5 tests ?)
 #       - http://johnnado.com/pyqt-qtest-example/
@@ -909,8 +923,10 @@ class AppWindow(QMainWindow):
         self.tab2 = TabEdges(self.ui, self, self.dsa, self.log)
         self.tab3 = TabFits(self.ui, self, self.dsa, self.log)
         self.tab4 = TabAnalyze(self.ui, self, self.dsa, self.log)
-        self.tab5 = Tab(self.ui, self, self.dsa, self.log)
-        self.tabs = [self.tab1, self.tab2, self.tab3, self.tab4, self.tab5]
+        self.tab5 = TabData(self.ui, self, self.dsa, self.log)
+        self.tab6 = Tab(self.ui, self, self.dsa, self.log)
+        self.tabs = [self.tab1, self.tab2, self.tab3, self.tab4, self.tab5,
+                     self.tab6]
         self.last_tab = 0
         # Including design.ui
         self.ui.setupUi(self)

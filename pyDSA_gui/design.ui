@@ -21,22 +21,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
-      </property>
-      <property name="elideMode">
-       <enum>Qt::ElideNone</enum>
-      </property>
-      <property name="documentMode">
-       <bool>true</bool>
-      </property>
-      <property name="tabsClosable">
-       <bool>false</bool>
-      </property>
-      <property name="movable">
-       <bool>false</bool>
-      </property>
-      <property name="tabBarAutoHide">
-       <bool>false</bool>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="tabimport">
        <attribute name="title">
@@ -1659,6 +1644,16 @@
            </layout>
           </item>
          </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tabdata">
+       <attribute name="title">
+        <string>Data</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_28">
+        <item>
+         <widget class="QTableWidget" name="tab5_DataTable"/>
         </item>
        </layout>
       </widget>
