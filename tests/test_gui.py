@@ -145,6 +145,16 @@ class TestGui(object):
         self.ui.tab4_combo_yaxis2.setCurrentIndex(3)
         QTest.qWait(self.delay)
 
+        #======================================================================
+        # TAB 5
+        #======================================================================
+        # Goto analyze tab
+        self.ui.tabWidget.setCurrentIndex(4)
+        QTest.qWait(self.delay)
+        # Set number of frames to take
+        self.ui.tab5_significativ_numbers.setValue(10)
+        QTest.qWait(self.delay)
+
         #==============================================================================
         # Back to TAB 1 to import images
         #==============================================================================
@@ -169,6 +179,8 @@ class TestGui(object):
         QTest.qWait(self.delay)
         self.ui.tab4_yaxis2_box.setChecked(False)
         QTest.qWait(self.delay)
+        self.ui.tabWidget.setCurrentIndex(4)
+        QTest.qWait(self.delay)
 
         #==============================================================================
         # Back to TAB 1 to import an image
@@ -177,6 +189,7 @@ class TestGui(object):
         self.ui.tabWidget.setCurrentIndex(0)
         QTest.qWait(self.delay)
         self.w.tab1.import_image(None, os.path.join(pwd, 'test1.png'))
+
         #==============================================================================
         # Just chec if other tab are alright
         #==============================================================================
@@ -190,6 +203,8 @@ class TestGui(object):
         self.ui.tab4_combo_yaxis.setCurrentIndex(6)
         QTest.qWait(self.delay)
         self.ui.tab4_yaxis2_box.setChecked(False)
+        QTest.qWait(self.delay)
+        self.ui.tabWidget.setCurrentIndex(4)
         QTest.qWait(self.delay)
 
         # #==============================================================================

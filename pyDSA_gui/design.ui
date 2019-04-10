@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1065</width>
+    <width>972</width>
     <height>854</height>
    </rect>
   </property>
@@ -1311,34 +1311,6 @@
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="tab4_export_box">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="title">
-              <string>Export</string>
-             </property>
-             <property name="flat">
-              <bool>false</bool>
-             </property>
-             <property name="checkable">
-              <bool>false</bool>
-             </property>
-             <property name="checked">
-              <bool>false</bool>
-             </property>
-             <layout class="QVBoxLayout" name="verticalLayout_27">
-              <item>
-               <widget class="QPushButton" name="tab4_export_csv_button">
-                <property name="text">
-                 <string>Export as csv</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
             <spacer name="verticalSpacer_13">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -1503,6 +1475,19 @@
             </widget>
            </item>
            <item>
+            <spacer name="verticalSpacer_15">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
             <widget class="QGroupBox" name="tab4_local_values_box">
              <property name="enabled">
               <bool>false</bool>
@@ -1649,9 +1634,112 @@
       </widget>
       <widget class="QWidget" name="tabdata">
        <attribute name="title">
-        <string>Data</string>
+        <string>Data Table</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_28">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QFrame" name="frame_5">
+          <property name="minimumSize">
+           <size>
+            <width>175</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>175</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_28">
+           <item>
+            <widget class="QGroupBox" name="tab5_export_box">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="title">
+              <string>Export</string>
+             </property>
+             <property name="flat">
+              <bool>false</bool>
+             </property>
+             <property name="checkable">
+              <bool>false</bool>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_30">
+              <item>
+               <widget class="QPushButton" name="tab5_export_csv_button">
+                <property name="text">
+                 <string>Export as csv</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="tab5_number_format_box">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="title">
+              <string>Number format</string>
+             </property>
+             <property name="flat">
+              <bool>false</bool>
+             </property>
+             <property name="checkable">
+              <bool>false</bool>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_27">
+              <item>
+               <widget class="QLabel" name="label_2">
+                <property name="text">
+                 <string>Significative numbers</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="tab5_significativ_numbers">
+                <property name="maximum">
+                 <number>1000</number>
+                </property>
+                <property name="value">
+                 <number>6</number>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_16">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>562</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+        </item>
         <item>
          <widget class="QTableWidget" name="tab5_DataTable">
           <property name="editTriggers">
@@ -1666,6 +1754,9 @@
           <property name="alternatingRowColors">
            <bool>true</bool>
           </property>
+          <attribute name="verticalHeaderVisible">
+           <bool>false</bool>
+          </attribute>
          </widget>
         </item>
        </layout>
@@ -1704,7 +1795,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1065</width>
+     <width>972</width>
      <height>20</height>
     </rect>
    </property>
@@ -1750,8 +1841,8 @@
    <slot>tab1.import_image()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>39</x>
-     <y>104</y>
+     <x>71</x>
+     <y>126</y>
     </hint>
     <hint type="destinationlabel">
      <x>6</x>
@@ -1766,8 +1857,8 @@
    <slot>tab1.import_video()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>39</x>
-     <y>162</y>
+     <x>71</x>
+     <y>184</y>
     </hint>
     <hint type="destinationlabel">
      <x>5</x>
@@ -1782,8 +1873,8 @@
    <slot>tab1.reset_crop()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>39</x>
-     <y>233</y>
+     <x>71</x>
+     <y>255</y>
     </hint>
     <hint type="destinationlabel">
      <x>8</x>
@@ -1814,8 +1905,8 @@
    <slot>tab2.set_current_frame(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>257</x>
-     <y>811</y>
+     <x>274</x>
+     <y>809</y>
     </hint>
     <hint type="destinationlabel">
      <x>255</x>
@@ -1830,12 +1921,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>323</x>
-     <y>806</y>
+     <x>551</x>
+     <y>804</y>
     </hint>
     <hint type="destinationlabel">
-     <x>257</x>
-     <y>811</y>
+     <x>274</x>
+     <y>809</y>
     </hint>
    </hints>
   </connection>
@@ -1846,12 +1937,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>257</x>
-     <y>811</y>
+     <x>274</x>
+     <y>809</y>
     </hint>
     <hint type="destinationlabel">
-     <x>323</x>
-     <y>806</y>
+     <x>551</x>
+     <y>804</y>
     </hint>
    </hints>
   </connection>
@@ -1862,8 +1953,8 @@
    <slot>tab1.set_scaling()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>39</x>
-     <y>304</y>
+     <x>71</x>
+     <y>326</y>
     </hint>
     <hint type="destinationlabel">
      <x>3</x>
@@ -1878,8 +1969,8 @@
    <slot>tab1.remove_scaling()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>39</x>
-     <y>364</y>
+     <x>71</x>
+     <y>386</y>
     </hint>
     <hint type="destinationlabel">
      <x>4</x>
@@ -2038,8 +2129,8 @@
    <slot>tab1.import_images()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>39</x>
-     <y>133</y>
+     <x>71</x>
+     <y>155</y>
     </hint>
     <hint type="destinationlabel">
      <x>6</x>
@@ -2054,12 +2145,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>272</x>
-     <y>811</y>
+     <x>274</x>
+     <y>809</y>
     </hint>
     <hint type="destinationlabel">
-     <x>839</x>
-     <y>806</y>
+     <x>949</x>
+     <y>804</y>
     </hint>
    </hints>
   </connection>
@@ -2070,8 +2161,8 @@
    <slot>tab3.set_current_frame(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>272</x>
-     <y>811</y>
+     <x>274</x>
+     <y>809</y>
     </hint>
     <hint type="destinationlabel">
      <x>180</x>
@@ -2086,12 +2177,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>839</x>
-     <y>806</y>
+     <x>949</x>
+     <y>804</y>
     </hint>
     <hint type="destinationlabel">
-     <x>272</x>
-     <y>811</y>
+     <x>274</x>
+     <y>809</y>
     </hint>
    </hints>
   </connection>
@@ -2246,8 +2337,8 @@
    <slot>tab4.update_plot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>171</x>
-     <y>354</y>
+     <x>173</x>
+     <y>317</y>
     </hint>
     <hint type="destinationlabel">
      <x>117</x>
@@ -2262,8 +2353,8 @@
    <slot>tab4.update_plot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>171</x>
-     <y>457</y>
+     <x>173</x>
+     <y>420</y>
     </hint>
     <hint type="destinationlabel">
      <x>139</x>
@@ -2432,22 +2523,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>tab4_export_csv_button</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>tab4.export_as_csv()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>171</x>
-     <y>275</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>4</x>
-     <y>492</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>tab2_canny_threshold1</sender>
    <signal>valueChanged(int)</signal>
    <receiver>MainWindow</receiver>
@@ -2486,8 +2561,8 @@
    <slot>tab4.update_plot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>171</x>
-     <y>560</y>
+     <x>173</x>
+     <y>523</y>
     </hint>
     <hint type="destinationlabel">
      <x>282</x>
@@ -2502,8 +2577,8 @@
    <slot>tab4.toggle_axis2(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>139</x>
-     <y>576</y>
+     <x>159</x>
+     <y>567</y>
     </hint>
     <hint type="destinationlabel">
      <x>159</x>
@@ -2518,8 +2593,8 @@
    <slot>tab4.update_plot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>170</x>
-     <y>385</y>
+     <x>172</x>
+     <y>348</y>
     </hint>
     <hint type="destinationlabel">
      <x>253</x>
@@ -2534,8 +2609,8 @@
    <slot>tab4.update_plot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>170</x>
-     <y>591</y>
+     <x>172</x>
+     <y>554</y>
     </hint>
     <hint type="destinationlabel">
      <x>434</x>
@@ -2550,8 +2625,8 @@
    <slot>tab4.update_plot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>170</x>
-     <y>488</y>
+     <x>172</x>
+     <y>451</y>
     </hint>
     <hint type="destinationlabel">
      <x>567</x>
@@ -2623,6 +2698,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>tab5_export_csv_button</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab5.export_as_csv()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>129</x>
+     <y>126</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>-10</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab5_significativ_numbers</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab5.update_data_table()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>63</x>
+     <y>281</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>62</x>
+     <y>828</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tab1.import_image()</slot>
@@ -2648,9 +2755,10 @@
   <slot>tab4.toggle_axis2(bool)</slot>
   <slot>tab1.set_first_frame(int)</slot>
   <slot>tab1.set_last_frame(int)</slot>
-  <slot>tab4.export_as_csv()</slot>
+  <slot>tab5.export_as_csv()</slot>
   <slot>tab4.compute()</slot>
   <slot>tab3.toggle_ellipses(bool)</slot>
   <slot>tab1.dt_from_video(bool)</slot>
+  <slot>tab5_update_data_table()</slot>
  </slots>
 </ui>

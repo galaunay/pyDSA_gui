@@ -723,7 +723,6 @@ class TabAnalyze(Tab):
         self.ui.tab4_yaxis_box.setEnabled(True)
         self.ui.tab4_yaxis2_box.setEnabled(True)
         self.ui.tab4_local_values_box.setEnabled(True)
-        self.ui.tab4_export_box.setEnabled(True)
         self.ui.tab4_run_box.setEnabled(True)
         if self.dsa.nmb_frames > 1:
             self.ui.tab4_run_box.setEnabled(True)
@@ -839,6 +838,35 @@ class TabAnalyze(Tab):
         self.use_yaxis2 = toggle
         self.update_plot()
 
+
+class TabData(Tab):
+
+    def enter_tab(self):
+        self.update_data_table()
+
+    def update_data_table(self, *args, **kwargs):
+        # get significative number
+        sign_nmb = self.ui.tab5_significativ_numbers.value()
+        # resize
+        self.ui.tab5_DataTable.setColumnCount(len(self.app.plottable_quant))
+        # Update table
+        for n, quant in enumerate(self.app.plottable_quant):
+            val, _, unit = self.dsa.get_plotable_quantity(quant, smooth=0)
+            if n == 0:
+                self.ui.tab5_DataTable.setRowCount(len(val))
+            for m, item in enumerate(val):
+                newitem = QTableWidgetItem(f"{item:.{sign_nmb}f}")
+                self.ui.tab5_DataTable.setItem(m, n, newitem)
+        # Update headers
+        self.ui.tab5_DataTable.setHorizontalHeaderLabels(self.app.plottable_quant)
+        # resize
+        self.ui.tab5_DataTable.resizeColumnsToContents()
+        self.ui.tab5_DataTable.resizeRowsToContents()
+
+    def enable_options(self):
+        self.ui.tab5_export_box.setEnabled(True)
+        self.ui.tab5_number_format_box.setEnabled(True)
+
     def export_as_csv(self, toggle):
         try:
             # get fiel to save to
@@ -872,22 +900,6 @@ class TabAnalyze(Tab):
         except:
             self.log.log_unknown_exception()
 
-
-class TabData(Tab):
-
-    def enter_tab(self):
-        # resize
-        self.ui.tab5_DataTable.setColumnCount(len(self.app.plottable_quant))
-        # Update table
-        for n, quant in enumerate(self.app.plottable_quant):
-            val, _, unit = self.dsa.get_plotable_quantity(quant, smooth=0)
-            if n == 0:
-                self.ui.tab5_DataTable.setRowCount(len(val))
-            for m, item in enumerate(val):
-                newitem = QTableWidgetItem(f"{item}")
-                self.ui.tab5_DataTable.setItem(m, n, newitem)
-        # Update headers
-        self.ui.tab5_DataTable.setHorizontalHeaderLabels(self.app.plottable_quant)
 
 # TODO: Add export_as_script
 # TODO: Add tests (QT5 tests ?)
