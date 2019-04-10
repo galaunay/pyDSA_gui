@@ -886,7 +886,6 @@ class TabData(Tab):
             for m, item in enumerate(val):
                 newitem = QTableWidgetItem(f"{item}")
                 self.ui.tab5_DataTable.setItem(m, n, newitem)
-                print(item)
         # Update headers
         self.ui.tab5_DataTable.setHorizontalHeaderLabels(self.app.plottable_quant)
 

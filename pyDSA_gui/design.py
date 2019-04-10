@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'design.ui'
 #
-# Created by: PyQt5 UI code generator 5.12
+# Created by: PyQt5 UI code generator 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -660,6 +660,10 @@ class Ui_MainWindow(object):
         self.verticalLayout_28 = QtWidgets.QVBoxLayout(self.tabdata)
         self.verticalLayout_28.setObjectName("verticalLayout_28")
         self.tab5_DataTable = QtWidgets.QTableWidget(self.tabdata)
+        self.tab5_DataTable.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.tab5_DataTable.setDragEnabled(True)
+        self.tab5_DataTable.setDragDropMode(QtWidgets.QAbstractItemView.DragOnly)
+        self.tab5_DataTable.setAlternatingRowColors(True)
         self.tab5_DataTable.setObjectName("tab5_DataTable")
         self.tab5_DataTable.setColumnCount(0)
         self.tab5_DataTable.setRowCount(0)

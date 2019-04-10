@@ -1653,7 +1653,20 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_28">
         <item>
-         <widget class="QTableWidget" name="tab5_DataTable"/>
+         <widget class="QTableWidget" name="tab5_DataTable">
+          <property name="editTriggers">
+           <set>QAbstractItemView::NoEditTriggers</set>
+          </property>
+          <property name="dragEnabled">
+           <bool>true</bool>
+          </property>
+          <property name="dragDropMode">
+           <enum>QAbstractItemView::DragOnly</enum>
+          </property>
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
