@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'design.ui'
 #
-# Created by: PyQt5 UI code generator 5.12
+# Created by: PyQt5 UI code generator 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -809,6 +809,9 @@ class Ui_MainWindow(object):
         self.tab1_dt_from_video.clicked['bool'].connect(MainWindow.tab1.dt_from_video)
         self.tab5_export_csv_button.clicked.connect(MainWindow.tab5.export_as_csv)
         self.tab5_significativ_numbers.valueChanged['int'].connect(MainWindow.tab5.update_data_table)
+        self.tab3_wetting_ridge_box.toggled['bool'].connect(MainWindow.tab3.toggle_wetting_ridge)
+        self.tab3_wetting_ridge_polydeg.valueChanged['int'].connect(MainWindow.tab3.update_fit)
+        self.tab3_wetting_ridge_sigma.valueChanged['int'].connect(MainWindow.tab3.update_fit)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):

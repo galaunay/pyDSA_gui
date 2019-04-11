@@ -67,6 +67,7 @@ class TabFits(Tab):
         self.ui.tab3_ellipses_box.setEnabled(True)
         self.ui.tab3_polyline_box.setEnabled(True)
         self.ui.tab3_spline_box.setEnabled(True)
+        self.ui.tab3_wetting_ridge_box.setEnabled(True)
 
     def set_current_frame(self, frame_number):
         if self._disable_frame_updater:
@@ -112,7 +113,9 @@ class TabFits(Tab):
         polyline = {'deg': self.ui.tab3_polyline_deg.value()}
         spline = {'k': self.ui.tab3_spline_deg.value(),
                   's': self.ui.tab3_spline_smooth.value()/100}
-        return circle, ellipse, ellipses, polyline, spline
+        wr = {'polydeg': self.ui.tab3_wetting_ridge_polydeg.value(),
+              'sigma': self.ui.tab3_wetting_ridge_sigma.value()/100}
+        return circle, ellipse, ellipses, polyline, spline, wr
 
     def update_fit(self):
         try:
@@ -133,7 +136,8 @@ class TabFits(Tab):
                             self.ui.tab3_ellipse_box,
                             self.ui.tab3_ellipses_box,
                             self.ui.tab3_polyline_box,
-                            self.ui.tab3_spline_box]
+                            self.ui.tab3_spline_box,
+                            self.ui.tab3_wetting_ridge_box]
                   if b != box and b.isChecked()]
         return checks
 
@@ -143,7 +147,8 @@ class TabFits(Tab):
                                        self.ui.tab3_ellipse_box,
                                        self.ui.tab3_ellipses_box,
                                        self.ui.tab3_polyline_box,
-                                       self.ui.tab3_spline_box]])
+                                       self.ui.tab3_spline_box,
+                                       self.ui.tab3_wetting_ridge_box]])
         if not np.any(checks):
             self.dsa.fit_method = None
 
@@ -187,6 +192,14 @@ class TabFits(Tab):
         if toggle:
             self.dsa.fit_method = 'spline'
             self._uncheck_others(self.ui.tab3_spline_box)
+        else:
+            self._update_fit_method()
+        self.update_fit()
+
+    def toggle_wetting_ridge(self, toggle):
+        if toggle:
+            self.dsa.fit_method = 'wetting_ridge'
+            self._uncheck_others(self.ui.tab3_wetting_ridge_box)
         else:
             self._update_fit_method()
         self.update_fit()
