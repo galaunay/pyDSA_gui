@@ -21,7 +21,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>4</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tabimport">
        <attribute name="title">
@@ -1120,6 +1120,76 @@
                 </property>
                 <property name="value">
                  <number>75</number>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="tab3_wetting_ridge_box">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="toolTip">
+              <string>Fit two splines to each droplet side.</string>
+             </property>
+             <property name="title">
+              <string>Wetting ridge</string>
+             </property>
+             <property name="flat">
+              <bool>false</bool>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_29">
+              <item>
+               <widget class="QLabel" name="label_16">
+                <property name="text">
+                 <string>Polyline degree</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="tab3_wetting_ridge_polydeg">
+                <property name="toolTip">
+                 <string>Degree of the spline (up to 5)</string>
+                </property>
+                <property name="minimum">
+                 <number>1</number>
+                </property>
+                <property name="maximum">
+                 <number>50</number>
+                </property>
+                <property name="value">
+                 <number>5</number>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_18">
+                <property name="text">
+                 <string>Sigma</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSlider" name="tab3_wetting_ridge_sigma">
+                <property name="toolTip">
+                 <string>Smoothiness of the spline</string>
+                </property>
+                <property name="maximum">
+                 <number>100</number>
+                </property>
+                <property name="value">
+                 <number>50</number>
                 </property>
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>

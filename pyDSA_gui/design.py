@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'design.ui'
 #
-# Created by: PyQt5 UI code generator 5.12.1
+# Created by: PyQt5 UI code generator 5.12
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -449,6 +449,33 @@ class Ui_MainWindow(object):
         self.tab3_spline_smooth.setObjectName("tab3_spline_smooth")
         self.verticalLayout_18.addWidget(self.tab3_spline_smooth)
         self.verticalLayout_9.addWidget(self.tab3_spline_box)
+        self.tab3_wetting_ridge_box = QtWidgets.QGroupBox(self.frame_3)
+        self.tab3_wetting_ridge_box.setEnabled(False)
+        self.tab3_wetting_ridge_box.setFlat(False)
+        self.tab3_wetting_ridge_box.setCheckable(True)
+        self.tab3_wetting_ridge_box.setChecked(False)
+        self.tab3_wetting_ridge_box.setObjectName("tab3_wetting_ridge_box")
+        self.verticalLayout_29 = QtWidgets.QVBoxLayout(self.tab3_wetting_ridge_box)
+        self.verticalLayout_29.setObjectName("verticalLayout_29")
+        self.label_16 = QtWidgets.QLabel(self.tab3_wetting_ridge_box)
+        self.label_16.setObjectName("label_16")
+        self.verticalLayout_29.addWidget(self.label_16)
+        self.tab3_wetting_ridge_polydeg = QtWidgets.QSpinBox(self.tab3_wetting_ridge_box)
+        self.tab3_wetting_ridge_polydeg.setMinimum(1)
+        self.tab3_wetting_ridge_polydeg.setMaximum(50)
+        self.tab3_wetting_ridge_polydeg.setProperty("value", 5)
+        self.tab3_wetting_ridge_polydeg.setObjectName("tab3_wetting_ridge_polydeg")
+        self.verticalLayout_29.addWidget(self.tab3_wetting_ridge_polydeg)
+        self.label_18 = QtWidgets.QLabel(self.tab3_wetting_ridge_box)
+        self.label_18.setObjectName("label_18")
+        self.verticalLayout_29.addWidget(self.label_18)
+        self.tab3_wetting_ridge_sigma = QtWidgets.QSlider(self.tab3_wetting_ridge_box)
+        self.tab3_wetting_ridge_sigma.setMaximum(100)
+        self.tab3_wetting_ridge_sigma.setProperty("value", 50)
+        self.tab3_wetting_ridge_sigma.setOrientation(QtCore.Qt.Horizontal)
+        self.tab3_wetting_ridge_sigma.setObjectName("tab3_wetting_ridge_sigma")
+        self.verticalLayout_29.addWidget(self.tab3_wetting_ridge_sigma)
+        self.verticalLayout_9.addWidget(self.tab3_wetting_ridge_box)
         spacerItem10 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_9.addItem(spacerItem10)
         self.horizontalLayout_11.addWidget(self.frame_3)
@@ -725,7 +752,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(4)
+        self.tabWidget.setCurrentIndex(2)
         self.tab1_import_image_button.clicked.connect(MainWindow.tab1.import_image)
         self.tab1_import_video_button.clicked.connect(MainWindow.tab1.import_video)
         self.tab1_reset_crop.clicked.connect(MainWindow.tab1.reset_crop)
@@ -869,6 +896,12 @@ class Ui_MainWindow(object):
         self.tab3_spline_deg.setToolTip(_translate("MainWindow", "Degree of the spline (up to 5)"))
         self.label_14.setText(_translate("MainWindow", "Smooth"))
         self.tab3_spline_smooth.setToolTip(_translate("MainWindow", "Smoothiness of the spline"))
+        self.tab3_wetting_ridge_box.setToolTip(_translate("MainWindow", "Fit two splines to each droplet side."))
+        self.tab3_wetting_ridge_box.setTitle(_translate("MainWindow", "Wetting ridge"))
+        self.label_16.setText(_translate("MainWindow", "Polyline degree"))
+        self.tab3_wetting_ridge_polydeg.setToolTip(_translate("MainWindow", "Degree of the spline (up to 5)"))
+        self.label_18.setText(_translate("MainWindow", "Sigma"))
+        self.tab3_wetting_ridge_sigma.setToolTip(_translate("MainWindow", "Smoothiness of the spline"))
         self.tab3_label_frame.setText(_translate("MainWindow", "Frames"))
         self.tab3_spinbox.setToolTip(_translate("MainWindow", "Frame number to display"))
         self.tab3_frameslider.setToolTip(_translate("MainWindow", "Frame number to display"))
