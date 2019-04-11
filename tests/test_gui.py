@@ -121,6 +121,9 @@ class TestGui(object):
         self.ui.tab3_spline_box.setChecked(True)
         self.ui.tab3_spline_deg.setValue(3)
         QTest.qWait(self.delay)
+        # Test wetting ridge fit
+        self.ui.tab3_wetting_ridge_box.setChecked(True)
+        QTest.qWait(self.delay)
         # Back to ellipse
         self.ui.tab3_ellipse_box.setChecked(True)
         QTest.qWait(self.delay)
