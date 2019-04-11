@@ -28,6 +28,7 @@ __status__ = "Development"
 
 from datetime import datetime
 import sys
+import os
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog,\
     QDialog, QTableWidgetItem
 from PyQt5 import QtWidgets, QtCore, QtGui
@@ -913,6 +914,13 @@ class AppWindow(QMainWindow):
         super().__init__()
         self.ui = Ui_MainWindow()
         self.globalapp = app
+        # Properly set the icon
+        script_path = os.path.dirname(os.path.realpath(__file__))
+        icon_path = os.path.join(script_path, "../icon/pyDSA_logo.eps")
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(icon_path),
+                       QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.setWindowIcon(icon)
         # Variables
         self.current_ind = 0
         self.statusbar_delay = 2000

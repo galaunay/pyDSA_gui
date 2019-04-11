@@ -890,7 +890,7 @@ class Ui_MainWindow(object):
         self.tab5_export_box.setTitle(_translate("MainWindow", "Export"))
         self.tab5_export_csv_button.setText(_translate("MainWindow", "Export as csv"))
         self.tab5_number_format_box.setTitle(_translate("MainWindow", "Number format"))
-        self.label_2.setText(_translate("MainWindow", "Significative numbers"))
+        self.label_2.setText(_translate("MainWindow", " Significant digits"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabdata), _translate("MainWindow", "Data Table"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab4_log), _translate("MainWindow", "Log"))
 
