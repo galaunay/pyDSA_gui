@@ -685,12 +685,13 @@ class DSA_mem(DSA):
                 elif self.fit_method == 'spline':
                     fit = edge.fit_spline(**spline_args)
                 elif self.fit_method == 'wetting_ridge':
-                    # get triple points from polyfit
-                    fit = edge.fit_polyline(deg=wr_args['deg'])
-                    fit.detect_triple_points()
-                    tp = fit.triple_pts
+                    # triple point estimate
+                    miny = np.min(edge.xy[:, 1])
+                    maxy = np.max(edge.xy[:, 1])
+                    tp_y = miny + (maxy - miny)*wr_args['pos_estimate']
                     # get fitting
-                    fit = edge.fit_circles(tp, sigma_max=wr_args['sigma'])
+                    fit = edge.fit_circles([[0, tp_y], [0, tp_y]],
+                                           sigma_max=wr_args['sigma'])
                 else:
                     self.log.log("No fitting method selected", level=2)
                     return dsa.DropFit(edge.baseline, edge.x_bounds,
@@ -1156,8 +1157,9 @@ class DSA_hdd(DSA):
                     fit = edge.fit_spline(**spline_args)
                 elif self.fit_method == 'wetting_ridge':
                     # triple point estimate
-                    tp_y = (np.max(edge.xy[:, 1])
-                            + np.min(edge.xy[:, 1]))/2
+                    miny = np.min(edge.xy[:, 1])
+                    maxy = np.max(edge.xy[:, 1])
+                    tp_y = miny + (maxy - miny)*wr_args['pos_estimate']
                     # get fitting
                     fit = edge.fit_circles([[0, tp_y], [0, tp_y]],
                                            sigma_max=wr_args['sigma'])

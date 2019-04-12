@@ -113,7 +113,7 @@ class TabFits(Tab):
         polyline = {'deg': self.ui.tab3_polyline_deg.value()}
         spline = {'k': self.ui.tab3_spline_deg.value(),
                   's': self.ui.tab3_spline_smooth.value()/100}
-        wr = {'polydeg': self.ui.tab3_wetting_ridge_polydeg.value(),
+        wr = {'pos_estimate': self.ui.tab3_wetting_ridge_pos_estimate.value()/100,
               'sigma': self.ui.tab3_wetting_ridge_sigma.value()/100}
         return circle, ellipse, ellipses, polyline, spline, wr
 
