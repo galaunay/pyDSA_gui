@@ -424,6 +424,27 @@ class DSA(object):
                 vals, unit = self.fits.get_drop_areas(), f'{unit_x}^2'
             elif quant == 'Volume':
                 vals, unit = self.fits.get_drop_volumes(), f'{unit_x}^3'
+            elif quant == 'Ridge height (left)':
+                if self.fit_method != "wetting ridge":
+                    vals = self.fits.get_triple_points()[0][:, 1]
+                    unit = f'{unit_x}'
+                else:
+                    vals, unit = [], ""
+            elif quant == 'Ridge height (right)':
+                if self.fit_method != "wetting ridge":
+                    vals = self.fits.get_triple_points()[1][:, 1]
+                    unit = f'{unit_x}'
+                else:
+                    vals, unit = [], ""
+            elif quant == 'Ridge height (mean)':
+                if self.fit_method != "wetting ridge":
+                    tps = self.fits.get_triple_points()
+                    vals1 = tps[0][:, 1]
+                    vals2 = tps[1][:, 1]
+                    vals = (vals1 + vals2)/2
+                    unit = f'{unit_x}'
+                else:
+                    vals, unit = [], ""
             else:
                 self.log.log(f'Non-plotable quantity: {quant}', level=3)
                 vals, unit = [], ""
