@@ -292,6 +292,8 @@ class DSA(object):
 
     def get_current_fit_pts(self, ind):
         fit = self.get_current_fit(ind)
+        if fit is None:
+            return [[0], [0]], [[-999], [-999]]
         if fit.baseline is None:
             return [[0], [0]], [[-999], [-999]]
         pts = fit.get_fit_as_points()
@@ -302,8 +304,13 @@ class DSA(object):
         if self.fit_method in ['circle', 'ellipse']:
             fit_center = fit.fits[0].copy()
         elif self.fit_method in ['wetting ridge']:
-            fit_center = np.array([fit.fits[i][0]
-                                   for i in range(3)]).transpose()
+            fit_center = []
+            for i in range(3):
+                if fit.fits is None:
+                    fit_center.append([np.nan, np.nan])
+                else:
+                    fit_center.append(fit.fits[i][0])
+            fit_center = np.array(fit_center).transpose()
         else:
             fit_center = np.array([[-999], [-999]])
         # Return fit pts

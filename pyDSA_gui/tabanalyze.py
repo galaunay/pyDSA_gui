@@ -27,6 +27,7 @@ class TabAnalyze(Tab):
     def __init__(self, ui, app, dsa, log):
         super().__init__(ui, app, dsa, log)
         self.use_yaxis2 = False
+        self._disable_plot_updater = False
 
     def initialize(self):
         # Set defauts for combo boxes
@@ -37,6 +38,7 @@ class TabAnalyze(Tab):
         self.initialized = True
 
     def update_combo_boxes(self):
+        self._disable_plot_updater = True
         ind = self.ui.tab4_combo_xaxis.findText('Frame number')
         if ind == -1:
             for opts in ['Frame number', 'Time']:
@@ -64,6 +66,12 @@ class TabAnalyze(Tab):
                     ind = self.ui.tab4_combo_yaxis.findText(opts)
                     self.ui.tab4_combo_yaxis.removeItem(ind)
                     self.ui.tab4_combo_yaxis2.removeItem(ind)
+        # Maybe reinit the combo box positions
+        for cb in [self.ui.tab4_combo_xaxis, self.ui.tab4_combo_yaxis,
+                   self.ui.tab4_combo_yaxis2]:
+            if cb.currentIndex() > cb.count():
+                cb.setCurrentIndex(0)
+        self._disable_plot_updater = False
 
     def enter_tab(self):
         # Update combo boxes
@@ -130,7 +138,7 @@ class TabAnalyze(Tab):
             replot=False, draw=True)
 
     def update_plot(self, index=0, replot=False, draw=True):
-        if not self.initialized:
+        if not self.initialized or self._disable_plot_updater:
             return None
         # get things to plot
         xaxis = self.ui.tab4_combo_xaxis.currentText()

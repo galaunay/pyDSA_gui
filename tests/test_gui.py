@@ -148,10 +148,33 @@ class TestGui(object):
         self.ui.tab4_combo_yaxis2.setCurrentIndex(3)
         QTest.qWait(self.delay)
 
+        #==============================================================================
+        # Quickly check that wetting ridge stuff has been added as well to tab4
+        #==============================================================================
+        # Goto fit tab
+        self.ui.tabWidget.setCurrentIndex(2)
+        QTest.qWait(self.delay)
+        # Test wetting ridge fit
+        self.ui.tab3_wetting_ridge_box.setChecked(True)
+        QTest.qWait(self.delay)
+        # Goto analyze tab
+        self.ui.tabWidget.setCurrentIndex(3)
+        QTest.qWait(self.delay)
+        self.ui.tab4_combo_yaxis.setCurrentIndex(13)
+        QTest.qWait(self.delay)
+        self.ui.tab4_combo_yaxis2.setCurrentIndex(12)
+        QTest.qWait(self.delay)
+        # Goto fit tab
+        self.ui.tabWidget.setCurrentIndex(2)
+        QTest.qWait(self.delay)
+        # Test wetting ridge fit
+        self.ui.tab3_ellipse_box.setChecked(True)
+        QTest.qWait(self.delay)
+
         #======================================================================
         # TAB 5
         #======================================================================
-        # Goto analyze tab
+        # Goto data tab
         self.ui.tabWidget.setCurrentIndex(4)
         QTest.qWait(self.delay)
         # Set number of frames to take
