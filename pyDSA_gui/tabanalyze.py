@@ -29,29 +29,51 @@ class TabAnalyze(Tab):
         self.use_yaxis2 = False
 
     def initialize(self):
-        # Add option to combo boxes
-        # TODO: Centralize the accessible things to make it more
-        #       convenient to add some
-        for opts in ['Frame number', 'Time']:
-            self.ui.tab4_combo_xaxis.insertItem(100, opts)
-        for opts in ['CA (mean)', 'CA (left)', 'CA (right)', 'Base radius',
-                     'CL velocity (x, left)', 'CL velocity (x, right)',
-                     'Position (x, center)', 'Position (x, right)',
-                     'Position (x, left)']:
-            self.ui.tab4_combo_xaxis.insertItem(100, opts)
-            self.ui.tab4_combo_yaxis.insertItem(100, opts)
-            self.ui.tab4_combo_yaxis2.insertItem(100, opts)
-        # Set defauts
+        # Set defauts for combo boxes
         self.ui.tab4_combo_xaxis.setCurrentIndex(0)
         self.ui.tab4_combo_yaxis.setCurrentIndex(0)
         self.ui.tab4_combo_yaxis2.setCurrentIndex(3)
+        #
         self.initialized = True
 
+    def update_combo_boxes(self):
+        ind = self.ui.tab4_combo_xaxis.findText('Frame number')
+        if ind == -1:
+            for opts in ['Frame number', 'Time']:
+                self.ui.tab4_combo_xaxis.insertItem(100, opts)
+            for opts in ['CA (mean)', 'CA (left)', 'CA (right)', 'Base radius',
+                         'CL velocity (x, left)', 'CL velocity (x, right)',
+                         'Position (x, center)', 'Position (x, right)',
+                         'Position (x, left)']:
+                self.ui.tab4_combo_xaxis.insertItem(100, opts)
+                self.ui.tab4_combo_yaxis.insertItem(100, opts)
+                self.ui.tab4_combo_yaxis2.insertItem(100, opts)
+        # Additional stuff for wetting ridge
+        for opts in ['Ridge height (left)', 'Ridge height (right)',
+                     'CA (TP, left)', 'CA (TP, right)',
+                     'CA (TP, mean)']:
+            if self.dsa.fit_method == "wetting ridge":
+                if self.ui.tab4_combo_xaxis.findText(opts) == -1:
+                    self.ui.tab4_combo_xaxis.insertItem(100, opts)
+                    self.ui.tab4_combo_yaxis.insertItem(100, opts)
+                    self.ui.tab4_combo_yaxis2.insertItem(100, opts)
+            else:
+                ind = self.ui.tab4_combo_xaxis.findText(opts)
+                if ind != -1:
+                    self.ui.tab4_combo_xaxis.removeItem(ind)
+                    ind = self.ui.tab4_combo_yaxis.findText(opts)
+                    self.ui.tab4_combo_yaxis.removeItem(ind)
+                    self.ui.tab4_combo_yaxis2.removeItem(ind)
+
     def enter_tab(self):
+        # Update combo boxes
+        self.update_combo_boxes()
         # initialize if needed
         if not self.initialized:
             self.initialize()
+        # Compute fits
         self.dsa.compute_fits()
+        # plot
         self.update_plot()
 
     def get_params(self, arg=None):
@@ -184,7 +206,7 @@ class TabAnalyze(Tab):
         yname = f'{yaxis} [{unit_y}]'
         yname2 = f'{yaxis2} [{unit_y2}]'
         # Should the plots share the same ylims
-        shared_names = ['Position', 'CL velocity', 'CA']
+        shared_names = ['Position', 'CL velocity', 'CA', 'Ridge height']
         sameylims = False
         for sname in shared_names:
             if yaxis.startswith(sname) and yaxis2.startswith(sname):

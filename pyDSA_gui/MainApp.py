@@ -65,12 +65,6 @@ class AppWindow(QMainWindow):
         self.current_ind = 0
         self.statusbar_delay = 2000
         self._disable_frame_updater = False
-        self.plottable_quant = [
-            'Frame number', 'Time', 'Position (x, right)',
-            'CL velocity (x, left)', 'CL velocity (x, right)',
-            'Position (x, left)', 'Position (x, center)',
-            'CA (right)', 'CA (left)', 'CA (mean)', 'Base radius',
-            'Height', 'Area', 'Volume']
         # Initialize log
         self.ui.logarea = None  # needed to be initialized for log
         self.ui.status_bar = None
@@ -97,6 +91,19 @@ class AppWindow(QMainWindow):
         self.ui.tabWidget.setCurrentIndex(0)
         # Show it !
         self.show()
+
+    @property
+    def plottable_quant(self):
+        pq = ['Frame number', 'Time', 'Position (x, right)',
+              'CL velocity (x, left)', 'CL velocity (x, right)',
+              'Position (x, left)', 'Position (x, center)',
+              'CA (right)', 'CA (left)', 'CA (mean)', 'Base radius',
+              'Height', 'Area', 'Volume']
+        if self.dsa.fit_method == 'wetting ridge':
+            pq += ['Ridge height (left)', 'Ridge height (right)',
+                   'CA (TP, left)', 'CA (TP, right)',
+                   'CA (TP, mean)']
+        return pq
 
     def init_progressbar(self):
         # Add Progress bar to status bar

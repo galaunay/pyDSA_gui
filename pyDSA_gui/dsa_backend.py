@@ -301,8 +301,9 @@ class DSA(object):
         # Get fit pts and center
         if self.fit_method in ['circle', 'ellipse']:
             fit_center = fit.fits[0].copy()
-        elif self.fit_method in ['wetting_ridge']:
-            fit_center = fit.fits[0][0].copy()
+        elif self.fit_method in ['wetting ridge']:
+            fit_center = np.array([fit.fits[i][0]
+                                   for i in range(3)]).transpose()
         else:
             fit_center = np.array([[-999], [-999]])
         # Return fit pts
@@ -425,24 +426,44 @@ class DSA(object):
             elif quant == 'Volume':
                 vals, unit = self.fits.get_drop_volumes(), f'{unit_x}^3'
             elif quant == 'Ridge height (left)':
-                if self.fit_method != "wetting ridge":
-                    vals = self.fits.get_triple_points()[0][:, 1]
+                if self.fit_method == "wetting ridge":
+                    vals = self.fits.get_ridge_height()[0]
                     unit = f'{unit_x}'
                 else:
                     vals, unit = [], ""
             elif quant == 'Ridge height (right)':
-                if self.fit_method != "wetting ridge":
-                    vals = self.fits.get_triple_points()[1][:, 1]
+                if self.fit_method == "wetting ridge":
+                    vals = self.fits.get_ridge_height()[1]
                     unit = f'{unit_x}'
                 else:
                     vals, unit = [], ""
             elif quant == 'Ridge height (mean)':
-                if self.fit_method != "wetting ridge":
+                if self.fit_method == "wetting ridge":
                     tps = self.fits.get_triple_points()
                     vals1 = tps[0][:, 1]
                     vals2 = tps[1][:, 1]
                     vals = (vals1 + vals2)/2
                     unit = f'{unit_x}'
+                else:
+                    vals, unit = [], ""
+            elif quant == 'CA (TP, left)':
+                if self.fit_method == "wetting ridge":
+                    tps = self.fits.get_triple_pts_contact_angles()
+                    vals, unit = tps[:, 0], f'{unit_x}'
+                else:
+                    vals, unit = [], ""
+            elif quant == 'CA (TP, right)':
+                if self.fit_method == "wetting ridge":
+                    tps = self.fits.get_triple_pts_contact_angles()
+                    vals, unit = 180 - tps[:, 1], f'{unit_x}'
+                else:
+                    vals, unit = [], ""
+            elif quant == 'CA (TP, mean)':
+                if self.fit_method == "wetting ridge":
+                    tps = self.fits.get_triple_pts_contact_angles()
+                    tps1 = tps[:, 0]
+                    tps2 = 180 - tps[:, 1]
+                    vals, unit = (tps1 + tps2)/2, f'{unit_x}'
                 else:
                     vals, unit = [], ""
             else:
@@ -705,7 +726,7 @@ class DSA_mem(DSA):
                     fit = edge.fit_polyline(**polyline_args)
                 elif self.fit_method == 'spline':
                     fit = edge.fit_spline(**spline_args)
-                elif self.fit_method == 'wetting_ridge':
+                elif self.fit_method == 'wetting ridge':
                     # triple point estimate
                     miny = np.min(edge.xy[:, 1])
                     maxy = np.max(edge.xy[:, 1])
@@ -1176,7 +1197,7 @@ class DSA_hdd(DSA):
                     fit = edge.fit_polyline(**polyline_args)
                 elif self.fit_method == 'spline':
                     fit = edge.fit_spline(**spline_args)
-                elif self.fit_method == 'wetting_ridge':
+                elif self.fit_method == 'wetting ridge':
                     # triple point estimate
                     miny = np.min(edge.xy[:, 1])
                     maxy = np.max(edge.xy[:, 1])
@@ -1270,7 +1291,7 @@ class DSA_hdd(DSA):
             fits2 = dsa.temporalfits.TemporalSplineFits(fits, edges)
         elif self.fit_method == 'spline':
             fits2 = dsa.temporalfits.TemporalSplineFits(fits, edges)
-        elif self.fit_method == 'wetting_ridge':
+        elif self.fit_method == 'wetting ridge':
             fits2 = dsa.temporalfits.TemporalCirclesFits(fits, edges)
         else:
             self.app.log.log('No fitting method selected', level=2)

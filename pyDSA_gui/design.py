@@ -463,7 +463,7 @@ class Ui_MainWindow(object):
         self.tab3_wetting_ridge_pos_estimate = QtWidgets.QSlider(self.tab3_wetting_ridge_box)
         self.tab3_wetting_ridge_pos_estimate.setMinimum(1)
         self.tab3_wetting_ridge_pos_estimate.setMaximum(50)
-        self.tab3_wetting_ridge_pos_estimate.setProperty("value", 10)
+        self.tab3_wetting_ridge_pos_estimate.setProperty("value", 25)
         self.tab3_wetting_ridge_pos_estimate.setOrientation(QtCore.Qt.Horizontal)
         self.tab3_wetting_ridge_pos_estimate.setObjectName("tab3_wetting_ridge_pos_estimate")
         self.verticalLayout_29.addWidget(self.tab3_wetting_ridge_pos_estimate)

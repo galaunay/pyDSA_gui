@@ -198,7 +198,7 @@ class TabFits(Tab):
 
     def toggle_wetting_ridge(self, toggle):
         if toggle:
-            self.dsa.fit_method = 'wetting_ridge'
+            self.dsa.fit_method = 'wetting ridge'
             self._uncheck_others(self.ui.tab3_wetting_ridge_box)
         else:
             self._update_fit_method()
