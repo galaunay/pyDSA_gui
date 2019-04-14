@@ -170,6 +170,9 @@ class TestGui(object):
         # Test wetting ridge fit
         self.ui.tab3_ellipse_box.setChecked(True)
         QTest.qWait(self.delay)
+        # Goto analyze tab
+        self.ui.tabWidget.setCurrentIndex(3)
+        QTest.qWait(self.delay)
 
         #======================================================================
         # TAB 5
@@ -237,13 +240,13 @@ class TestGui(object):
         # # Wait at the end
         # #==============================================================================
         # QTest.qWait(50000000)
-        #==============================================================================
-        # Clean
-        #==============================================================================
-        pwd = os.path.dirname(os.path.realpath(__file__))
-        filelist = glob.glob(join(pwd, '*.info'))
-        for filepath in filelist:
-            os.remove(filepath)
+        # #==============================================================================
+        # # Clean
+        # #==============================================================================
+        # pwd = os.path.dirname(os.path.realpath(__file__))
+        # filelist = glob.glob(join(pwd, '*.info'))
+        # for filepath in filelist:
+        #     os.remove(filepath)
 
 if __name__ == "__main__":
     test = TestGui()

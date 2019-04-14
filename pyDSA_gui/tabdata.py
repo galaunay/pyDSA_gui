@@ -37,6 +37,11 @@ class TabData(Tab):
         sign_nmb = self.ui.tab5_significativ_numbers.value()
         # resize
         self.ui.tab5_DataTable.setColumnCount(len(self.app.plottable_quant))
+        # Update headers
+        self.ui.tab5_DataTable.setHorizontalHeaderLabels(self.app.plottable_quant)
+        # check
+        if self.dsa.fits is None:
+            return None
         # Update table
         for n, quant in enumerate(self.app.plottable_quant):
             val, _, unit = self.dsa.get_plotable_quantity(quant, smooth=0)
@@ -45,8 +50,6 @@ class TabData(Tab):
             for m, item in enumerate(val):
                 newitem = QTableWidgetItem(f"{item:.{sign_nmb}f}")
                 self.ui.tab5_DataTable.setItem(m, n, newitem)
-        # Update headers
-        self.ui.tab5_DataTable.setHorizontalHeaderLabels(self.app.plottable_quant)
         # resize
         self.ui.tab5_DataTable.resizeColumnsToContents()
         self.ui.tab5_DataTable.resizeRowsToContents()
