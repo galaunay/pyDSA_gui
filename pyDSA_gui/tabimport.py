@@ -221,9 +221,10 @@ class TabImport(Tab):
         bpt2[1] = sizey - bpt2[1]
         self.ui.mplwidgetimport.update_baseline(bpt1, bpt2)
         # cropt
-        self.ui.tab1_spinbox_first.setValue(infos['cropt'][0])
-        self.ui.tab1_spinbox_last.setValue(infos['cropt'][1])
-        self.ui.tab1_spinbox_frame.setValue(infos['cropt'][0])
+        if self.dsa.input_type != "image":
+            self.ui.tab1_spinbox_first.setValue(infos['cropt'][0])
+            self.ui.tab1_spinbox_last.setValue(infos['cropt'][1])
+            self.ui.tab1_spinbox_frame.setValue(infos['cropt'][0])
 
     def set_current_frame(self, frame_number):
         self.app.current_ind = frame_number - 1
