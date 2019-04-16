@@ -28,6 +28,7 @@ class Tab(object):
         self.log = log
         self.initialized = False
         self.already_opened = False
+        self._disable_frame_updater = False
 
     def enter_tab(self):
         pass

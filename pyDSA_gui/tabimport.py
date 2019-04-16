@@ -226,9 +226,9 @@ class TabImport(Tab):
         self.ui.tab1_spinbox_frame.setValue(infos['cropt'][0])
 
     def set_current_frame(self, frame_number):
+        self.app.current_ind = frame_number - 1
         if self._disable_frame_updater:
             return None
-        self.app.current_ind = frame_number - 1
         im = self.dsa.get_current_raw_im(self.app.current_ind)
         self.ui.mplwidgetimport.update_image(im.values)
 
@@ -237,6 +237,13 @@ class TabImport(Tab):
 
     def set_last_frame(self, frame_number):
         self.ui.tab1_spinbox_frame.setValue(frame_number)
+
+    def zoom_to_area(self):
+        xlims, ylims = self.ui.mplwidgetimport.rect_hand.lims
+        self.ui.mplwidgetimport.toolbar.push_current()
+        self.ui.mplwidgetimport.ax.set_xlim(*xlims)
+        self.ui.mplwidgetimport.ax.set_ylim(*ylims[::-1])
+        self.ui.mplwidgetimport.canvas.draw()
 
     def reset_crop(self):
         im = self.dsa.get_current_raw_im(self.app.current_ind)

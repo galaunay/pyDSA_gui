@@ -58,6 +58,9 @@ class Ui_MainWindow(object):
         self.tab1_crop_box.setObjectName("tab1_crop_box")
         self.verticalLayout_12 = QtWidgets.QVBoxLayout(self.tab1_crop_box)
         self.verticalLayout_12.setObjectName("verticalLayout_12")
+        self.tab1_zoom_to_area = QtWidgets.QPushButton(self.tab1_crop_box)
+        self.tab1_zoom_to_area.setObjectName("tab1_zoom_to_area")
+        self.verticalLayout_12.addWidget(self.tab1_zoom_to_area)
         self.tab1_reset_crop = QtWidgets.QPushButton(self.tab1_crop_box)
         self.tab1_reset_crop.setObjectName("tab1_reset_crop")
         self.verticalLayout_12.addWidget(self.tab1_reset_crop)
@@ -754,7 +757,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(2)
+        self.tabWidget.setCurrentIndex(0)
         self.tab1_import_image_button.clicked.connect(MainWindow.tab1.import_image)
         self.tab1_import_video_button.clicked.connect(MainWindow.tab1.import_video)
         self.tab1_reset_crop.clicked.connect(MainWindow.tab1.reset_crop)
@@ -814,6 +817,7 @@ class Ui_MainWindow(object):
         self.tab3_wetting_ridge_box.toggled['bool'].connect(MainWindow.tab3.toggle_wetting_ridge)
         self.tab3_wetting_ridge_sigma.valueChanged['int'].connect(MainWindow.tab3.update_fit)
         self.tab3_wetting_ridge_pos_estimate.valueChanged['int'].connect(MainWindow.tab3.update_fit)
+        self.tab1_zoom_to_area.clicked['bool'].connect(MainWindow.tab1.zoom_to_area)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -827,6 +831,8 @@ class Ui_MainWindow(object):
         self.tab1_import_video_button.setToolTip(_translate("MainWindow", "Import a video (avi,mp4,mkv,...)"))
         self.tab1_import_video_button.setText(_translate("MainWindow", "Video"))
         self.tab1_crop_box.setTitle(_translate("MainWindow", "Crop"))
+        self.tab1_zoom_to_area.setToolTip(_translate("MainWindow", "Reset the cropping window"))
+        self.tab1_zoom_to_area.setText(_translate("MainWindow", "Zoom to area"))
         self.tab1_reset_crop.setToolTip(_translate("MainWindow", "Reset the cropping window"))
         self.tab1_reset_crop.setText(_translate("MainWindow", "Reset"))
         self.tab1_scaling_box.setTitle(_translate("MainWindow", "Scaling"))

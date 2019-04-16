@@ -70,9 +70,9 @@ class TabFits(Tab):
         self.ui.tab3_wetting_ridge_box.setEnabled(True)
 
     def set_current_frame(self, frame_number):
+        self.app.current_ind = frame_number - 1
         if self._disable_frame_updater:
             return None
-        self.app.current_ind = frame_number - 1
         # update image
         im = self.dsa.get_current_precomp_im(self.app.current_ind)
         self.ui.mplwidgetfit.update_image(im.values)

@@ -64,7 +64,6 @@ class AppWindow(QMainWindow):
         # Variables
         self.current_ind = 0
         self.statusbar_delay = 2000
-        self._disable_frame_updater = False
         # Initialize log
         self.ui.logarea = None  # needed to be initialized for log
         self.ui.status_bar = None
