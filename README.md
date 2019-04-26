@@ -48,13 +48,14 @@ Launay G. PyDSA_core: Drop shape analysis in Python, 2018-, https://framagit.org
 
 bibtex entry:
 ``` bibtex
-@Misc{,
+@Misc{launay_pydsa_2018,
   author =    {Gaby Launay},
-  title =     {{PyDSA_core}: Drop shape analysis in {Python}},
+  title =     {{PyDSA}: Drop shape analysis in {Python}},
   year =      {2018--},
   url = "https://framagit.org/gabylaunay/pyDSA_core",
   note = {[Online; accessed <today>]}
 }
+
 ```
 
 ## Issues and bugs
