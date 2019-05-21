@@ -41,7 +41,7 @@ setup(
     ],
     keywords='GUI DSA drop shape contact angle hysteresis',
     packages=find_packages(exclude=['contrib', 'docs', 'tests', 'samples']),
-    install_requires=['pyQt5', 'pyDSA_core==1.0.2', 'IMTreatment==1.0.0',
+    install_requires=['pyQt5', 'pyDSA_core==1.1.1', 'IMTreatment==1.1.1',
                       'numpy', 'matplotlib>=2.2.0'],
     extras_require={},
     setup_requires=['pytest-runner'],
