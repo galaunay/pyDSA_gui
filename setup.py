@@ -5,7 +5,6 @@
 
 # Author: Gaby Launay  <gaby.launay@tutanota.com>
 # URL: https://framagit.org/gabylaunay/pyDSA_gui
-# Version: 0.1
 
 # This file is part of pyDSA_gui
 

@@ -21,7 +21,6 @@ __author__ = "Gaby Launay"
 __copyright__ = "Gaby Launay 2018-2019"
 __credits__ = ""
 __license__ = "GPL3"
-__version__ = ""
 __email__ = "gaby.launay@tutanota.com"
 __status__ = "Development"
 
