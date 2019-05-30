@@ -20,7 +20,7 @@
 
 from PyQt5.QtWidgets import QTableWidgetItem
 import numpy as np
-import datetime
+from datetime import datetime
 
 
 from .tab import Tab
@@ -62,11 +62,15 @@ class TabData(Tab):
         try:
             # get fiel to save to
             filepath = select_new_file("Save as")
+            extension = ".csv"
             if len(filepath) == 0:
                 return None
             filepath = filepath[0]
             if filepath[0] == "":
                 return None
+            # Add extension
+            if filepath[-len(extension):] != extension:
+                filepath += extension
             # get data
             data = []
             headers = []
