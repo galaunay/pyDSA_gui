@@ -976,23 +976,25 @@ class DSA_hdd(DSA):
         self.cached_current_precomp_im = None
         self.cached_current_ind = None
 
-    def import_image(self, filepath):
-        success = self.import_images([filepath])
+    def import_image(self, filepath, log=True):
+        success = self.import_images([filepath], log=log)
         self.input_type = "image"
         return success
 
-    def import_images(self, filepaths):
+    def import_images(self, filepaths, log=True):
         self.log.log(f'DSA backend: Importing image set: {filepaths}', level=1)
-        filepaths.sort()
         try:
+            filepaths.sort()
             tmp_im = dsa.import_from_image(filepaths[0], dtype=np.uint8,
                                            cache_infos=False)
         except OSError:
-            self.log.log(f'Could not load images from first image: '
-                         f'{filepaths[0]}', level=3)
+            if log:
+                self.log.log(f'Could not load images from first image: '
+                             f'{filepaths[0]}', level=3)
             return None
         except:
-            self.log.log_unknown_exception()
+            if log:
+                self.log.log_unknown_exception()
             return None
         self.reset_cache()
         self.filepath = filepaths
@@ -1004,7 +1006,7 @@ class DSA_hdd(DSA):
         self.sizey = tmp_im.shape[1]
         return True
 
-    def import_video(self, filepath):
+    def import_video(self, filepath, log=True):
         self.log.log(f'DSA backend: Importing video: {filepath}', level=1)
         try:
             vid = cv2.VideoCapture()
@@ -1013,11 +1015,13 @@ class DSA_hdd(DSA):
             if not success:
                 raise OSError()
         except OSError:
-            self.log.log(f'Could not load video from: '
-                         f'{filepath}', level=3)
+            if log:
+                self.log.log(f'Could not load video from: '
+                             f'{filepath}', level=3)
             return None
         except:
-            self.log.log_unknown_exception()
+            if log:
+                self.log.log_unknown_exception()
             return None
         self.reset_cache()
         self.vid = vid

@@ -53,7 +53,7 @@ class TestGui(object):
         #======================================================================
         # Import video
         pwd = os.path.dirname(os.path.realpath(__file__))
-        self.w.tab1.import_video(None, os.path.join(pwd, 'test.avi'))
+        self.w.tab1.import_file(None, [os.path.join(pwd, 'test.avi')])
         QTest.qWait(self.delay)
         # Crop in time
         self.ui.tab1_spinbox_first.setValue(50+92)
@@ -190,9 +190,9 @@ class TestGui(object):
         # Goto import tab
         self.ui.tabWidget.setCurrentIndex(0)
         QTest.qWait(self.delay)
-        self.w.tab1.import_images(None,
-                                  [os.path.join(pwd, f'test{i+1}.png')
-                                   for i in range(8)])
+        self.w.tab1.import_file(None,
+                                [os.path.join(pwd, f'test{i+1}.png')
+                                 for i in range(8)])
 
         #==============================================================================
         # Just chec if other tab are alright
@@ -217,7 +217,7 @@ class TestGui(object):
         # Goto import tab
         self.ui.tabWidget.setCurrentIndex(0)
         QTest.qWait(self.delay)
-        self.w.tab1.import_image(None, os.path.join(pwd, 'test1.png'))
+        self.w.tab1.import_file(None, [os.path.join(pwd, 'test1.png')])
 
         #==============================================================================
         # Just chec if other tab are alright

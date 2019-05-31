@@ -21,7 +21,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="tabimport">
        <attribute name="title">
@@ -68,32 +68,12 @@
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_3">
               <item>
-               <widget class="QPushButton" name="tab1_import_image_button">
+               <widget class="QPushButton" name="tab1_open_button">
                 <property name="toolTip">
-                 <string>Import a single image (png, jpg, bmp, ...)</string>
+                 <string>Import a file (image, video or image set)</string>
                 </property>
                 <property name="text">
-                 <string>Image</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="tab1_import_images_button">
-                <property name="toolTip">
-                 <string>Import a set of images (need to be sorted in alphabetical order)</string>
-                </property>
-                <property name="text">
-                 <string>Images</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="tab1_import_video_button">
-                <property name="toolTip">
-                 <string>Import a video (avi,mp4,mkv,...)</string>
-                </property>
-                <property name="text">
-                 <string>Video</string>
+                 <string>Open</string>
                 </property>
                </widget>
               </item>
@@ -138,7 +118,7 @@
               <bool>false</bool>
              </property>
              <property name="title">
-              <string>Scaling</string>
+              <string>Scale</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_14">
               <item>
@@ -1579,7 +1559,7 @@
               <bool>false</bool>
              </property>
              <property name="title">
-              <string>Local values</string>
+              <string>Cursor values</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_22">
               <item>
@@ -1719,6 +1699,9 @@
        </layout>
       </widget>
       <widget class="QWidget" name="tabdata">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <attribute name="title">
         <string>Data Table</string>
        </attribute>
@@ -1764,6 +1747,9 @@
              <layout class="QVBoxLayout" name="verticalLayout_30">
               <item>
                <widget class="QPushButton" name="tab5_export_csv_button">
+                <property name="toolTip">
+                 <string>Export all the computed data to a csv text file</string>
+                </property>
                 <property name="text">
                  <string>Export as csv</string>
                 </property>
@@ -1799,6 +1785,9 @@
               </item>
               <item>
                <widget class="QSpinBox" name="tab5_significativ_numbers">
+                <property name="toolTip">
+                 <string>Only affects the datatable display</string>
+                </property>
                 <property name="maximum">
                  <number>1000</number>
                 </property>
@@ -1921,10 +1910,10 @@
  <resources/>
  <connections>
   <connection>
-   <sender>tab1_import_image_button</sender>
+   <sender>tab1_open_button</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>tab1.import_image()</slot>
+   <slot>tab1.import_file()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>114</x>
@@ -1933,22 +1922,6 @@
     <hint type="destinationlabel">
      <x>6</x>
      <y>113</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>tab1_import_video_button</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>tab1.import_video()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>114</x>
-     <y>184</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>5</x>
-     <y>179</y>
     </hint>
    </hints>
   </connection>
@@ -2205,22 +2178,6 @@
     <hint type="destinationlabel">
      <x>7</x>
      <y>107</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>tab1_import_images_button</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>tab1.import_images()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>114</x>
-     <y>155</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>6</x>
-     <y>217</y>
     </hint>
    </hints>
   </connection>
@@ -2882,7 +2839,7 @@
   </connection>
  </connections>
  <slots>
-  <slot>tab1.import_image()</slot>
+  <slot>tab1.import_file()</slot>
   <slot>tab1.import_video()</slot>
   <slot>tab1.set_current_frame(int)</slot>
   <slot>tab1.reset_crop()</slot>

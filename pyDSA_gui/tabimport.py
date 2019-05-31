@@ -118,13 +118,42 @@ class TabImport(Tab):
         pt2 = [9/10*w, 2/3*h]
         self.ui.mplwidgetimport.update_baseline(pt1, pt2)
 
-    def import_image(self, toggle=None, filepath=None):
+    def import_file(self, toggle=None, filepath=None):
+        # Ask for file path
+        if filepath is None:
+            filepath, typ = select_files('Open a file')
+        # Checks
+        if filepath is None:
+            return None
+        if len(filepath) == 0:
+            return None
+        # Images
+        if len(filepath) > 1:
+            success = self.import_images(filepath)
+            return None
+        else:
+            filepath = filepath[0]
+        # Image
+        success = self.import_image(filepath, log=False)
+        # Video
+        if not success:
+            success = self.import_video(filepath, log=False)
+        # Something else
+        if success:
+            # disable data table
+            self.ui.tabdata.setEnabled(False)
+        else:
+            self.log.log("Unrecognized file format", level=3)
+
+        return success
+
+    def import_image(self, filepath=None, log=True):
         if filepath is None:
             # Select image to import
             filepath = select_file('Open image')[0]
         # Import image
         self.app.current_ind = 0
-        success = self.dsa.import_image(filepath)
+        success = self.dsa.import_image(filepath, log=log)
         if success:
             # Disable frame sliders
             self.disable_frame_sliders()
@@ -142,8 +171,9 @@ class TabImport(Tab):
             self.app.tab3.initialized = False
             # initilize stuff from infofile
             self.update_from_infofile()
+        return success
 
-    def import_images(self, toggle=None, filepath=None):
+    def import_images(self, filepath=None, log=True):
         # Select images to import
         if filepath is None:
             filepath = select_files('Open images')[0]
@@ -151,7 +181,7 @@ class TabImport(Tab):
         if len(filepath) == 0:
             return None
         # Import images
-        success = self.dsa.import_images(filepath)
+        success = self.dsa.import_images(filepath, log=log)
         if success:
             # Enable frame sliders
             self.enable_frame_sliders()
@@ -169,13 +199,14 @@ class TabImport(Tab):
             self.app.tab3.initialized = False
             # initilize stuff from infofile
             self.update_from_infofile()
+        return success
 
-    def import_video(self, toggle=None, filepath=None):
+    def import_video(self, filepath=None, log=True):
         # Select video to import
         if filepath is None:
             filepath = select_file('Open video')[0]
         # Import video
-        success = self.dsa.import_video(filepath)
+        success = self.dsa.import_video(filepath, log=log)
         if success:
             # Enable frame sliders
             self.enable_frame_sliders()
@@ -196,6 +227,7 @@ class TabImport(Tab):
             self.app.tab3.initialized = False
             # initilize stuff from infofile
             self.update_from_infofile()
+        return success
 
     def update_from_infofile(self):
         sizey = abs(self.ui.mplwidgetimport.ax.viewLim.height)
