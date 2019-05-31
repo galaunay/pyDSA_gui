@@ -34,11 +34,6 @@ class TabEdges(Tab):
     def enter_tab(self):
         if not self.initialized:
             self.initialize()
-        # Replot
-        im = self.dsa.get_current_precomp_im(self.app.current_ind)
-        self.ui.mplwidgetdetect.update_image(im.values)
-        pt1, pt2 = self.dsa.get_baseline_display_points(self.app.current_ind)
-        self.ui.mplwidgetdetect.update_baseline(pt1, pt2)
         # Update the curent frame
         self._disable_frame_updater = True
         self.ui.tab2_frameslider.setValue(self.app.current_ind + 1)
@@ -50,7 +45,13 @@ class TabEdges(Tab):
         self.ui.tab2_spinbox.setMinimum(cropt[0])
         self.ui.tab2_spinbox.setMaximum(cropt[1])
         # update the detected edge
-        self.update_edge()
+        self.update_edge(blit=False)
+        # Update the baseline
+        pt1, pt2 = self.dsa.get_baseline_display_points(self.app.current_ind)
+        self.ui.mplwidgetdetect.update_baseline(pt1, pt2, blit=False)
+        # Replot Image
+        im = self.dsa.get_current_precomp_im(self.app.current_ind)
+        self.ui.mplwidgetdetect.update_image(im.values, blit=True)
         #
         self.already_opened = True
         self.ui.mplwidgetdetect.tab_opened = True
@@ -119,13 +120,13 @@ class TabEdges(Tab):
                    'size_ratio': self.ui.tab2_size_ratio.value()/100}
         return canny, contour, options
 
-    def update_edge(self, draw=True):
+    def update_edge(self, blit=True):
         try:
             edge = self.dsa.get_current_edge_pts(self.app.current_ind)
         except:
             self.log.log_unknown_exception()
             return None
-        self.ui.mplwidgetdetect.update_edge(edge)
+        self.ui.mplwidgetdetect.update_edge(edge, blit=blit)
 
     def toggle_canny(self, toggle):
         if toggle:

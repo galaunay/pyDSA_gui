@@ -35,22 +35,23 @@ class TabFits(Tab):
     def enter_tab(self):
         if not self.initialized:
             self.initialize()
-        # Update the plot only if necessary
-        im = self.dsa.get_current_precomp_im(self.app.current_ind)
-        self.ui.mplwidgetfit.update_image(im.values)
-        pt1, pt2 = self.dsa.get_baseline_display_points(self.app.current_ind)
-        self.ui.mplwidgetfit.update_baseline(pt1, pt2)
         # Update the curent frame
         self._disable_frame_updater = True
         self.ui.tab3_frameslider.setValue(self.app.current_ind + 1)
         self._disable_frame_updater = False
-        # update the edge fit and baseline
-        self.update_fit()
         # update the 'ignore lower part' slider upper bound
         sizey = abs(self.ui.mplwidgetimport.ax.viewLim.height)
         self.ui.tab3_circle_ymin.setMaximum(sizey)
         self.ui.tab3_ellipse_ymin.setMaximum(sizey)
         self.ui.tab3_ellipses_ymin.setMaximum(sizey)
+        # update the edge fit
+        self.update_fit(blit=False)
+        # Update the baseline
+        pt1, pt2 = self.dsa.get_baseline_display_points(self.app.current_ind)
+        self.ui.mplwidgetfit.update_baseline(pt1, pt2, blit=False)
+        # Update the plot only if necessary
+        im = self.dsa.get_current_precomp_im(self.app.current_ind)
+        self.ui.mplwidgetfit.update_image(im.values, blit=True)
         #
         self.already_opened = True
         self.ui.mplwidgetfit.tab_opened = True
@@ -117,7 +118,7 @@ class TabFits(Tab):
               'sigma': self.ui.tab3_wetting_ridge_sigma.value()/100}
         return circle, ellipse, ellipses, polyline, spline, wr
 
-    def update_fit(self):
+    def update_fit(self, blit=True):
         try:
             fit, fit_center = self.dsa.get_current_fit_pts(self.app.current_ind)
         except:
@@ -128,7 +129,7 @@ class TabFits(Tab):
         except:
             self.log.log_unknown_exception()
             return None
-        self.ui.mplwidgetfit.update_fit_and_cas(fit, fit_center, cas)
+        self.ui.mplwidgetfit.update_fit_and_cas(fit, fit_center, cas, blit=blit)
 
     def _uncheck_others(self, box):
         checks = [b.setChecked(False)

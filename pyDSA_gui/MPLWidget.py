@@ -262,25 +262,29 @@ class MplWidgetDetect(MplWidget):
         self.ax.set_yticks([])
         self.ax.set_yticklabels([])
 
-    def update_image(self, im):
+    def update_image(self, im, blit=True):
         new_data = im.transpose()[::-1]
         if not np.all(new_data.shape == self.data.shape):
             self.need_replot = True
         self.data = new_data
         self.im.set_data(self.data)
+        if blit:
+            self.blit_it()
 
-    def update_baseline(self, pt1, pt2):
+    def update_baseline(self, pt1, pt2, blit=True):
         sizex = abs(self.ax.viewLim.width)
         pt1, pt2 = Baseline.get_baseline_from_points([pt1, pt2],
                                                      xmin=-100*sizex,
                                                      xmax=100*sizex)
         self.baseline.set_data([[pt1[0], pt2[0]],
                                 [pt1[1], pt2[1]]])
-        self.blit_it()
+        if blit:
+            self.blit_it()
 
-    def update_edge(self, edge):
+    def update_edge(self, edge, blit=True):
         self.edge.set_data(*edge)
-        self.blit_it()
+        if blit:
+            self.blit_it()
 
     def blit_it(self):
         if not self.tab_opened:
@@ -353,23 +357,26 @@ class MplWidgetFit(MplWidget):
         self.ax.set_yticks([])
         self.ax.set_yticklabels([])
 
-    def update_image(self, im):
+    def update_image(self, im, blit=True):
         new_data = im.transpose()[::-1]
         if not np.all(new_data.shape == self.data.shape):
             self.need_replot = True
         self.data = new_data
         self.im.set_data(self.data)
+        if blit:
+            self.blit_it()
 
-    def update_baseline(self, pt1, pt2):
+    def update_baseline(self, pt1, pt2, blit=True):
         sizex = abs(self.ax.viewLim.width)
         pt1, pt2 = Baseline.get_baseline_from_points([pt1, pt2],
                                                      xmin=-100*sizex,
                                                      xmax=100*sizex)
         self.baseline.set_data([[pt1[0], pt2[0]],
                                 [pt1[1], pt2[1]]])
-        self.blit_it()
+        if blit:
+            self.blit_it()
 
-    def update_fit_and_cas(self, fit, fit_center, cas):
+    def update_fit_and_cas(self, fit, fit_center, cas, blit=True):
         # fit
         if fit_center is None:
             fit_center = [[0], [0]]
@@ -379,7 +386,8 @@ class MplWidgetFit(MplWidget):
         ca1, ca2 = cas
         self.ca_r.set_data(*ca1)
         self.ca_l.set_data(*ca2)
-        self.blit_it()
+        if blit:
+            self.blit_it()
 
     def blit_it(self):
         if not self.tab_opened:
