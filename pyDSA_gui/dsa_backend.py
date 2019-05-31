@@ -302,6 +302,8 @@ class DSA(object):
             return [[-999, -998], [-999, -998]], np.array([[-999], [-999]])
         # Get fit pts and center
         if self.fit_method in ['circle', 'ellipse']:
+            if fit.fits is None:
+                return [[-999, -998], [-999, -998]], np.array([[-999], [-999]])
             fit_center = fit.fits[0].copy()
         elif self.fit_method in ['wetting ridge']:
             fit_center = []
@@ -1272,7 +1274,7 @@ class DSA_hdd(DSA):
                 self.app.globalapp.processEvents()
                 if self.stop:
                     fit = fits[-1]
-                    fit.fits = [None]*len(fit.fits)
+                    fit.fits = None
                     fit.thetas = None
                 else:
                     fit = self.get_current_fit(ind)
