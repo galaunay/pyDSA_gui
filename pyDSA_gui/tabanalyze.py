@@ -81,6 +81,8 @@ class TabAnalyze(Tab):
             self.initialize()
         # Compute fits
         self.dsa.compute_fits()
+        # Enable data table
+        self.ui.tabdata.setEnabled(True)
         # plot
         self.update_plot()
 
