@@ -1270,14 +1270,14 @@ class DSA_hdd(DSA):
             fits = [self.get_current_fit(0)]*2
             ts = [0, 1]
         else:
-            for i, ind in enumerate(np.arange(ff, lf, N)):
+            for i, ind in enumerate(np.arange(ff, lf+1, N)):
                 self.app.globalapp.processEvents()
                 if self.stop:
                     fit = fits[-1]
                     fit.fits = None
                     fit.thetas = None
                 else:
-                    fit = self.get_current_fit(ind)
+                    fit = self.get_current_fit(ind-1)
                 fits.append(fit)
                 ts.append(ind*dt)
                 hook(i, int((lf - ff)/N))

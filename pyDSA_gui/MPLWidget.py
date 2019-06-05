@@ -487,7 +487,7 @@ class MplWidgetAnalyze(MplWidget):
             self.vertical_line.finish_drag()
             self.vertical_line.unselect_hand()
 
-    def update_plots(self, x, y, y2, y_orig, y2_orig,
+    def update_plots(self, x, y, y2, y_orig, y2_orig, current_x,
                      xname, yname, y2name, same_y_lims=False,
                      draw=True, replot=False):
         # check
@@ -543,8 +543,7 @@ class MplWidgetAnalyze(MplWidget):
         # Update limits
         self.update_lims(x, y, y2, y_orig, y2_orig, samelims=same_y_lims)
         # Update the vertical line position
-        if len(x) > 1:
-            self.vertical_line.update_line_pos((np.max(x) + np.min(x))/2)
+        self.vertical_line.update_line_pos(current_x)
         # Update labels
         self.ax.set_xlabel(xname)
         self.ax.set_ylabel(yname)

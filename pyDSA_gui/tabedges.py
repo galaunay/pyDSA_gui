@@ -80,6 +80,8 @@ class TabEdges(Tab):
         self.update_edge()
 
     def enable_frame_sliders(self):
+        # Preserve current ind
+        current_ind = self.app.current_ind
         self._disable_frame_updater = True
         cropt = self.app.tab1.get_params('cropt')
         self.ui.tab2_frameslider.setMinimum(cropt[0])
@@ -88,8 +90,8 @@ class TabEdges(Tab):
         self.ui.tab2_spinbox.setMaximum(cropt[1])
         self.ui.tab2_frameslider.setEnabled(True)
         self.ui.tab2_spinbox.setEnabled(True)
-        self.ui.tab2_frameslider.setValue(self.app.current_ind)
-        self.ui.tab2_spinbox.setValue(self.app.current_ind)
+        self.ui.tab2_frameslider.setValue(current_ind)
+        self.ui.tab2_spinbox.setValue(current_ind)
         for widg in [self.ui.tab2_label_frame,
                      self.ui.tab2_spinbox,
                      self.ui.tab2_frameslider]:

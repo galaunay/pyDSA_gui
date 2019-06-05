@@ -81,6 +81,8 @@ class TabFits(Tab):
         self.update_fit()
 
     def enable_frame_sliders(self):
+        # Preserve current ind
+        current_ind = self.app.current_ind
         self._disable_frame_updater = True
         cropt = self.app.tab1.get_params('cropt')
         self.ui.tab3_frameslider.setMinimum(cropt[0])
@@ -89,8 +91,8 @@ class TabFits(Tab):
         self.ui.tab3_spinbox.setMaximum(cropt[1])
         self.ui.tab3_frameslider.setEnabled(True)
         self.ui.tab3_spinbox.setEnabled(True)
-        self.ui.tab3_frameslider.setValue(self.app.current_ind)
-        self.ui.tab3_spinbox.setValue(self.app.current_ind)
+        self.ui.tab3_frameslider.setValue(current_ind)
+        self.ui.tab3_spinbox.setValue(current_ind)
         for widg in [self.ui.tab3_label_frame,
                      self.ui.tab3_spinbox,
                      self.ui.tab3_frameslider]:

@@ -86,6 +86,12 @@ class TabAnalyze(Tab):
         # plot
         self.update_plot()
 
+    def leave_tab(self):
+        self.app.current_ind = \
+            int(np.round(self.ui.mplwidgetanalyze.vertical_line.pt[0])) - 1
+        print(f"ANALYZE: Setting current frame number to {self.app.current_ind + 1}")
+        return True
+
     def get_params(self, arg=None):
         dic = {}
         # number of frames
@@ -222,9 +228,13 @@ class TabAnalyze(Tab):
             if yaxis.startswith(sname) and yaxis2.startswith(sname):
                 sameylims = True
                 break
-        #
+        # Get current frame number
+        fn, _, _ = self.dsa.get_plotable_quantity("Frame number")
+        current_x = fn[np.argmin(abs(fn - (self.app.current_ind + 1)))]
+        # Update
         self.ui.mplwidgetanalyze.update_plots(x, y, y2,
                                               y_orig, y2_orig,
+                                              current_x=current_x,
                                               xname=xname,
                                               yname=yname,
                                               y2name=yname2,
