@@ -21,7 +21,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>4</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tabimport">
        <attribute name="title">
@@ -928,6 +928,9 @@
              <property name="checkable">
               <bool>true</bool>
              </property>
+             <property name="checked">
+              <bool>false</bool>
+             </property>
              <layout class="QVBoxLayout" name="verticalLayout_16">
               <item>
                <widget class="QLabel" name="label_21">
@@ -973,7 +976,7 @@
               <bool>true</bool>
              </property>
              <property name="checked">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_26">
               <item>

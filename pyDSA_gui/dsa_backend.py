@@ -85,11 +85,11 @@ class DSA(object):
         self.edge_cache_params = [None]*3
         self.edge_cache_method = None
         # Fit
-        self.fit_method = 'ellipse'
+        self.fit_method = 'ellipses'
         self.fits = None
         self.fit_cache = []
         self.fit_cache_params = [None]*3
-        self.fit_cache_method = 'ellipse'
+        self.fit_cache_method = 'ellipses'
         # Plottable quantities
         self.plottable_quantity_cache = {}
 
