@@ -76,9 +76,9 @@ class TabFits(Tab):
             return None
         # update image
         im = self.dsa.get_current_precomp_im(self.app.current_ind)
-        self.ui.mplwidgetfit.update_image(im.values)
+        self.ui.mplwidgetfit.update_image(im.values, blit=False)
         # update fit
-        self.update_fit()
+        self.update_fit(blit=True)
 
     def enable_frame_sliders(self):
         # Preserve current ind

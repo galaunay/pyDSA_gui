@@ -89,7 +89,6 @@ class TabAnalyze(Tab):
     def leave_tab(self):
         self.app.current_ind = \
             int(np.round(self.ui.mplwidgetanalyze.vertical_line.pt[0])) - 1
-        print(f"ANALYZE: Setting current frame number to {self.app.current_ind + 1}")
         return True
 
     def get_params(self, arg=None):

@@ -73,11 +73,9 @@ class TabEdges(Tab):
             return None
         # update image
         im = self.dsa.get_current_precomp_im(self.app.current_ind)
-        self.ui.mplwidgetdetect.update_image(im.values)
+        self.ui.mplwidgetdetect.update_image(im.values, blit=False)
         # update edge
-        # TODO: replotting the edge markers for each frame take time,
-        #       It may be a better idea to use imshow to display edges
-        self.update_edge()
+        self.update_edge(blit=True)
 
     def enable_frame_sliders(self):
         # Preserve current ind
