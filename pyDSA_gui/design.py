@@ -709,7 +709,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_27.addWidget(self.label_2)
         self.tab5_significativ_numbers = QtWidgets.QSpinBox(self.tab5_number_format_box)
         self.tab5_significativ_numbers.setMaximum(1000)
-        self.tab5_significativ_numbers.setProperty("value", 6)
+        self.tab5_significativ_numbers.setProperty("value", 3)
         self.tab5_significativ_numbers.setObjectName("tab5_significativ_numbers")
         self.verticalLayout_27.addWidget(self.tab5_significativ_numbers)
         self.verticalLayout_28.addWidget(self.tab5_number_format_box)
