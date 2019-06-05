@@ -230,7 +230,10 @@ class TabAnalyze(Tab):
                 break
         # Get current frame number
         fn, _, _ = self.dsa.get_plotable_quantity("Frame number")
-        current_x = fn[np.argmin(abs(fn - (self.app.current_ind + 1)))]
+        if len(fn) > 1:
+            current_x = fn[np.argmin(abs(fn - (self.app.current_ind + 1)))]
+        else:
+            current_x = None
         # Update
         self.ui.mplwidgetanalyze.update_plots(x, y, y2,
                                               y_orig, y2_orig,

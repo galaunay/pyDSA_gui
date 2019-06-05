@@ -372,7 +372,7 @@ class DSA(object):
         # fits should be computed already...
         if self.fits is None:
             self.log.log('Fit need to be computed first', level=3)
-            return [], [], ""
+            return np.array([]), np.array([]), ""
         # check if already cached !
         cache_name = f"{quant}_smooth{smooth}"
         try:
@@ -494,6 +494,8 @@ class DSA(object):
                 vals = np.concatenate((vals, vals))
                 vals_ori = np.concatenate((vals_ori, vals_ori))
         # store computed values
+        vals = np.asarray(vals)
+        vals_ori = np.asarray(vals_ori)
         self.plottable_quantity_cache[cache_name] = vals, vals_ori, unit
         # return
         return vals, vals_ori, unit
