@@ -142,7 +142,8 @@ class TabAnalyze(Tab):
 
     def clean_plot(self):
         self.ui.mplwidgetanalyze.update_plots(
-            [], [], [], [], [], xname="", yname="", y2name="",
+            [], [], [], [], [], current_x=None,
+            xname="", yname="", y2name="",
             replot=False, draw=True)
 
     def update_plot(self, index=0, replot=False, draw=True):

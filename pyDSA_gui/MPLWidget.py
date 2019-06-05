@@ -543,7 +543,8 @@ class MplWidgetAnalyze(MplWidget):
         # Update limits
         self.update_lims(x, y, y2, y_orig, y2_orig, samelims=same_y_lims)
         # Update the vertical line position
-        self.vertical_line.update_line_pos(current_x)
+        if current_x is not None:
+            self.vertical_line.update_line_pos(current_x)
         # Update labels
         self.ax.set_xlabel(xname)
         self.ax.set_ylabel(yname)
