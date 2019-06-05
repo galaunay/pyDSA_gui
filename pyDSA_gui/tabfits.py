@@ -39,6 +39,12 @@ class TabFits(Tab):
         self._disable_frame_updater = True
         self.ui.tab3_frameslider.setValue(self.app.current_ind + 1)
         self._disable_frame_updater = False
+        # Update the first and last frames
+        cropt = self.app.tab1.get_params('cropt')
+        self.ui.tab3_frameslider.setMinimum(cropt[0])
+        self.ui.tab3_frameslider.setMaximum(cropt[1])
+        self.ui.tab3_spinbox.setMinimum(cropt[0])
+        self.ui.tab3_spinbox.setMaximum(cropt[1])
         # update the 'ignore lower part' slider upper bound
         sizey = abs(self.ui.mplwidgetimport.ax.viewLim.height)
         self.ui.tab3_circle_ymin.setMaximum(sizey)
