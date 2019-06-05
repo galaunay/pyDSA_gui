@@ -486,6 +486,7 @@ class MplWidgetAnalyze(MplWidget):
         if self.vertical_line.is_dragging():
             self.vertical_line.finish_drag()
             self.vertical_line.unselect_hand()
+            self.app.current_ind = int(np.round(self.vertical_line.pt[0])) - 1
 
     def update_plots(self, x, y, y2, y_orig, y2_orig, current_x,
                      xname, yname, y2name, same_y_lims=False,

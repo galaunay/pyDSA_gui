@@ -86,11 +86,6 @@ class TabAnalyze(Tab):
         # plot
         self.update_plot()
 
-    def leave_tab(self):
-        self.app.current_ind = \
-            int(np.round(self.ui.mplwidgetanalyze.vertical_line.pt[0])) - 1
-        return True
-
     def get_params(self, arg=None):
         dic = {}
         # number of frames

@@ -83,6 +83,7 @@ class AppWindow(QMainWindow):
         self.ui.setupUi(self)
         # Add missing links
         self.ui.mplwidgetanalyze.ui = self.ui
+        self.ui.mplwidgetanalyze.app = self
         # Initialize progressbar
         self.init_progressbar()
         # Always start from the first tab
