@@ -23,7 +23,7 @@ with open(path.join(here, "README.md"), "r") as fh:
 
 setup(
     name='pyDSA_gui',
-    version='1.2.4',
+    version='1.2.5',
     description='GUI for pyDSA_core',
     long_description=long_description,
     long_description_content_type='text/markdown',
