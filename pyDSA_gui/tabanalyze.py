@@ -224,13 +224,16 @@ class TabAnalyze(Tab):
                 sameylims = True
                 break
         # Get current value of x from current frame number
-        fn, _, _ = self.dsa.get_plotable_quantity("Frame number")
         current_x = None
-        if len(fn) > 1:
-            current_fn = np.argmin(abs(fn - (self.app.current_ind + 1)))
-            current_x = x[current_fn]
-        if np.isnan(current_x):
-            current_x = None
+        try:
+            fn, _, _ = self.dsa.get_plotable_quantity("Frame number")
+            if len(fn) > 1:
+                current_fn = np.argmin(abs(fn - (self.app.current_ind + 1)))
+                current_x = x[current_fn]
+                if np.isnan(current_x):
+                    current_x = None
+        except:
+            self.log.log_unknown_exception()
         # Update
         self.ui.mplwidgetanalyze.update_plots(x, y, y2,
                                               y_orig, y2_orig,

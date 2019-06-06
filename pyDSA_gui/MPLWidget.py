@@ -545,9 +545,12 @@ class MplWidgetAnalyze(MplWidget):
         # Update limits
         self.update_lims(x, y, y2, y_orig, y2_orig, samelims=same_y_lims)
         # Update the vertical line position
-        if current_x is None:
-            current_x = (np.nanmax(x) + np.nanmin(x))/2
-        self.vertical_line.update_line_pos(current_x)
+        try:
+            if current_x is None and len(x) > 0:
+                current_x = (np.nanmax(x) + np.nanmin(x))/2
+            self.vertical_line.update_line_pos(current_x)
+        except:
+            self.log.log_unknown_exception()
         # Update labels
         self.ax.set_xlabel(xname)
         self.ax.set_ylabel(yname)

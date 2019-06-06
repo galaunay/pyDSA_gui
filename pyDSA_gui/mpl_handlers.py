@@ -375,6 +375,10 @@ class VerticalLineHandler(Handler):
 
     def update_line_pos(self, x):
         # update
+        if x is None:
+            return None
+        if np.isnan(x):
+            return None
         self.pt[0] = x
         self.pt[1] = np.mean(self.ax.get_ylim())
         self.update_hands()
