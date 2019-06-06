@@ -23,7 +23,7 @@ with open(path.join(here, "README.md"), "r") as fh:
 
 setup(
     name='pyDSA_gui',
-    version='1.2.0',
+    version='1.2.1',
     description='GUI for pyDSA_core',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -41,7 +41,7 @@ setup(
     ],
     keywords='GUI DSA drop shape contact angle hysteresis',
     packages=find_packages(exclude=['contrib', 'docs', 'tests', 'samples']),
-    install_requires=['pyQt5', 'pyDSA_core==1.2.0', 'IMTreatment==1.2.0',
+    install_requires=['pyQt5', 'pyDSA_core==1.2.1', 'IMTreatment==1.2.1',
                       'numpy', 'matplotlib>=2.2.0'],
     extras_require={},
     setup_requires=['pytest-runner'],
