@@ -223,10 +223,11 @@ class TabAnalyze(Tab):
             if yaxis.startswith(sname) and yaxis2.startswith(sname):
                 sameylims = True
                 break
-        # Get current frame number
+        # Get current value of x from current frame number
         fn, _, _ = self.dsa.get_plotable_quantity("Frame number")
         if len(fn) > 1:
-            current_x = fn[np.argmin(abs(fn - (self.app.current_ind + 1)))]
+            current_fn = np.argmin(abs(fn - (self.app.current_ind + 1)))
+            current_x = x[current_fn]
         else:
             current_x = None
         # Update

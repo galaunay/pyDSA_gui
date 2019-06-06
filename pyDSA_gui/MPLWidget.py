@@ -439,6 +439,7 @@ class MplWidgetAnalyze(MplWidget):
         self.ax3.set_yticks([])
         # plots
         self.current_x = []
+        self.current_xname = None
         self.current_y = []
         self.current_y2 = []
         self.plot1 = None
@@ -486,7 +487,6 @@ class MplWidgetAnalyze(MplWidget):
         if self.vertical_line.is_dragging():
             self.vertical_line.finish_drag()
             self.vertical_line.unselect_hand()
-            self.app.current_ind = int(np.round(self.vertical_line.pt[0])) - 1
 
     def update_plots(self, x, y, y2, y_orig, y2_orig, current_x,
                      xname, yname, y2name, same_y_lims=False,
@@ -503,6 +503,7 @@ class MplWidgetAnalyze(MplWidget):
             self.canvas.draw()
         # store
         self.current_x = x
+        self.current_xname = xname
         self.current_y = y
         self.current_y2 = y2
         # check
@@ -658,6 +659,10 @@ class MplWidgetAnalyze(MplWidget):
             if not np.isnan(y2i):
                 y2i_t = f"{y2i:.4f}"
         self.ui.tab4_local_y2_value.setText(y2i_t)
+        # Update the current indice
+        current_x = self.vertical_line.pt[0]
+        ind = np.argmin(abs(current_x - x))*self.ui.tab4_set_N.value()
+        self.app.current_ind = ind
 
     @staticmethod
     def linear_interp(x1, x2, y1, y2, x):
