@@ -483,7 +483,14 @@ class DSA(object):
             vals, unit = [], ""
         # Smooth if asked
         if smooth != 0:
-            smoothed_vals = ndimage.gaussian_filter(vals, smooth, mode='nearest')
+            nans = np.isnan(vals)
+            if np.any(nans):
+                inds = np.arange(len(vals))
+                vals[nans] = np.interp(inds[nans], inds[~nans], vals[~nans])
+            smoothed_vals = ndimage.gaussian_filter(vals, smooth,
+                                                    mode='nearest')
+            smoothed_vals[nans] = np.nan
+            vals[nans] = np.nan
             vals_ori = vals
             vals = smoothed_vals
         else:
