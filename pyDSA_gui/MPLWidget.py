@@ -545,8 +545,9 @@ class MplWidgetAnalyze(MplWidget):
         # Update limits
         self.update_lims(x, y, y2, y_orig, y2_orig, samelims=same_y_lims)
         # Update the vertical line position
-        if current_x is not None:
-            self.vertical_line.update_line_pos(current_x)
+        if current_x is None:
+            current_x = (np.nanmax(x) + np.nanmin(x))/2
+        self.vertical_line.update_line_pos(current_x)
         # Update labels
         self.ax.set_xlabel(xname)
         self.ax.set_ylabel(yname)
@@ -621,17 +622,33 @@ class MplWidgetAnalyze(MplWidget):
         yi = None
         y2i = None
         if len(self.current_x) != 0:
-            indx = np.argwhere(self.current_x > xi)
-            if len(indx) != 0:
-                indx = indx[0]
-                if len(indx) < 2:
-                    indx = indx[0]
-                    yi = self.linear_interp(x[indx - 1], x[indx],
-                                            y[indx - 1], y[indx],
-                                            xi)
-                    y2i = self.linear_interp(x[indx - 1], x[indx],
-                                             y2[indx - 1], y2[indx],
-                                             xi)
+            indxs = np.argwhere(np.logical_or(
+                np.logical_and(self.current_x[1::] <= xi,
+                               self.current_x[:-1] >= xi),
+                np.logical_and(self.current_x[1::] >= xi,
+                               self.current_x[:-1] <= xi))).flatten()
+            yis = [self.linear_interp(x[indx], x[indx + 1],
+                                      y[indx], y[indx + 1],
+                                      xi)
+                   for indx in indxs]
+            y2is = [self.linear_interp(x[indx], x[indx + 1],
+                                       y2[indx], y2[indx + 1],
+                                       xi)
+                    for indx in indxs]
+            yis = np.asarray(yis)
+            y2is = np.asarray(y2is)
+            # only keep the one closest to the handler
+            vl_pos = self.vertical_line.pt
+            vl_pos = self.vertical_line.ax.transData.transform(vl_pos)
+            if len(yis) > 0 and not np.all(np.isnan(yis)):
+                yvl = self.ax.transData.inverted().transform(vl_pos)[1]
+                tmpind = np.nanargmin(abs(yis - yvl))
+                yi = yis[tmpind]
+            if len(y2is) > 0 and not np.all(np.isnan(y2is)):
+                yvl = self.ax2.transData.inverted().transform(vl_pos)[1]
+                tmpind = np.nanargmin(abs(y2is - yvl))
+                y2i = y2is[tmpind]
+        #
         # Update the indicators
         if self.indicator1 is not None:
             if xi is not None and yi is not None:
@@ -661,14 +678,15 @@ class MplWidgetAnalyze(MplWidget):
         self.ui.tab4_local_y2_value.setText(y2i_t)
         # Update the current indice
         current_x = self.vertical_line.pt[0]
-        ind = np.argmin(abs(current_x - x))*self.ui.tab4_set_N.value()
-        self.app.current_ind = ind
+        if not np.all(np.isnan(x)):
+            ind = np.nanargmin(abs(current_x - x))*self.ui.tab4_set_N.value()
+            self.app.current_ind = ind
 
     @staticmethod
     def linear_interp(x1, x2, y1, y2, x):
-        if x1 > x:
+        if x < x1 and x < x2:
             return None
-        if x > x2:
+        if x > x2 and x > x1:
             return None
         y = (abs(x1 - x)*y2 + abs(x2 - x)*y1)/abs(x1 - x2)
         return y
