@@ -682,7 +682,9 @@ class MplWidgetAnalyze(MplWidget):
         # Update the current indice
         current_x = self.vertical_line.pt[0]
         if not np.all(np.isnan(x)):
-            ind = np.nanargmin(abs(current_x - x))*self.ui.tab4_set_N.value()
+            fn, _, _ = self.app.dsa.get_plotable_quantity("Frame number")
+            tmpind = np.nanargmin(abs(current_x - x))
+            ind = fn[tmpind] - 1
             self.app.current_ind = ind
 
     @staticmethod
