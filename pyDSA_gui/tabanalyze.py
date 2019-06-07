@@ -128,12 +128,15 @@ class TabAnalyze(Tab):
         self.update_plot(replot=True, draw=False)
         self.already_opened = True
 
+    def compute_all(self):
+        self.ui.tab4_set_N.setValue(1)
+        self.compute()
+
     def enable_options(self):
         self.ui.tab4_xaxis_box.setEnabled(True)
         self.ui.tab4_yaxis_box.setEnabled(True)
         self.ui.tab4_yaxis2_box.setEnabled(True)
         self.ui.tab4_local_values_box.setEnabled(True)
-        self.ui.tab4_run_box.setEnabled(True)
         if self.dsa.nmb_frames > 1:
             self.ui.tab4_run_box.setEnabled(True)
             # self.ui.tab4_set_N.setEnabled(True)
@@ -144,7 +147,6 @@ class TabAnalyze(Tab):
             self.ui.tab4_set_N.setMaximum(self.dsa.nmb_frames)
         else:
             self.ui.tab4_run_box.setEnabled(False)
-            # self.ui.tab4_set_N.setEnabled(False)
 
     def clean_plot(self):
         self.ui.mplwidgetanalyze.update_plots(

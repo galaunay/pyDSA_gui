@@ -369,6 +369,7 @@ class DSA(object):
         precomp_params['dt'] = precomp_params['dt'].asNumber()
         precomp_params['dx'] = precomp_params['dx'].asNumber()
         params = (precomp_params, self.get_edge_params(),
+                  self.edge_detection_method, self.fit_method,
                   self.get_fit_params(), self.get_run_params())
         # freeze evertyhing recursively
         def freeze(o):
