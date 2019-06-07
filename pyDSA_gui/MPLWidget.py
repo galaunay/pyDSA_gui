@@ -488,7 +488,7 @@ class MplWidgetAnalyze(MplWidget):
             self.vertical_line.finish_drag()
             self.vertical_line.unselect_hand()
 
-    def update_plots(self, x, y, y2, y_orig, y2_orig, current_x,
+    def update_plots(self, x, y, y2, y_orig, y2_orig,
                      xname, yname, y2name, same_y_lims=False,
                      draw=True, replot=False):
         # check
@@ -544,13 +544,6 @@ class MplWidgetAnalyze(MplWidget):
             self.ax2.set_visible(False)
         # Update limits
         self.update_lims(x, y, y2, y_orig, y2_orig, samelims=same_y_lims)
-        # Update the vertical line position
-        try:
-            if current_x is None and len(x) > 0:
-                current_x = (np.nanmax(x) + np.nanmin(x))/2
-            self.vertical_line.update_line_pos(current_x)
-        except:
-            self.log.log_unknown_exception()
         # Update labels
         self.ax.set_xlabel(xname)
         self.ax.set_ylabel(yname)
@@ -558,6 +551,29 @@ class MplWidgetAnalyze(MplWidget):
             self.ax2.set_ylabel(y2name)
         else:
             self.ax2.set_ylabel("")
+        # Draw if asked
+        if draw:
+            self.canvas.draw()
+
+    def update_plot_vertical_line(self, ind, draw=True):
+        if self.plot1 is None:
+            return None
+        try:
+            x = self.plot1.get_data()[0]
+            # Find new position
+            if ind is None:
+                current_x = None
+            else:
+                current_x = x[ind]
+                if np.isnan(current_x):
+                    current_x = None
+            # Put the line in the middle if no alid positions
+            if current_x is None and len(x) > 0:
+                current_x = (np.nanmax(x) + np.nanmin(x))/2
+            # Update the line position
+            self.vertical_line.update_line_pos(current_x)
+        except:
+            self.app.log.log_unknown_exception()
         # Draw if asked
         if draw:
             self.canvas.draw()

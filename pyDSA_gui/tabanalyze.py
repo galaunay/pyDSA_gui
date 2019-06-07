@@ -36,6 +36,8 @@ class TabAnalyze(Tab):
         self.ui.tab4_combo_yaxis2.setCurrentIndex(3)
         #
         self.initialized = True
+        #
+        self.params_hash = None
 
     def update_combo_boxes(self):
         self._disable_plot_updater = True
@@ -79,12 +81,22 @@ class TabAnalyze(Tab):
         # initialize if needed
         if not self.initialized:
             self.initialize()
+        # Check if hash changed
+        hashe = self.dsa.get_params_hash()
+        replot = True
+        if self.params_hash is not None:
+            if self.params_hash == hashe:
+                replot = False
+        self.params_hash = hashe
         # Compute fits
-        self.dsa.compute_fits()
+        if replot or self.dsa.fits is None:
+            self.dsa.compute_fits()
         # Enable data table
         self.ui.tabdata.setEnabled(True)
         # plot
-        self.update_plot()
+        if replot:
+            self.update_plot_values(draw=False)
+        self.update_plot_verical_line(draw=True)
 
     def get_params(self, arg=None):
         dic = {}
@@ -113,7 +125,7 @@ class TabAnalyze(Tab):
         # Clear quantity cache
         self.dsa.clear_plottable_quantity_cache()
         #
-        self.update_plot(replot=True, draw=True)
+        self.update_plot(replot=True, draw=False)
         self.already_opened = True
 
     def enable_options(self):
@@ -136,11 +148,15 @@ class TabAnalyze(Tab):
 
     def clean_plot(self):
         self.ui.mplwidgetanalyze.update_plots(
-            [], [], [], [], [], current_x=None,
+            [], [], [], [], [],
             xname="", yname="", y2name="",
             replot=False, draw=True)
 
     def update_plot(self, index=0, replot=False, draw=True):
+        self.update_plot_values(index=index, replot=replot, draw=False)
+        self.update_plot_verical_line()
+
+    def update_plot_values(self, index=0, replot=False, draw=True):
         if not self.initialized or self._disable_plot_updater:
             return None
         # get things to plot
@@ -149,12 +165,11 @@ class TabAnalyze(Tab):
         yaxis = self.ui.tab4_combo_yaxis.currentText()
         ysmooth = self.ui.tab4_smoothy.value()
         try:
-            x, x_orig, unit_x = self.dsa.get_plotable_quantity(xaxis,
-                                                               smooth=xsmooth)
+            x, _, unit_x = self.dsa.get_plotable_quantity(xaxis,
+                                                          smooth=xsmooth)
         except:
             self.log.log_unknown_exception()
             x = []
-            x_orig = []
             unit_x = ""
         try:
             y, y_orig, unit_y = self.dsa.get_plotable_quantity(yaxis,
@@ -223,27 +238,28 @@ class TabAnalyze(Tab):
             if yaxis.startswith(sname) and yaxis2.startswith(sname):
                 sameylims = True
                 break
-        # Get current value of x from current frame number
-        current_x = None
-        try:
-            fn, _, _ = self.dsa.get_plotable_quantity("Frame number")
-            if len(fn) > 1:
-                current_fn = np.argmin(abs(fn - (self.app.current_ind + 1)))
-                current_x = x[current_fn]
-                if np.isnan(current_x):
-                    current_x = None
-        except:
-            self.log.log_unknown_exception()
         # Update
         self.ui.mplwidgetanalyze.update_plots(x, y, y2,
                                               y_orig, y2_orig,
-                                              current_x=current_x,
                                               xname=xname,
                                               yname=yname,
                                               y2name=yname2,
                                               same_y_lims=sameylims,
                                               replot=replot,
                                               draw=draw)
+
+    def update_plot_verical_line(self, draw=True):
+        if not self.initialized or self._disable_plot_updater:
+            return None
+        # Get current value of x from current frame number
+        ind = None
+        try:
+            fn, _, _ = self.dsa.get_plotable_quantity("Frame number")
+            if len(fn) > 1:
+                ind = np.argmin(abs(fn - (self.app.current_ind + 1)))
+        except:
+            self.log.log_unknown_exception()
+        self.ui.mplwidgetanalyze.update_plot_vertical_line(ind, draw=draw)
 
     def toggle_axis2(self, toggle):
         self.use_yaxis2 = toggle

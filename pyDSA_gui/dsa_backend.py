@@ -359,6 +359,27 @@ class DSA(object):
         lines[:, 1] = deltay - lines[:, 1]
         return lines
 
+    def get_params_hash(self):
+        """
+        Return a hash of the computing parameters
+
+        This is intended to check if the params have changed or not.
+        """
+        precomp_params = self.get_precomp_params()
+        precomp_params['dt'] = precomp_params['dt'].asNumber()
+        precomp_params['dx'] = precomp_params['dx'].asNumber()
+        params = (precomp_params, self.get_edge_params(),
+                  self.get_fit_params(), self.get_run_params())
+        # freeze evertyhing recursively
+        def freeze(o):
+            if isinstance(o, dict):
+                return frozenset({k: freeze(v) for k, v in o.items()}.items())
+            if isinstance(o, list) or isinstance(o, np.ndarray) \
+               or isinstance(o, tuple):
+                return tuple([freeze(v) for v in o])
+            return o
+        return hash(freeze(params))
+
     def compute_fits(self):
         raise NotImplementedError
 
