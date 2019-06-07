@@ -503,7 +503,7 @@ class DSA(object):
             self.log.log_unknown_exception()
             vals, unit = [], ""
         # Smooth if asked
-        if smooth != 0:
+        if smooth != 0 and len(vals) > 1 and np.any(~np.isnan(vals)):
             nans = np.isnan(vals)
             isnans = np.any(nans)
             if isnans:
