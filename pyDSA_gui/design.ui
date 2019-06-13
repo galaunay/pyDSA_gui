@@ -21,7 +21,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="tabimport">
        <attribute name="title">
@@ -1771,6 +1771,16 @@
                 </property>
                </widget>
               </item>
+              <item>
+               <widget class="QPushButton" name="tab5_export_xlsx_button">
+                <property name="toolTip">
+                 <string>Export all the computed data to a csv text file</string>
+                </property>
+                <property name="text">
+                 <string>Export as xlsx</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </widget>
            </item>
@@ -1886,7 +1896,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>919</width>
+     <width>972</width>
      <height>20</height>
     </rect>
    </property>
@@ -1932,8 +1942,8 @@
    <slot>tab1.import_file()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>40</x>
-     <y>103</y>
+     <x>51</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>6</x>
@@ -2028,8 +2038,8 @@
    <slot>tab1.set_scaling()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>40</x>
-     <y>105</y>
+     <x>51</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>3</x>
@@ -2092,8 +2102,8 @@
    <slot>tab2.update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>40</x>
-     <y>95</y>
+     <x>51</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>5</x>
@@ -2140,8 +2150,8 @@
    <slot>tab2.update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>45</x>
-     <y>103</y>
+     <x>56</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>4</x>
@@ -2156,8 +2166,8 @@
    <slot>tab2.update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>41</x>
-     <y>103</y>
+     <x>52</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -2204,12 +2214,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>274</x>
-     <y>809</y>
+     <x>163</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
-     <x>391</x>
-     <y>804</y>
+     <x>163</x>
+     <y>94</y>
     </hint>
    </hints>
   </connection>
@@ -2220,8 +2230,8 @@
    <slot>tab3.set_current_frame(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>274</x>
-     <y>809</y>
+     <x>163</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>180</x>
@@ -2236,12 +2246,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>391</x>
-     <y>804</y>
+     <x>163</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
-     <x>274</x>
-     <y>809</y>
+     <x>163</x>
+     <y>94</y>
     </hint>
    </hints>
   </connection>
@@ -2252,8 +2262,8 @@
    <slot>tab3.update_fit()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>148</x>
-     <y>535</y>
+     <x>119</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>3</x>
@@ -2268,8 +2278,8 @@
    <slot>tab3.toggle_spline(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>139</x>
-     <y>504</y>
+     <x>119</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -2284,8 +2294,8 @@
    <slot>tab3.update_fit()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>148</x>
-     <y>493</y>
+     <x>119</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>3</x>
@@ -2300,8 +2310,8 @@
    <slot>tab3.toggle_polyline(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>139</x>
-     <y>411</y>
+     <x>119</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -2316,8 +2326,8 @@
    <slot>tab3.update_fit()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>148</x>
-     <y>400</y>
+     <x>119</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>8</x>
@@ -2332,8 +2342,8 @@
    <slot>tab3.toggle_ellipse(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>139</x>
-     <y>235</y>
+     <x>119</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>6</x>
@@ -2348,8 +2358,8 @@
    <slot>tab3.update_fit()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>148</x>
-     <y>223</y>
+     <x>119</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>3</x>
@@ -2364,8 +2374,8 @@
    <slot>tab3.update_fit()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>148</x>
-     <y>139</y>
+     <x>119</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -2396,8 +2406,8 @@
    <slot>tab4.update_plot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>151</x>
-     <y>407</y>
+     <x>119</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>117</x>
@@ -2412,8 +2422,8 @@
    <slot>tab4.update_plot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>151</x>
-     <y>510</y>
+     <x>119</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>139</x>
@@ -2588,8 +2598,8 @@
    <slot>tab2.update_edge()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>40</x>
-     <y>100</y>
+     <x>51</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>72</x>
@@ -2620,8 +2630,8 @@
    <slot>tab4.update_plot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>151</x>
-     <y>613</y>
+     <x>119</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>282</x>
@@ -2636,8 +2646,8 @@
    <slot>tab4.toggle_axis2(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>139</x>
-     <y>646</y>
+     <x>119</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>159</x>
@@ -2652,8 +2662,8 @@
    <slot>tab4.update_plot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>172</x>
-     <y>438</y>
+     <x>119</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>253</x>
@@ -2668,8 +2678,8 @@
    <slot>tab4.update_plot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>172</x>
-     <y>644</y>
+     <x>119</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>434</x>
@@ -2684,8 +2694,8 @@
    <slot>tab4.update_plot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>172</x>
-     <y>541</y>
+     <x>119</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>567</x>
@@ -2700,8 +2710,8 @@
    <slot>tab4.compute()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>151</x>
-     <y>184</y>
+     <x>119</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>3</x>
@@ -2716,8 +2726,8 @@
    <slot>tab3.toggle_ellipses(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>105</x>
-     <y>319</y>
+     <x>116</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>4</x>
@@ -2732,8 +2742,8 @@
    <slot>tab3.update_fit()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>107</x>
-     <y>307</y>
+     <x>118</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>3</x>
@@ -2748,8 +2758,8 @@
    <slot>tab1.dt_from_video(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>40</x>
-     <y>96</y>
+     <x>51</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>4</x>
@@ -2764,8 +2774,8 @@
    <slot>tab5.export_as_csv()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>151</x>
-     <y>103</y>
+     <x>173</x>
+     <y>126</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
@@ -2780,8 +2790,8 @@
    <slot>tab5.update_data_table()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>151</x>
-     <y>95</y>
+     <x>173</x>
+     <y>248</y>
     </hint>
     <hint type="destinationlabel">
      <x>62</x>
@@ -2796,8 +2806,8 @@
    <slot>tab3.toggle_wetting_ridge(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>85</x>
-     <y>639</y>
+     <x>96</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -2812,8 +2822,8 @@
    <slot>tab3.update_fit()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>136</x>
-     <y>661</y>
+     <x>119</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -2828,8 +2838,8 @@
    <slot>tab3.update_fit()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>108</x>
-     <y>619</y>
+     <x>119</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>4</x>
@@ -2844,8 +2854,8 @@
    <slot>tab1.zoom_to_area(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>40</x>
-     <y>104</y>
+     <x>51</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>1</x>
@@ -2860,12 +2870,28 @@
    <slot>tab4.compute_all()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>107</x>
-     <y>252</y>
+     <x>118</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>5</x>
      <y>211</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab5_export_xlsx_button</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tab5.export_as_xlsx()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>90</x>
+     <y>146</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>3</x>
+     <y>163</y>
     </hint>
    </hints>
   </connection>

@@ -183,6 +183,13 @@ class TestGui(object):
         # Set number of frames to take
         self.ui.tab5_significativ_numbers.setValue(10)
         QTest.qWait(self.delay)
+        # Try exporting
+        self.w.tab5.export_as_csv(None, filepath="./test.csv")
+        self.w.tab5.export_as_xlsx(None, filepath="./test.xlsx")
+        QTest.qWait(self.delay)
+        os.remove("./test.csv")
+        os.remove("./test.xlsx")
+
 
         #==============================================================================
         # Back to TAB 1 to import images

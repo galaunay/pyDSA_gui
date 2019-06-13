@@ -58,39 +58,73 @@ class TabData(Tab):
         self.ui.tab5_export_box.setEnabled(True)
         self.ui.tab5_number_format_box.setEnabled(True)
 
-    def export_as_csv(self, toggle):
-        try:
-            # get fiel to save to
+    def _get_data_to_export(self):
+        data = []
+        headers = []
+        for quant in self.app.plottable_quant:
+            val, _, unit = self.dsa.get_plotable_quantity(quant, smooth=0)
+            # check that length matches
+            if len(data) > 0:
+                if len(data[0]) != len(val):
+                    self.log.log(f"Quantity {quant} does not have the right"
+                                 f" length ({len(val)} instead of"
+                                 f" {len(data[0])})", level=3)
+                    continue
+            data.append(list(val))
+            headers.append(f'{quant.replace(",", "")}'
+                           f' [{unit.replace(",", "")}]')
+        data = np.array(data, dtype=float).transpose()
+        return data, headers
+
+    def _get_filepath_to_export(self, filepath, ext):
+        # get fiel to save to
+        if filepath is None:
             filepath = select_new_file("Save as")
-            extension = ".csv"
             if len(filepath) == 0:
                 return None
             filepath = filepath[0]
-            if filepath[0] == "":
-                return None
-            # Add extension
-            if filepath[-len(extension):] != extension:
-                filepath += extension
-            # get data
-            data = []
-            headers = []
-            for quant in self.app.plottable_quant:
-                val, _, unit = self.dsa.get_plotable_quantity(quant, smooth=0)
-                # check that length matches
-                if len(data) > 0:
-                    if len(data[0]) != len(val):
-                        self.log.log(f"Quantity {quant} does not have the right"
-                                     f" length ({len(val)} instead of"
-                                     f" {len(data[0])})", level=3)
-                        continue
-                data.append(list(val))
-                headers.append(f'{quant.replace(",", "")}'
-                               f' [{unit.replace(",", "")}]')
-            data = np.array(data, dtype=float).transpose()
+        if filepath[0] == "":
+            return None
+        # Add extension
+        if filepath[-len(ext):] != ext:
+            filepath += ext
+        # Return
+        return filepath
+
+    def export_as_csv(self, toggle, filepath=None):
+        try:
+            # Get filepath
+            filepath = self._get_filepath_to_export(filepath, ext=".csv")
+            # get and store data
+            data, headers = self._get_data_to_export()
+            date = datetime.now().strftime("%y-%m-%d %I:%M%p")
             np.savetxt(filepath, data, delimiter=', ',
                        header=f"File: {self.dsa.filepath}\n"
-                       f"Analysis date: {datetime.utcnow()}\n"
+                       f"Analysis date: {date}\n"
                        + ", ".join(headers))
-            self.log.log(f"Save data in {filepath}", level=1)
+            self.log.log(f"Saved data in {filepath}", level=1)
+        except:
+            self.log.log_unknown_exception()
+
+    def export_as_xlsx(self, toggle, filepath=None):
+        import xlsxwriter
+        try:
+            # Get filepath
+            filepath = self._get_filepath_to_export(filepath, ext=".xlsx")
+            # get and store data
+            data, headers = self._get_data_to_export()
+            date = datetime.now().strftime("%y-%m-%d %I:%M%p")
+            wb = xlsxwriter.Workbook(filepath, {'nan_inf_to_errors': True})
+            ws = wb.add_worksheet()
+            # write headers
+            ws.write('A1', "File")
+            ws.write('A2', "Analysis date")
+            ws.merge_range('B1:H1', f"{self.dsa.filepath}")
+            ws.merge_range('B2:H2', f"{date}")
+            ws.write_row(2, 0, headers)
+            for i, row in enumerate(data):
+                ws.write_row(i+3, 0, row)
+            wb.close()
+            self.log.log(f"Saved data in {filepath}", level=1)
         except:
             self.log.log_unknown_exception()
