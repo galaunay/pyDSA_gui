@@ -27,6 +27,7 @@ __status__ = "Development"
 
 import sys
 import os
+import argparse
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5 import QtWidgets, QtCore, QtGui
 
@@ -156,11 +157,16 @@ class AppWindow(QMainWindow):
 
 
 def run():
-    app = QApplication(sys.argv)
+    # Parse args
+    description = "Drop shape analyser"
+    argparser = argparse.ArgumentParser(prog="PyDSA",
+                                        description=description)
+    args = argparser.parse_args()
+    # Create apps
+    app = QApplication([""])
     app.setStyle('fusion')
     w = AppWindow(app)
     w.show()
-    # exit()
     sys.exit(app.exec_())
 
 
