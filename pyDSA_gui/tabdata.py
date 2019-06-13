@@ -79,12 +79,9 @@ class TabData(Tab):
     def _get_filepath_to_export(self, filepath, ext):
         # get fiel to save to
         if filepath is None:
-            filepath = select_new_file("Save as")
-            if len(filepath) == 0:
+            filepath, _ = select_new_file("Save as")
+            if filepath == "":
                 return None
-            filepath = filepath[0]
-        if filepath[0] == "":
-            return None
         # Add extension
         if filepath[-len(ext):] != ext:
             filepath += ext
@@ -95,6 +92,8 @@ class TabData(Tab):
         try:
             # Get filepath
             filepath = self._get_filepath_to_export(filepath, ext=".csv")
+            if filepath is None:
+                return None
             # get and store data
             data, headers = self._get_data_to_export()
             date = datetime.now().strftime("%y-%m-%d %I:%M%p")
@@ -111,6 +110,8 @@ class TabData(Tab):
         try:
             # Get filepath
             filepath = self._get_filepath_to_export(filepath, ext=".xlsx")
+            if filepath is None:
+                return None
             # get and store data
             data, headers = self._get_data_to_export()
             date = datetime.now().strftime("%y-%m-%d %I:%M%p")
