@@ -83,7 +83,7 @@ class TabData(Tab):
             if filepath == "":
                 return None
         # Add extension
-        if filepath[-len(ext):] != ext:
+        if '.' not in filepath[-5:-1]:
             filepath += ext
         # Return
         return filepath
