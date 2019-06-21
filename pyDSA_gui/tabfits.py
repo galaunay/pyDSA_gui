@@ -126,7 +126,7 @@ class TabFits(Tab):
               'sigma': self.ui.tab3_wetting_ridge_sigma.value()/100}
         return circle, ellipse, ellipses, polyline, spline, wr
 
-    def update_fit(self, blit=True):
+    def update_fit(self, toggle=True, blit=True):
         try:
             fit, fit_center = self.dsa.get_current_fit_pts(self.app.current_ind)
         except:

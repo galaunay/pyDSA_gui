@@ -120,7 +120,7 @@ class TabEdges(Tab):
                    'size_ratio': self.ui.tab2_size_ratio.value()/100}
         return canny, contour, options
 
-    def update_edge(self, blit=True):
+    def update_edge(self, toggle=False, blit=True):
         try:
             edge = self.dsa.get_current_edge_pts(self.app.current_ind)
         except:
