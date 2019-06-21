@@ -42,13 +42,6 @@ from .tabanalyze import TabAnalyze
 from .tabdata import TabData
 
 
-# TODO: Add export_as_script
-# TODO: Add tests (QT5 tests ?)
-#       - http://johnnado.com/pyqt-qtest-example/
-#       - https://pypi.org/project/pytest-qt/
-# TODO: Add circles fitting for ridge detection
-# TODO: Add keybindings
-# TODO: Make everything asynchroneous
 class AppWindow(QMainWindow):
     def __init__(self, app):
         super().__init__()

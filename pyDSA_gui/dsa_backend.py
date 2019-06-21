@@ -573,7 +573,9 @@ class DSA_mem(DSA):
         return True
 
     def import_images(self, filepaths):
-        self.log.log(f'DSA backend: Importing image set: {filepaths}', level=1)
+        self.log.log(f'DSA backend: Importing {len(filepaths)} '
+                     f'images from folder: {os.path.dirname(filepaths[0])}',
+                     level=1)
         ims = dsa.TemporalImages(filepath=None, cache_infos=False)
         filepaths.sort()
         import_hook = self.get_progressbar_hook('Importing image set',
@@ -1017,7 +1019,14 @@ class DSA_hdd(DSA):
         return success
 
     def import_images(self, filepaths, log=True):
-        self.log.log(f'DSA backend: Importing image set: {filepaths}', level=1)
+        if len(filepaths) == 1:
+            self.log.log(f'DSA backend: Importing image: \'{filepaths[0]}\'',
+                         level=1)
+        else:
+            self.log.log(f'DSA backend: Importing {len(filepaths)} '
+                         f'images from folder:'
+                         f' \'{os.path.dirname(filepaths[0])}\'',
+                         level=1)
         try:
             filepaths.sort()
             tmp_im = dsa.import_from_image(filepaths[0], dtype=np.uint8,
