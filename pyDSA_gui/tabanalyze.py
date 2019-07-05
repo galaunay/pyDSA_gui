@@ -47,6 +47,7 @@ class TabAnalyze(Tab):
                 self.ui.tab4_combo_xaxis.insertItem(100, opts)
             for opts in ['CA (mean)', 'CA (left)', 'CA (right)', 'Base radius',
                          'CL velocity (x, left)', 'CL velocity (x, right)',
+                         'Volume (est.)',
                          'Position (x, center)', 'Position (x, right)',
                          'Position (x, left)']:
                 self.ui.tab4_combo_xaxis.insertItem(100, opts)

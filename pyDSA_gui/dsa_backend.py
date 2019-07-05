@@ -427,6 +427,10 @@ class DSA(object):
             elif quant == 'Position (x, left)':
                 pt1s, _ = self.fits.get_drop_positions()
                 vals, unit = pt1s[:, 0], unit_x
+            elif quant == 'Volume (est.)':
+                vals = self.fits.get_drop_volumes()
+                vals[vals == 0] = np.nan
+                unit = (make_unit(unit_x)**3).strUnit()[1:-1]
             elif quant == 'CL velocity (x, left)':
                 pt1s, _ = self.fits.get_drop_positions()
                 pt1s = pt1s[:, 0]

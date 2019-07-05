@@ -89,6 +89,7 @@ class AppWindow(QMainWindow):
     def plottable_quant(self):
         pq = ['Frame number', 'Time', 'Position (x, right)',
               'CL velocity (x, left)', 'CL velocity (x, right)',
+              'Volume (est.)',
               'Position (x, left)', 'Position (x, center)',
               'CA (right)', 'CA (left)', 'CA (mean)', 'Base radius',
               'Height', 'Area', 'Volume']
