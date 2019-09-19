@@ -60,7 +60,7 @@ bibtex entry:
 
 ## Issues and bugs
 
-If pyDSA_gui crashes or behaves abnormally, you can report [here](https://framagit.org/gabylaunay/pyDSA_gui/issues) or just send me an email at [gaby.launay@northumbria.ac.uk](mailto:gaby.launay@northumbria.ac.uk).
+If pyDSA_gui crashes or behaves abnormally, you can report [here](https://framagit.org/gabylaunay/pyDSA_gui/issues) or just send me an email at [gaby.launay@protonmail.com](mailto:gaby.launay@protonmail.com).
 Any of the followings will greatly help me fix the issue:
 
 - A description of the problem (as detailled as possible, for me to get it)
