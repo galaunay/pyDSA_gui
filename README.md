@@ -24,22 +24,22 @@ Just start PyDSA from the terminal (or anaconda console) with:
 ``pyDSA``
 
 ## Screenshots
-
-Image scaling and pre-processing:
-
+<div>
+Image scaling and pre-processing:<br>
 <img src="doc/screenshot1.png" alt="Import" width="300"/>
-
-Droplet edge detection:
-
+</div>
+<div>
+Droplet edge detection:<br>
 <img src="doc/screenshot2.png" alt="Import" width="300"/>
-
-Droplet edge fitting:
-
+</div>
+<div>
+Droplet edge fitting:<br>
 <img src="doc/screenshot3.png" alt="Import" width="300"/>
-
-Droplets properties evolution after full analysis:
-
+</div>
+<div>
+Droplets properties evolution after full analysis:<br>
 <img src="doc/screenshot4.png" alt="Import" width="300"/>
+</div>
 
 ## Documentation
 
