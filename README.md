@@ -3,47 +3,52 @@
 </div>
 
 
-# pyDSA_gui: Graphical interface for drop shape analysis.
+# Drop shape analysis software with graphical interface.
 
 
-pyDSA_gui is a graphical interface for [pyDSA](https://framagit.org/gabylaunay/pyDSA_core), a drop shape analyzer.
+PyDSA is a software for drop shape analysis. It allows to measure the properties of droplets in contact with solids (contact angle, droplet volume, evaporation rate, displacement velocity, ...)
+PyDSA is developed in Python and use Qt5 for it graphical interface.
 
 ## Installation<a name="installation"></a>
 
 ``pip install pyDSA_gui``
 
-To update pyDSA_gui, use:
+To update PyDSA, use:
 
 ``pip install -U pyDSA_gui``
 
 ## Usage
 
-Just fire up the GUI from the terminal (or anaconda console) with:
+Just start PyDSA from the terminal (or anaconda console) with:
 
 ``pyDSA``
 
-## Mandatory screenshots
+## Screenshots
 
+Image scaling and pre-processing:
 <img src="doc/screenshot1.png" alt="Import" width="300"/>
 
+Droplet edge detection:
 <img src="doc/screenshot2.png" alt="Import" width="300"/>
 
+Droplet edge fitting:
 <img src="doc/screenshot3.png" alt="Import" width="300"/>
 
+Droplets properties evolution after full analysis:
 <img src="doc/screenshot4.png" alt="Import" width="300"/>
 
 ## Documentation
 
-pyDSA_gui is designed to be simple and straightforward to use.
+PyDSA is designed to be simple and straightforward to use.
 If you don't understand the effect of an option,
-please refers to the inline documentation of [pyDSA](https://framagit.org/gabylaunay/pyDSA_core),
+please refers to the inline documentation of [pyDSA_core](https://framagit.org/gabylaunay/pyDSA_core),
 where all the features are documented in details.
 
 ## Citing this software
 
-If PyDSA_core have been usefull for you, please consider citing it:
+If PyDSA have been usefull for you, please consider citing it:
 ```
-Launay G. PyDSA_core: Drop shape analysis in Python, 2018-, https://framagit.org/gabylaunay/pyDSA_core [Online; accessed <today>].
+Launay G. PyDSA: Drop shape analysis in Python, 2018-, https://framagit.org/gabylaunay/pyDSA_core [Online; accessed <today>].
 ```
 
 bibtex entry:
@@ -60,9 +65,9 @@ bibtex entry:
 
 ## Issues and bugs
 
-If pyDSA_gui crashes or behaves abnormally, you can report [here](https://framagit.org/gabylaunay/pyDSA_gui/issues) or just send me an email at [gaby.launay@protonmail.com](mailto:gaby.launay@protonmail.com).
+If pyDSA crashes or behaves abnormally, you can report [here](https://framagit.org/gabylaunay/pyDSA_gui/issues) or just send me an email at [gaby.launay@protonmail.com](mailto:gaby.launay@protonmail.com).
 Any of the followings will greatly help me fix the issue:
 
-- A description of the problem (as detailled as possible, for me to get it)
+- A description of the problem
 - The logs from the terminal
 - A test case to reproduce the problem
