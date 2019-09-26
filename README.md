@@ -69,7 +69,8 @@ bibtex entry:
 
 ## Issues and bugs
 
-If pyDSA crashes or behaves abnormally, you can report [here](https://framagit.org/gabylaunay/pyDSA_gui/issues) or just send me an email at [gaby.launay@protonmail.com](mailto:gaby.launay@protonmail.com).
+PyDSA is hosted on [Framagit](https://framagit.org/gabylaunay/pyDSA_gui).
+If PyDSA crashes or behaves abnormally, you can report [here](https://framagit.org/gabylaunay/pyDSA_gui/issues) or just send me an email at [gaby.launay@protonmail.com](mailto:gaby.launay@protonmail.com).
 Any of the followings will greatly help me fix the issue:
 
 - A description of the problem
