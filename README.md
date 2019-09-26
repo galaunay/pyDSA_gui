@@ -26,15 +26,19 @@ Just start PyDSA from the terminal (or anaconda console) with:
 ## Screenshots
 
 Image scaling and pre-processing:
+
 <img src="doc/screenshot1.png" alt="Import" width="300"/>
 
 Droplet edge detection:
+
 <img src="doc/screenshot2.png" alt="Import" width="300"/>
 
 Droplet edge fitting:
+
 <img src="doc/screenshot3.png" alt="Import" width="300"/>
 
 Droplets properties evolution after full analysis:
+
 <img src="doc/screenshot4.png" alt="Import" width="300"/>
 
 ## Documentation
