@@ -3,10 +3,11 @@
 </div>
 
 
-# Drop shape analysis software with graphical interface.
+# Drop shape analysis software.
 
 
-PyDSA is a software for drop shape analysis. It allows to measure the properties of droplets in contact with solids (contact angle, droplet volume, evaporation rate, displacement velocity, ...).
+PyDSA is a software for drop shape analysis.
+It allows to measure the properties of droplets in contact with solids (contact angle, droplet volume, evaporation rate, displacement velocity, ...) through an intuitive interface.
 PyDSA is developed in Python and use Qt5 for it graphical interface.
 
 ## Installation<a name="installation"></a>
