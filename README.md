@@ -30,14 +30,17 @@ Image scaling and pre-processing:<br>
 <img src="doc/screenshot1.png" alt="Import" width="300"/>
 </div>
 <div>
+<br>
 Droplet edge detection:<br>
 <img src="doc/screenshot2.png" alt="Import" width="300"/>
 </div>
 <div>
+<br>
 Droplet edge fitting:<br>
 <img src="doc/screenshot3.png" alt="Import" width="300"/>
 </div>
 <div>
+<br>
 Droplets properties evolution after full analysis:<br>
 <img src="doc/screenshot4.png" alt="Import" width="300"/>
 </div>
