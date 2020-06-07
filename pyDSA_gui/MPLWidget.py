@@ -26,8 +26,8 @@ __email__ = "gaby.launay@tutanota.com"
 __status__ = "Development"
 
 
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as Canvas
-from matplotlib.backends.backend_qt4 import (
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as Canvas
+from matplotlib.backends.backend_qt5 import (
     NavigationToolbar2QT as MplNavigationBar)
 from PyQt5.QtWidgets import QWidget, QVBoxLayout
 from matplotlib.figure import Figure
