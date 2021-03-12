@@ -192,7 +192,7 @@ class MplWidgetImport(MplWidget):
         if event.inaxes != self.ax:
             return None
         # toolbar want the focus !
-        if self.toolbar._active is not None:
+        if self.toolbar.mode != "":
             return None
         # On a scaling handle
         if self.scaling_hand.select_hand_at_point(event):
@@ -469,7 +469,7 @@ class MplWidgetAnalyze(MplWidget):
         if event.inaxes != self.ax3:
             return None
         # toolbar want the focus !
-        if self.toolbar._active is not None:
+        if self.toolbar.mode != "":
             return None
         #
         if self.vertical_line.select_hand_at_point(event):
