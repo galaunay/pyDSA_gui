@@ -46,7 +46,7 @@ class TabFits(Tab):
         self.ui.tab3_spinbox.setMinimum(cropt[0])
         self.ui.tab3_spinbox.setMaximum(cropt[1])
         # update the 'ignore lower part' slider upper bound
-        sizey = abs(self.ui.mplwidgetimport.ax.viewLim.height)
+        sizey = int(abs(self.ui.mplwidgetimport.ax.viewLim.height))
         self.ui.tab3_circle_ymin.setMaximum(sizey)
         self.ui.tab3_ellipse_ymin.setMaximum(sizey)
         self.ui.tab3_ellipses_ymin.setMaximum(sizey)
@@ -116,9 +116,10 @@ class TabFits(Tab):
         self._disable_frame_updater = False
 
     def get_params(self):
-        circle = {'triple_pts': [[0, self.ui.tab3_circle_ymin.value()]]*2}
-        ellipse = {'triple_pts': [[0, self.ui.tab3_ellipse_ymin.value()]]*2}
-        ellipses = {'triple_pts': [[0, self.ui.tab3_ellipses_ymin.value()]]*2}
+        dx = self.app.tab1.get_params('dx').asNumber()
+        circle = {'triple_pts': [[0, self.ui.tab3_circle_ymin.value()*dx]]*2}
+        ellipse = {'triple_pts': [[0, self.ui.tab3_ellipse_ymin.value()*dx]]*2}
+        ellipses = {'triple_pts': [[0, self.ui.tab3_ellipses_ymin.value()*dx]]*2}
         polyline = {'deg': self.ui.tab3_polyline_deg.value()}
         spline = {'k': self.ui.tab3_spline_deg.value(),
                   's': self.ui.tab3_spline_smooth.value()/100}
