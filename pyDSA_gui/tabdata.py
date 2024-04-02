@@ -76,6 +76,26 @@ class TabData(Tab):
         data = np.array(data, dtype=float).transpose()
         return data, headers
 
+    def _get_edges_to_export(self):
+        data = []
+        headers = ["frame", "time", "x", "y"]
+        for i in len(self.dsa.edges):
+            pass
+        for quant in self.app.plottable_quant:
+            val, _, unit = self.dsa.get_plotable_quantity(quant, smooth=0)
+            # check that length matches
+            if len(data) > 0:
+                if len(data[0]) != len(val):
+                    self.log.log(f"Quantity {quant} does not have the right"
+                                 f" length ({len(val)} instead of"
+                                 f" {len(data[0])})", level=3)
+                    continue
+            data.append(list(val))
+            headers.append(f'{quant.replace(",", "")}'
+                           f' [{unit.replace(",", "")}]')
+        data = np.array(data, dtype=float).transpose()
+        return data, headers
+
     def _get_filepath_to_export(self, filepath, ext):
         # get fiel to save to
         if filepath is None:
@@ -106,6 +126,48 @@ class TabData(Tab):
             self.log.log_unknown_exception()
 
     def export_as_xlsx(self, toggle, filepath=None):
+        import xlsxwriter
+        try:
+            # Get filepath
+            filepath = self._get_filepath_to_export(filepath, ext=".xlsx")
+            if filepath is None:
+                return None
+            # get and store data
+            data, headers = self._get_data_to_export()
+            date = datetime.now().strftime("%y-%m-%d %I:%M%p")
+            wb = xlsxwriter.Workbook(filepath, {'nan_inf_to_errors': True})
+            ws = wb.add_worksheet()
+            # write headers
+            ws.write('A1', "File")
+            ws.write('A2', "Analysis date")
+            ws.merge_range('B1:H1', f"{self.dsa.filepath}")
+            ws.merge_range('B2:H2', f"{date}")
+            ws.write_row(2, 0, headers)
+            for i, row in enumerate(data):
+                ws.write_row(i+3, 0, row)
+            wb.close()
+            self.log.log(f"Saved data in {filepath}", level=1)
+        except:
+            self.log.log_unknown_exception()
+
+    def export_edges_as_csv(self, toggle, filepath=None):
+        try:
+            # Get filepath
+            filepath = self._get_filepath_to_export(filepath, ext=".csv")
+            if filepath is None:
+                return None
+            # get and store data
+            data, headers = self._get_data_to_export()
+            date = datetime.now().strftime("%y-%m-%d %I:%M%p")
+            np.savetxt(filepath, data, delimiter=', ',
+                       header=f"File: {self.dsa.filepath}\n"
+                       f"Analysis date: {date}\n"
+                       + ", ".join(headers))
+            self.log.log(f"Saved data in {filepath}", level=1)
+        except:
+            self.log.log_unknown_exception()
+
+    def export_edges_as_xlsx(self, toggle, filepath=None):
         import xlsxwriter
         try:
             # Get filepath
