@@ -323,29 +323,33 @@ class DSA(object):
         deltay = lims[1][1]
         pts[0] = pts[0]/dx - deltax
         pts[1] = deltay - pts[1]/dx
-        fit_center[0] = fit_center[0]/dx - deltax
-        fit_center[1] = deltay - fit_center[1]/dx
+        fit_center = [[fit_center[0]/dx - deltax],
+                      [deltay - fit_center[1]/dx]]
         return pts, fit_center
 
     def get_current_ca(self, ind):
         # get the fit
         fit = self.get_current_fit(ind)
         if fit is None:
-            return [[np.nan, np.nan], [np.nan, np.nan]]
+            return [[[np.nan], [np.nan]],
+                    [[np.nan], [np.nan]]]
         # No need to recompute contact angles
         if fit.thetas is None:
             try:
                 fit.compute_contact_angle()
             except AttributeError:
-                return [[np.nan, np.nan], [np.nan, np.nan]]
+                return [[[np.nan], [np.nan]],
+                        [[np.nan], [np.nan]]]
             except:
                 self.log.log_unknown_exception()
-                return [[np.nan, np.nan], [np.nan, np.nan]]
+                return [[[np.nan], [np.nan]],
+                        [[np.nan], [np.nan]]]
         if fit.thetas is None:
             self.log.log("Couldn't compute contact angles "
                          "for the current image",
                          level=2)
-            return [[np.nan, np.nan], [np.nan, np.nan]]
+            return [[[np.nan], [np.nan]],
+                    [[np.nan], [np.nan]]]
         # return angles
         lines = fit._get_angle_display_lines()
         lines = lines[0:2]
