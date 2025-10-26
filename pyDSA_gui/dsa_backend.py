@@ -1145,6 +1145,7 @@ class DSA_hdd(DSA):
         else:
             self.log.log("Cannot get the current image... ", level=3)
             im = self.default_image
+        im.values = im.values[:, ::-1]
         # update the cache
         if self.cached_current_ind != ind:
             self.cached_current_precomp_im = None
